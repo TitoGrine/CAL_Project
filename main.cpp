@@ -3,6 +3,9 @@
 #include "Utilities/parser.h"
 #include "Interface/ConsoleFunctions.h"
 #include "Interface/Input.h"
+#include "GraphViewer/graphviewer.h"
+#include "GraphViewer/utilities.h"
+
 
 using namespace std;
 
@@ -91,12 +94,15 @@ void MapMenu()
 
 	option_number = menuInput(" Option ? ", 0, 11);
 	Graph * graph = (Graph *)malloc(sizeof(Graph));
+	GraphViewer * gv = (GraphViewer *)malloc(sizeof(GraphViewer));
 	switch (option_number)
 	{
 	case 1:
 		graph = buildGraph("Aveiro");
 		cout << "\t" << graph->getTopBound() << endl << graph->getLeftBound() << "\t\t\t" << graph->getRightBound() << "\n\t" << graph->getBottomBound() << endl;
-		//gv->rearrange();
+		gv = createGraphViewer(graph);
+		gv->rearrange();
+		getchar();
 		break;
 	case 2:
 		

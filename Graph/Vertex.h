@@ -30,9 +30,12 @@ public:
 	Vertex(long in);
 	bool operator<(Vertex & vertex) const; // // required by MutablePriorityQueue
 	long getInfo() const;
+	double getX() const { return x; };
+	double getY() const { return y; };
 	double getDist() const;
 	double getEuclideanDist(const Vertex *  vertex2) const;
 	Vertex *getPath() const;
+	const vector<Edge> * getAdj() const { return &adj; };
 	friend class Graph;
 	friend class MutablePriorityQueue<Vertex>;
 };
