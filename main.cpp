@@ -1,5 +1,5 @@
 #include <iostream>
-#include "GraphViewer/graphviewer.h"
+#include "Graph/Graph.h"
 #include "Utilities/parser.h"
 #include "Interface/ConsoleFunctions.h"
 #include "Interface/Input.h"
@@ -90,11 +90,12 @@ void MapMenu()
 	std::cout << "   0 - Go back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 11);
-	GraphViewer * gv = (GraphViewer *)malloc(sizeof(GraphViewer));
+	Graph * graph = (Graph *)malloc(sizeof(Graph));
 	switch (option_number)
 	{
 	case 1:
-		gv = buildGraph("Aveiro", 700, 700);
+		graph = buildGraph("Aveiro");
+		cout << "\t" << graph->getTopBound() << endl << graph->getLeftBound() << "\t\t\t" << graph->getRightBound() << "\n\t" << graph->getBottomBound() << endl;
 		//gv->rearrange();
 		break;
 	case 2:

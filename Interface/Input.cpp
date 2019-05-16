@@ -15,7 +15,6 @@ using namespace std;
 */
 bool afterNumber(istringstream & in)
 {
-	int numbers = 0;
 	char ch;
 	if (in.get(ch))
 	{

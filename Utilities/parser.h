@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GraphViewer/graphviewer.h"
+#include "../Graph/Graph.h"
 #include <string.h>
 
-GraphViewer * buildGraph(std::string MapName, int width, int height);
+Graph * buildGraph(std::string MapName);
