@@ -11,6 +11,7 @@
 using namespace std;
 
 void InicialMenu(Graph * graph);
+void MapOperationsMenu(Graph * graph);
 
 /**
 *  +------------------------+
@@ -243,13 +244,14 @@ void PointMenu(Graph * graph, bool initial){
 		break;
 	case 0:
 		system("cls");
-		InicialMenu(graph);
+		MapOperationsMenu(graph);
 		return;
     default:break;
     }
 }
 
 void MapOperationsMenu(Graph * graph){
+	header("MAP OPERATIONS");
 
 	int option_number;
 
@@ -386,11 +388,8 @@ void InicialMenu(Graph * graph)
 	case 3:
 		if(graph == NULL)
 			cout << "\n You must first choose a map\n\n";
-		else{
-			header("MAP OPERATIONS");
+		else
 			MapOperationsMenu(graph);
-		}
-		InicialMenu(graph);
 		break;
 	case 0:
 		system("cls");

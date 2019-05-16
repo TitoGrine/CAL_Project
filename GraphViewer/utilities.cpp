@@ -39,6 +39,7 @@ GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, strin
 void addEdgesToGV(const Graph * graph, GraphViewer * gv){
 	// Edges
 	int edgeID = 0;
+	gv->defineEdgeCurved(false);
 	for(auto i = 0; i < graph->getNumVertex(); i++){
 		Vertex * v = graph->getVertexSet().at(i);
 		for(size_t j = 0; j < v->getAdj()->size(); j++)
