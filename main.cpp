@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "Graph/Graph.h"
 #include "Utilities/parser.h"
 #include "Interface/ConsoleFunctions.h"
@@ -9,7 +10,7 @@
 
 using namespace std;
 
-void InicialMenu();
+void InicialMenu(Graph * graph);
 
 /**
 *  +------------------------+
@@ -69,12 +70,224 @@ void header(const string &header)
 /**
 *  +------------------------+
 *  |                        |
+*  |        DISPLAY         |
+*  |                        |
+*  +------------------------+
+*/
+
+void showGraph(Graph * graph){
+	cout << " Map shown in the GraphViewer" << endl;
+	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW");
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+
+}
+
+//-----------------------------------------------------------------------------------------------------------------------//
+
+void showPointTerminal(Graph * graph, bool initial){
+	Vertex * v;
+	if(initial){
+		if((v = graph->findInitial()) == NULL){
+			cout << "\n There is no initial point to be shown\n\n";
+			return;
+		}
+		cout << "\n Info:\t" << v->getInfo() << "\n X:\t" << v->getX() << "\n Y:\t" << v->getY() << endl;
+		return;
+	}
+	if((v = graph->findFinal()) == NULL){
+		cout << "\n There is no final point to be shown\n\n";
+		return;
+	}
+	cout << "\n Info:\t" << v->getInfo() << "\n X:\t" << v->getX() << "\n Y:\t" << v->getY() << endl;
+}
+
+//-----------------------------------------------------------------------------------------------------------------------//
+
+void showPointGV(Graph * graph, bool initial){
+	Vertex * v;
+	if(initial){
+		if((v = graph->findInitial()) == NULL){
+			cout << "\n There is no initial point to be shown\n\n";
+			return;
+		}
+		cout << " Map shown in the GraphViewer" << endl;
+		GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+		gv->setVertexSize(v->getInfo(), 20);
+		gv->setVertexColor(v->getInfo(), "GREEN");
+		gv->setVertexLabel(v->getInfo(), "Start");
+		gv->rearrange();
+		getchar();
+		gv->closeWindow();
+		return;
+	}
+	if((v = graph->findFinal()) == NULL){
+		cout << "\n There is no final point to be shown\n\n";
+		return;
+	}
+	cout << " Map shown in the GraphViewer" << endl;
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	gv->setVertexSize(v->getInfo(), 20);
+	gv->setVertexColor(v->getInfo(), "RED");
+	gv->setVertexLabel(v->getInfo(), "End");
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+}
+
+//=======================================================================================================================//
+
+/**
+*  +------------------------+
+*  |                        |
+*  |          ADD           |
+*  |                        |
+*  +------------------------+
+*/
+
+void addPoint(Graph * graph, bool initial){
+	string question = initial? " Initial Vertex ID (0 - " :  " Final Vertex ID (0 - ";
+	question += to_string(graph->getNumVertex());
+	question +=  ") ? ";
+	if(initial){
+		if(graph->findInitial() != NULL)
+			cout << "\n There is already a starting point\n\n";
+		else{
+			
+			int initialID =  menuInput(question, 0, graph->getNumVertex() - 1);
+			graph->getVertexSet().at(initialID)->setInitial();
+		}
+		return;
+	}
+	if(graph->findFinal() != NULL)
+		cout << "\n There is already a final point\n\n";
+	else{
+		int finalID =  menuInput(question, 0, graph->getNumVertex() - 1);
+		graph->getVertexSet().at(finalID)->setFinal();
+	}
+}
+
+//=======================================================================================================================//
+
+/**
+*  +------------------------+
+*  |                        |
+*  |         REMOVE         |
+*  |                        |
+*  +------------------------+
+*/
+
+void removePoint(Graph * graph, bool initial){
+	Vertex *v;
+	if(initial){
+		if((v = graph->findInitial()) != NULL)
+			v->removeInitial();
+		else
+			cout << "\n There is no initial point to be removed\n\n";
+		return;
+	}
+	if((v = graph->findFinal()) != NULL)
+		v->removeFinal();
+	else
+		cout << "\n There is no final point to be removed\n\n";
+
+}
+
+//=======================================================================================================================//
+
+/**
+*  +------------------------+
+*  |                        |
 *  |          MENUS         |
 *  |                        |
 *  +------------------------+
 */
 
-void MapMenu()
+// TODO: ver melhor como vai ser a seleção de um ponto
+
+void PointMenu(Graph * graph, bool initial){
+	if(initial)	header("INITIAL POINT");
+	else header("FINAL POINT");
+
+
+	int option_number;
+
+	std::cout << " OPTIONS:" << endl << endl;
+
+	std::cout << "   1 - Add Point" << endl;
+	std::cout << "   2 - Remove Point" << endl;
+	std::cout << "   3 - Show Point Terminal" << endl;
+	std::cout << "   4 - Show Point GraphViewer" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 4);
+
+	switch (option_number)
+	{
+	case 1:
+		addPoint(graph, initial);
+		PointMenu(graph, initial);
+		break;
+	case 2:
+		removePoint(graph, initial);
+		PointMenu(graph, initial);
+		break;
+	case 3:
+		showPointTerminal(graph, initial);
+		PointMenu(graph, initial);
+		break;
+	case 4:
+		showPointGV(graph, initial);
+		PointMenu(graph, initial);
+		break;
+	case 0:
+		system("cls");
+		InicialMenu(graph);
+		return;
+    default:break;
+    }
+}
+
+void MapOperationsMenu(Graph * graph){
+
+	int option_number;
+
+	std::cout << " OPTIONS:" << endl << endl;
+
+	std::cout << "   1 - Initial Point" << endl;
+	std::cout << "   2 - Final Point" << endl;
+	std::cout << "   3 - Test Conectivity" << endl;
+	std::cout << "   4 - Solve Problems" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 4);
+
+	switch (option_number)
+	{
+	case 1:
+		PointMenu(graph, true);
+		break;
+	case 2:
+		PointMenu(graph, false);
+		break;
+	case 3:
+		header("TEST CONNECTIVITY");
+		break;
+	case 4:
+		header("SOLVE PROBLEMS");
+		break;
+	case 0:
+		system("cls");
+		InicialMenu(graph);
+		return;
+    default:break;
+    }
+
+}
+
+
+void MapMenu(Graph * graph)
 {
 	int option_number;
 
@@ -93,57 +306,91 @@ void MapMenu()
 	std::cout << "   0 - Go back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 11);
-	Graph * graph = (Graph *)malloc(sizeof(Graph));
-	GraphViewer * gv = (GraphViewer *)malloc(sizeof(GraphViewer));
 	switch (option_number)
 	{
 	case 1:
 		graph = buildGraph("Aveiro");
-		cout << "\t" << graph->getTopBound() << endl << graph->getLeftBound() << "\t\t\t" << graph->getRightBound() << "\n\t" << graph->getBottomBound() << endl;
-		gv = createGraphViewer(graph);
-		gv->rearrange();
-		getchar();
 		break;
 	case 2:
-		
+		graph = buildGraph("Braga");		
 		break;
 	case 3:
-		
+		graph = buildGraph("Coimbra");		
 		break;
 	case 4:
-		
+		graph = buildGraph("Ermesinde");
 		break;
 	case 5:
-		
+		graph = buildGraph("Fafe");		
+		break;
+	case 6:
+		graph = buildGraph("Gondomar");		
+		break;
+	case 7:
+		graph = buildGraph("Lisboa");		
+		break;
+	case 8:
+		graph = buildGraph("Maia");		
+		break;
+	case 9:
+		graph = buildGraph("Porto");		
+		break;
+	case 10:
+		graph = buildGraph("Portugal");		
+		break;
+	case 11:
+		graph = buildGraph("Viseu");		
 		break;
 	case 0:
-		system("cls");
-		mainHeader("Welcome to the Smart Delivery");
-		InicialMenu();
 		break;
     default:break;
     }
+	system("cls");
+	InicialMenu(graph);
+
 }
 
 //-----------------------------------------------------------------------------------------------------------------------//
 
-void InicialMenu()
+void InicialMenu(Graph * graph)
 {
+	mainHeader("Welcome to the Smart Delivery");
 
 	int option_number;
 
 	std::cout << " OPTIONS:" << endl << endl;
 
 	std::cout << "   1 - Choose Map" << endl;
+	std::cout << "   2 - Show Map" << endl;
+	std::cout << "   3 - Map Operations" << endl;
 	std::cout << "   0 - Exit" << endl << endl;
 
-	option_number = menuInput(" Option ? ", 0, 1);
+	option_number = menuInput(" Option ? ", 0, 3);
 
 	switch (option_number)
 	{
 	case 1:
 		header("CHOOSE MAP");
-		MapMenu();
+		MapMenu(graph);
+		break;
+	case 2:
+		if(graph == NULL)
+			cout << "\n You must first choose a map\n\n";
+		else{
+			header("MAP");
+			showGraph(graph);
+			system("cls");
+		}
+		InicialMenu(graph);
+		break;
+	case 3:
+		if(graph == NULL)
+			cout << "\n You must first choose a map\n\n";
+		else{
+			header("MAP OPERATIONS");
+			MapOperationsMenu(graph);
+		}
+		InicialMenu(graph);
 		break;
 	case 0:
 		system("cls");
@@ -157,10 +404,12 @@ void InicialMenu()
 
 int main() {	
 	system("title   SMART DELIVERY");
-	mainHeader("Welcome to the Smart Delivery");
 
+	Graph * graph = NULL;
 
-	InicialMenu();
+	InicialMenu(graph);
+
+	free(graph);
 
 	return 0;
 }

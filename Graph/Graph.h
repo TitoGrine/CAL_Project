@@ -46,10 +46,13 @@ public:
 	bool addEdge(const long &sourc, const long &dest, double w);
 	int getNumVertex() const;
 	vector<Vertex *> getVertexSet() const;
+
 	double getRightBound() const { return rightBound; };
 	double getLeftBound() const { return leftBound; };
 	double getTopBound() const { return topBound; };
 	double getBottomBound() const { return bottomBound; };
+	Vertex *findInitial() const;
+	Vertex *findFinal() const;
 	
 
 	// Fp05 - single source

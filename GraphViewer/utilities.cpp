@@ -3,15 +3,17 @@
 
 using namespace std;
 
-GraphViewer * createGraphViewer(const Graph * graph){
+GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, string vertexColor){
 	double graphWidth = graph->getRightBound() - graph->getLeftBound();
 	double graphHeight = graph->getTopBound() - graph->getBottomBound();
 
-	// Definir proporção com 1000 de altura
-	int gvHeight = 1000;
+	// Definir proporção com 800 de altura
+	int gvHeight = 800;
 	int gvWidth = max(gvHeight, static_cast<int>(gvHeight * graphWidth / graphHeight));
 	GraphViewer *gv = new GraphViewer(gvWidth, gvHeight, false);
 	gv->createWindow(gvWidth, gvHeight);
+
+	gv->defineVertexColor(vertexColor);
 
 	// Vertex
 	for(auto i = 0; i < graph->getNumVertex(); i++){
@@ -28,8 +30,13 @@ GraphViewer * createGraphViewer(const Graph * graph){
 		newY += (0.025 * gvHeight);
 		
         gv->addNode(v->getInfo(), static_cast<int>(newX), static_cast<int>(gvHeight - newY));
+		gv->setVertexSize(v->getInfo(), vertexSize);
 	}
 
+	return gv;	
+}
+
+void addEdgesToGV(const Graph * graph, GraphViewer * gv){
 	// Edges
 	int edgeID = 0;
 	for(auto i = 0; i < graph->getNumVertex(); i++){
@@ -38,6 +45,10 @@ GraphViewer * createGraphViewer(const Graph * graph){
 			gv->addEdge(edgeID++, v->getInfo(), v->getAdj()->at(j).getDest()->getInfo(), EdgeType::DIRECTED);
 
 	}
+}
 
-	return gv;	
+GraphViewer * createFullGraphViewer(const Graph * graph, int vertexSize, string vertexColor){
+	GraphViewer * gv = createVertexGraphViewer(graph, vertexSize, vertexColor);
+	addEdgesToGV(graph, gv);
+	return gv;
 }

@@ -25,6 +25,20 @@ Vertex * Graph::findVertex(const long &in) const {
 	return nullptr;
 }
 
+Vertex * Graph::findInitial() const {
+	for(auto v: vertexSet)
+		if(v->initial)
+			return v;
+	return nullptr;
+}
+
+Vertex * Graph::findFinal() const {
+	for(auto v: vertexSet)
+		if(v->last)
+			return v;
+	return nullptr;
+}
+
 /*
  * Finds the index of the vertex with a given content.
  */

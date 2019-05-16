@@ -22,6 +22,10 @@ class Vertex {
 	Vertex *path = nullptr;
 	int queueIndex = 0; 		// required by MutablePriorityQueue
 
+	// Deposite and garage identifiers
+	bool initial = false;
+	bool last = false;
+
 	void addEdge(Vertex *dest, double w);
 
 
@@ -34,6 +38,10 @@ public:
 	double getY() const { return y; };
 	double getDist() const;
 	double getEuclideanDist(const Vertex *  vertex2) const;
+	void setInitial() { this->initial = true; };
+	void setFinal() { this->last = true; };
+	void removeInitial() { this->initial = false; };
+	void removeFinal() { this->last = false; };
 	Vertex *getPath() const;
 	const vector<Edge> * getAdj() const { return &adj; };
 	friend class Graph;

@@ -1,5 +1,3 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #include "connection.h"
 
 void myerror(string msg) {
@@ -37,7 +35,7 @@ Connection::Connection(short port) {
 	// Create a socket.
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {
-        printf("Client: socket() - Error at socket(): %ld\n", (long int) WSAGetLastError());
+        printf("Client: socket() - Error at socket(): %d\n", WSAGetLastError());
         WSACleanup();
     }
 
