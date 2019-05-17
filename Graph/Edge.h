@@ -32,6 +32,8 @@ public:
 
 	Vertex *  getOrig() const { return orig; };
 	Vertex *  getDest() const { return dest; };
+
+	void invert();
 	
 };
 

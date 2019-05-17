@@ -88,6 +88,13 @@ bool Graph::addVertex(const long &in, double x, double y){
 	return true;
 }
 
+
+void Graph::invert(){
+	for(auto v: this->vertexSet)
+		for(size_t j = 0; j < v->getAdj()->size(); j++)
+			v->getAdj()->at(j).invert();
+}
+
 /*
  * Adds an edge to a graph (this), given the contents of the source and
  * destination vertices and the edge weight (w).
@@ -121,40 +128,6 @@ Vertex * Graph::initSingleSource(const long &origin) {
 	return s;
 }
 
-/**
- * Analyzes an edge in single source shortest path algorithm.
- * Returns true if the target vertex was relaxed (dist, path).
- * Used by all single-source shortest path algorithms.
- */
-
-inline bool Graph::relax(Vertex *v, Vertex *w, double weight) {
-	if (v->dist + weight < w->dist) {
-		w->dist = v->dist + weight;
-		w->path = v;
-		return true;
-	}
-	else
-		return false;
-}
-
-
-void Graph::dijkstraShortestPath(const long &origin) {
-	auto s = initSingleSource(origin);
-	MutablePriorityQueue<Vertex> q;
-	q.insert(s);
-	while( ! q.empty() ) {
-		auto v = q.extractMin();
-		for(auto e : v->adj) {
-			auto oldDist = e.dest->dist;
-			if (relax(v, e.dest, e.weight)) {
-				if (oldDist == INF)
-					q.insert(e.dest);
-				else
-					q.decreaseKey(e.dest);
-			}
-		}
-	}
-}
 
 
 vector<long> Graph::getPath(const long &origin, const long &dest) const{
@@ -172,7 +145,7 @@ vector<long> Graph::getPath(const long &origin, const long &dest) const{
 	return res;
 }
 
-
+/*
 void Graph::unweightedShortestPath(const long &orig) {
 	auto s = initSingleSource(orig);
 	queue< Vertex* > q;
@@ -198,7 +171,7 @@ void Graph::bellmanFordShortestPath(const long &orig) {
 			if (relax(v, e.dest, e.weight))
 				std::cout << "Negative cycle!" << endl;
 }
-
+*/
 
 /**************** All Pairs Shortest Path  ***************/
 

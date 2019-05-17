@@ -37,13 +37,19 @@ public:
 	double getX() const { return x; };
 	double getY() const { return y; };
 	double getDist() const;
+
+	bool getVisited() const { return this->visited; };
 	double getEuclideanDist(const Vertex *  vertex2) const;
 	void setInitial() { this->initial = true; };
 	void setFinal() { this->last = true; };
+	void setDist(double dist) { this->dist = dist; };
+	void setPath(Vertex * v) { this->path = v; };
 	void removeInitial() { this->initial = false; };
 	void removeFinal() { this->last = false; };
+	void setVisited(bool visited) { this->visited = visited; };
+
 	Vertex *getPath() const;
-	const vector<Edge> * getAdj() const { return &adj; };
+	vector<Edge> * getAdj() { return &adj; };
 	friend class Graph;
 	friend class MutablePriorityQueue<Vertex>;
 };

@@ -27,11 +27,9 @@ class Vertex;
 class Graph {
 	vector<Vertex *> vertexSet;    // vertex set
 
-	double rightBound, leftBound, topBound, bottomBound;
+	double rightBound, leftBound, topBound, bottomBound;	
 
 	// Fp05
-	Vertex * initSingleSource(const long &orig);
-	bool relax(Vertex *v, Vertex *w, double weight);
 	double ** W = nullptr;   // dist
 	int **P = nullptr;   // path
 	int findVertexIdx(const long &in) const;
@@ -53,10 +51,12 @@ public:
 	double getBottomBound() const { return bottomBound; };
 	Vertex *findInitial() const;
 	Vertex *findFinal() const;
+	void invert();
 	
 
 	// Fp05 - single source
-	void dijkstraShortestPath(const long &s);
+	Vertex * initSingleSource(const long &orig);
+
 	void unweightedShortestPath(const long &s);
 	void bellmanFordShortestPath(const long &s);
 	vector<long> getPath(const long &origin, const long &dest) const;
