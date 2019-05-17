@@ -6,9 +6,10 @@
 
 using namespace std;
 
-Graph * buildGraph(string MapName)
+template <class T>
+Graph<MapInfo> * buildGraph(string MapName)
 {
-	Graph * graph = new Graph();
+	Graph<MapInfo> * graph = new Graph<MapInfo>();
 
 	ifstream nodesFile;
 	nodesFile.open("./Maps/" + MapName + "/T04_nodes_X_Y_" + MapName + ".txt");
@@ -33,7 +34,8 @@ Graph * buildGraph(string MapName)
 		getline(nodesFile, line);
 		iss = istringstream(line);
 		iss >> p >> id >> p >> nodeX >> p >> nodeY >> p;
-		graph->addVertex(id, nodeX, nodeY);
+		MapInfo mi(id);
+		graph->addVertex(mi, nodeX, nodeY);
 	}
 	
 	nodesFile.close();
@@ -59,7 +61,12 @@ Graph * buildGraph(string MapName)
 		getline(edgesFile, line);
 		iss = istringstream(line);
 		iss >> p >> pt1 >> p >> pt2 >> p;
-		graph->addEdge(pt1, pt2, graph->findVertex(pt1)->getEuclideanDist(graph->findVertex(pt2)));
+		MapInfo mi1(pt1);
+		MapInfo mi2(pt2);
+		Vertex<T> * v1 = graph->findVertex(mi1);
+		Vertex<T> * v2 = graph->findVertex(mi2);
+	
+		graph->addEdge(v1->getInfo(), v2->getInfo(), v1->getEuclideanDist(v2));
 	}
 
 	edgesFile.close();

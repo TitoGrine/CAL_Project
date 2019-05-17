@@ -2,8 +2,11 @@
 
 #include "Graph.h"
 
-std::vector<Vertex *> dfs(Graph * graph, Vertex * initial);
+template <class T>
+std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
 
-std::vector<Vertex *> scc(Graph * graph, Vertex * initial);
+template <class T>
+std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial);
 
-void dijkstraShortestPath(Graph * graph, const long &s);
+template <class T>
+void dijkstraShortestPath(Graph<T> * graph, const T &s);

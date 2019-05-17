@@ -4,10 +4,14 @@
 #include <string>
 #include "../Graph/Graph.h"
 
-GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, std::string vertexColor);
+template <class T>
+GraphViewer * createVertexGraphViewer(const Graph<T> * graph, int vertexSize, std::string vertexColor);
 
-void addEdgesToGV(const Graph * graph, GraphViewer * gv);
+template <class T>
+void addEdgesToGV(const Graph<T> * graph, GraphViewer * gv);
 
-GraphViewer * createFullGraphViewer(const Graph * graph, int vertexSize, std::string vertexColor);
+template <class T>
+GraphViewer * createFullGraphViewer(const Graph<T> * graph, int vertexSize, std::string vertexColor);
 
-void paintVertexesGV(GraphViewer * gv, int vertexSize, std::string vertexColor, const std::vector<Vertex *> & vertexes);
+template <class T>
+void paintVertexesGV(GraphViewer * gv, int vertexSize, std::string vertexColor, const std::vector<Vertex<T> *> & vertexes);

@@ -13,60 +13,62 @@
 #include "Edge.h"
 #include "../Utilities/MutablePriorityQueue.h"
 
-class Edge;
-class Graph;
-class Vertex;
+template <class T> class Edge;
+template <class T> class Graph;
+template <class T> class Vertex;
 
 #define INF std::numeric_limits<double>::max()
 
 
 /*************************** Graph  **************************/
 
+template <class T>
 class Graph {
-	vector<Vertex *> vertexSet;    // vertex set
+	vector<Vertex<T> *> vertexSet;    // vertex set
 
 	double rightBound, leftBound, topBound, bottomBound;	
 
 	// Fp05
+	Vertex<T> * initSingleSource(const T &orig);
 	double ** W = nullptr;   // dist
 	int **P = nullptr;   // path
-	int findVertexIdx(const long &in) const;
+	int findVertexIdx(const T &in) const;
 
-	priority_queue<Edge> buildHeap();
+	priority_queue<Edge<T>> buildHeap();
 
 
 public:
-	Vertex *findVertex(const long &in) const;
-	bool addVertex(const long &in);
-	bool addVertex(const long &in, double x, double y);
-	bool addEdge(const long &sourc, const long &dest, double w);
+	Vertex<T> *findVertex(const T &in) const;
+	bool addVertex(const T &in, double x, double y);
+	bool addEdge(const T &sourc, const T &dest, double w);
 	int getNumVertex() const;
-	vector<Vertex *> getVertexSet() const;
-
-	double getRightBound() const { return rightBound; };
-	double getLeftBound() const { return leftBound; };
-	double getTopBound() const { return topBound; };
-	double getBottomBound() const { return bottomBound; };
-	Vertex *findInitial() const;
-	Vertex *findFinal() const;
-	Graph invert();
-	
+	vector<Vertex<T> *> getVertexSet() const;
 
 	// Fp05 - single source
-	Vertex * initSingleSource(const long &orig);
-
-	void unweightedShortestPath(const long &s);
-	void bellmanFordShortestPath(const long &s);
-	vector<long> getPath(const long &origin, const long &dest) const;
+	void unweightedShortestPath(const T &s);
+	void bellmanFordShortestPath(const T &s);
+	vector<T> getPath(const T &origin, const T &dest) const;
 
 	// Fp05 - all pairs
 	void floydWarshallShortestPath();
-	vector<long> getfloydWarshallPath(const long &origin, const long &dest) const;
+	vector<T> getfloydWarshallPath(const T &origin, const T &dest) const;
 	~Graph();
 
 	// Fp07 - minimum spanning tree
-	vector<Vertex *> calculatePrim();
-	vector<Vertex *> calculateKruskal();
+	vector<Vertex<T>*> calculatePrim();
+	vector<Vertex<T>*> calculateKruskal();
+
+	double getRightBound() const { return this->rightBound; };
+	double getLeftBound() const { return this->leftBound; };
+	double getTopBound() const { return this->topBound; };
+	double getBottomBound() const { return this->bottomBound; };
+
+	Vertex<T> *findInitial() const;
+	Vertex<T> *findFinal() const;
+	Graph<T> invert();
+	
+
 };
+
 
 #endif /* GRAPH_H_ */

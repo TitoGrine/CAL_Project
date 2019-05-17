@@ -1,9 +1,11 @@
 #include "utilities.h"
 #include <cmath>
+#include "../Utilities/MapInfo.h"
 
 using namespace std;
 
-GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, string vertexColor){
+template <class T>
+GraphViewer * createVertexGraphViewer(const Graph<T> * graph, int vertexSize, string vertexColor){
 	double graphWidth = graph->getRightBound() - graph->getLeftBound();
 	double graphHeight = graph->getTopBound() - graph->getBottomBound();
 
@@ -17,7 +19,7 @@ GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, strin
 
 	// Vertex
 	for(auto i = 0; i < graph->getNumVertex(); i++){
-		Vertex * v = graph->getVertexSet().at(i);
+		Vertex<T> * v = graph->getVertexSet().at(i);
 		// 1º subtrair para por em 0
 		// 2º regra de 3 simples
 		// 3º *0.95 para reduzir um pouco tamanho (nao ir ate bordas mesmo)
@@ -29,34 +31,37 @@ GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, strin
 		newX += (0.025 * gvWidth);
 		newY += (0.025 * gvHeight);
 		
-        gv->addNode(v->getInfo(), static_cast<int>(newX), static_cast<int>(gvHeight - newY));
-		gv->setVertexSize(v->getInfo(), vertexSize);
+        gv->addNode(v->getInfo().getID(), static_cast<int>(newX), static_cast<int>(gvHeight - newY));
+		gv->setVertexSize(v->getInfo().getID(), vertexSize);
 	}
 
 	return gv;	
 }
 
-void addEdgesToGV(const Graph * graph, GraphViewer * gv){
+template <class T>
+void addEdgesToGV(const Graph<T> * graph, GraphViewer * gv){
 	// Edges
 	int edgeID = 0;
 	gv->defineEdgeCurved(false);
 	for(auto i = 0; i < graph->getNumVertex(); i++){
-		Vertex * v = graph->getVertexSet().at(i);
+		Vertex<T> * v = graph->getVertexSet().at(i);
 		for(size_t j = 0; j < v->getAdj()->size(); j++)
-			gv->addEdge(edgeID++, v->getInfo(), v->getAdj()->at(j).getDest()->getInfo(), EdgeType::DIRECTED);
+			gv->addEdge(edgeID++, v->getInfo().getID(), v->getAdj()->at(j).getDest()->getInfo().getID(), EdgeType::DIRECTED);
 
 	}
 }
 
-GraphViewer * createFullGraphViewer(const Graph * graph, int vertexSize, string vertexColor){
+template <class T>
+GraphViewer * createFullGraphViewer(const Graph<T> * graph, int vertexSize, string vertexColor){
 	GraphViewer * gv = createVertexGraphViewer(graph, vertexSize, vertexColor);
 	addEdgesToGV(graph, gv);
 	return gv;
 }
 
-void paintVertexesGV(GraphViewer * gv, int vertexSize, string vertexColor, const vector<Vertex *> & vertexes){
+template <class T>
+void paintVertexesGV(GraphViewer * gv, int vertexSize, string vertexColor, const vector<Vertex<T> *> & vertexes){
 	for(auto v : vertexes){
-		gv->setVertexColor(v->getInfo(), vertexColor);
-		gv->setVertexSize(v->getInfo(), vertexSize);
+		gv->setVertexColor(v->getInfo().getID(), vertexColor);
+		gv->setVertexSize(v->getInfo().getID(), vertexSize);
 	}
 }

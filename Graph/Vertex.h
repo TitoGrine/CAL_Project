@@ -7,50 +7,42 @@
 
 #include <vector>
 #include "Edge.h"
-#include "Vertex.h"
 #include "../Utilities/MutablePriorityQueue.h"
 
-class Edge;
+template <class T> class Edge;
+template <class T> class Graph;
 
+template <class T>
 class Vertex {
-	long info;                // contents
-	vector<Edge> adj;  // outgoing edges
+	T info;                // contents
+	vector<Edge<T> > adj;  // outgoing edges
 	bool visited;          // auxiliary field
 	double dist = 0;
-	double x, y;
-	Vertex *path = nullptr;
+	Vertex<T> *path = NULL;
 	int queueIndex = 0; 		// required by MutablePriorityQueue
 
-	// Deposite and garage identifiers
-	bool initial = false;
-	bool last = false;
+	bool processing = false;
 
-	void addEdge(Vertex *dest, double w);
+	double _x, _y;
 
+	void addEdge(Vertex<T> *dest, double w);
 
 public:
-	Vertex(long in, double x, double y);
-	Vertex(long in);
-	bool operator<(Vertex & vertex) const; // // required by MutablePriorityQueue
-	long getInfo() const;
-	double getX() const { return x; };
-	double getY() const { return y; };
+	Vertex(T in, double x, double y);
+	bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
+	T getInfo() const;
 	double getDist() const;
+	Vertex<T> *getPath() const;
 
-	bool getVisited() const { return this->visited; };
-	double getEuclideanDist(const Vertex *  vertex2) const;
-	void setInitial() { this->initial = true; };
-	void setFinal() { this->last = true; };
-	void setDist(double dist) { this->dist = dist; };
-	void setPath(Vertex * v) { this->path = v; };
-	void setVisited(bool visited) { this->visited = visited; };
-	void removeInitial() { this->initial = false; };
-	void removeFinal() { this->last = false; };
+	double getX() const { return this->_x; };
+	double getY() const { return this->_y; };
 
-	Vertex *getPath() const;
-	vector<Edge> * getAdj() { return &adj; };
-	friend class Graph;
-	friend class MutablePriorityQueue<Vertex>;
+	double getEuclideanDist(const Vertex<T> *  vertex2) const;
+
+
+	friend class Graph<T>;
+	friend class MutablePriorityQueue<Vertex<T>>;
 };
+
 
 #endif

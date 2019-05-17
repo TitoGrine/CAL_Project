@@ -5,36 +5,23 @@
 using namespace std;
 
 
-int Graph::getNumVertex() const {
+template <class T>
+int Graph<T>::getNumVertex() const {
 	return vertexSet.size();
 }
 
-
-vector<Vertex *> Graph::getVertexSet() const {
+template <class T>
+vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 	return vertexSet;
 }
 
 /*
  * Auxiliary function to find a vertex with a given content.
  */
-
-Vertex * Graph::findVertex(const long &in) const {
+template <class T>
+Vertex<T> * Graph<T>::findVertex(const T &in) const {
 	for (auto v : vertexSet)
 		if (v->info == in)
-			return v;
-	return nullptr;
-}
-
-Vertex * Graph::findInitial() const {
-	for(auto v: vertexSet)
-		if(v->initial)
-			return v;
-	return nullptr;
-}
-
-Vertex * Graph::findFinal() const {
-	for(auto v: vertexSet)
-		if(v->last)
 			return v;
 	return nullptr;
 }
@@ -42,8 +29,8 @@ Vertex * Graph::findFinal() const {
 /*
  * Finds the index of the vertex with a given content.
  */
-
-int Graph::findVertexIdx(const long &in) const {
+template <class T>
+int Graph<T>::findVertexIdx(const T &in) const {
 	for (unsigned i = 0; i < vertexSet.size(); i++)
 		if (vertexSet[i]->info == in)
 			return i;
@@ -53,19 +40,11 @@ int Graph::findVertexIdx(const long &in) const {
  *  Adds a vertex with a given content or info (in) to a graph (this).
  *  Returns true if successful, and false if a vertex with that content already exists.
  */
-
-bool Graph::addVertex(const long &in) {
+template <class T>
+bool Graph<T>::addVertex(const T &in, double x, double y) {
+	// TODO: confiar que ele n tem indices repetidos??
 	if (findVertex(in) != nullptr)
 		return false;
-	vertexSet.push_back(new Vertex(in));
-	return true;
-}
-
-
-bool Graph::addVertex(const long &in, double x, double y){
-	// TODO: confiar que ele n tem indices repetidos??
-	// if (findVertex(in) != nullptr)
-	// 	return false;
 
 	if(vertexSet.size() == 0){
 		this->rightBound = x;		
@@ -84,16 +63,32 @@ bool Graph::addVertex(const long &in, double x, double y){
 			this->bottomBound = y;
 	}
 	
-	vertexSet.push_back(new Vertex(in, x, y));
+	vertexSet.push_back(new Vertex<T>(in, x, y));
 	return true;
 }
 
+template <class T>
+Vertex<T> * Graph<T>::findInitial() const {
+	for(auto v: vertexSet)
+		if(v->getInfo().isInitial())
+			return v;
+	return nullptr;
+}
+
+template <class T>
+Vertex<T> * Graph<T>::findFinal() const {
+	for(auto v: vertexSet)
+		if(v->getInfo().isFinal())
+			return v;
+	return nullptr;
+}
+
 // TODO: meter isto direito
-Graph Graph::invert(){
-	Graph newGraph = Graph();
+template <class T>
+Graph<T> Graph<T>::invert(){
+	Graph<T> newGraph = Graph();
 	for(auto v: this->vertexSet)
 		newGraph.addVertex(v->getInfo());
-	
 	
 	for(auto v: this->vertexSet)
 		for(size_t j = 0; j < v->getAdj()->size(); j++)
@@ -106,8 +101,8 @@ Graph Graph::invert(){
  * destination vertices and the edge weight (w).
  * Returns true if successful, and false if the source or destination vertex does not exist.
  */
-
-bool Graph::addEdge(const long &sourc, const long &dest, double w) {
+template <class T>
+bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 	auto v1 = findVertex(sourc);
 	auto v2 = findVertex(dest);
 	if (v1 == nullptr || v2 == nullptr)
@@ -124,7 +119,8 @@ bool Graph::addEdge(const long &sourc, const long &dest, double w) {
  * Receives the content of the source vertex and returns a pointer to the source vertex.
  * Used by all single-source shortest path algorithms.
  */
-Vertex * Graph::initSingleSource(const long &origin) {
+template<class T>
+Vertex<T> * Graph<T>::initSingleSource(const T &origin) {
 	for(auto v : vertexSet) {
 		v->dist = INF;
 		v->path = nullptr;
@@ -135,13 +131,9 @@ Vertex * Graph::initSingleSource(const long &origin) {
 }
 
 
-
-vector<long> Graph::getPath(const long &origin, const long &dest) const{
-	vector<long> res;
-	
-	// TODO: something with origin
-	if(origin == 0) return res;
-
+template<class T>
+vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
+	vector<T> res;
 	auto v = findVertex(dest);
 	if (v == nullptr || v->dist == INF) // missing or disconnected
 		return res;
@@ -152,9 +144,10 @@ vector<long> Graph::getPath(const long &origin, const long &dest) const{
 }
 
 /*
-void Graph::unweightedShortestPath(const long &orig) {
+template<class T>
+void Graph<T>::unweightedShortestPath(const T &orig) {
 	auto s = initSingleSource(orig);
-	queue< Vertex* > q;
+	queue< Vertex<T>* > q;
 	q.push(s);
 	while( ! q.empty() ) {
 		auto v = q.front();
@@ -165,8 +158,8 @@ void Graph::unweightedShortestPath(const long &orig) {
 	}
 }
 
-
-void Graph::bellmanFordShortestPath(const long &orig) {
+template<class T>
+void Graph<T>::bellmanFordShortestPath(const T &orig) {
 	initSingleSource(orig);
 	for (unsigned i = 1; i < vertexSet.size(); i++)
 		for (auto v: vertexSet)
@@ -175,7 +168,7 @@ void Graph::bellmanFordShortestPath(const long &orig) {
 	for (auto v: vertexSet)
 		for (auto e: v->adj)
 			if (relax(v, e.dest, e.weight))
-				std::cout << "Negative cycle!" << endl;
+				cout << "Negative cycle!" << endl;
 }
 */
 
@@ -191,14 +184,14 @@ void deleteMatrix(T **m, int n) {
 	}
 }
 
-
-Graph::~Graph() {
+template <class T>
+Graph<T>::~Graph() {
 	deleteMatrix(W, vertexSet.size());
 	deleteMatrix(P, vertexSet.size());
 }
 
-
-void Graph::floydWarshallShortestPath() {
+template<class T>
+void Graph<T>::floydWarshallShortestPath() {
 	unsigned n = vertexSet.size();
 	deleteMatrix(W, n);
 	deleteMatrix(P, n);
@@ -232,9 +225,9 @@ void Graph::floydWarshallShortestPath() {
 }
 
 
-
-vector<long> Graph::getfloydWarshallPath(const long &orig, const long &dest) const{
-	vector<long> res;
+template<class T>
+vector<T> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) const{
+	vector<T> res;
 	int i = findVertexIdx(orig);
 	int j = findVertexIdx(dest);
 	if (i == -1 || j == -1 || W[i][j] == INF) // missing or disconnected
@@ -247,8 +240,8 @@ vector<long> Graph::getfloydWarshallPath(const long &orig, const long &dest) con
 
 /**************** Minimum Spanning Tree  ***************/
 
-
-vector<Vertex* > Graph::calculatePrim() {
+template <class T>
+vector<Vertex<T>* > Graph<T>::calculatePrim() {
 	for(auto v : vertexSet) {
 		v->dist = INF;
 		v->path = nullptr;
@@ -256,7 +249,7 @@ vector<Vertex* > Graph::calculatePrim() {
 	}
 	auto s = vertexSet.at(0);
 	s->dist = 0;
-	MutablePriorityQueue<Vertex> q;
+	MutablePriorityQueue<Vertex<T>> q;
 	q.insert(s);
 	while( ! q.empty() ) {
 		auto v = q.extractMin();
@@ -278,9 +271,9 @@ vector<Vertex* > Graph::calculatePrim() {
 	return vertexSet;
 }
 
-
-priority_queue<Edge> Graph::buildHeap(){
-	priority_queue<Edge> heap;
+template <class T>
+priority_queue<Edge<T>> Graph<T>::buildHeap(){
+	priority_queue<Edge<T>> heap;
 	for(auto v : vertexSet){
 		for(auto edge : v->adj)
 			heap.push(edge);
@@ -288,34 +281,35 @@ priority_queue<Edge> Graph::buildHeap(){
 	return heap;
 }
 
-
-int findDisjSet(vector<vector<Vertex *>> & vectorDisjSet, Vertex * ver){
+template <class T>
+int findDisjSet(vector<vector<Vertex<T> *>> & vectorDisjSet, Vertex<T> * ver){
 	for(size_t i = 0; i < vectorDisjSet.size(); i++)
 		if(find(vectorDisjSet.at(i).begin(), vectorDisjSet.at(i).end(), ver) != vectorDisjSet.at(i).end())
 			return i;
 	return -1;
 }
 
-
-void uniteDisjSet(vector<vector<Vertex *>> & vectorDisjSet, int disj1, int disj2){
+template <class T>
+void uniteDisjSet(vector<vector<Vertex<T> *>> & vectorDisjSet, int disj1, int disj2){
 	vectorDisjSet.at(disj1).insert(vectorDisjSet.at(disj1).end(), vectorDisjSet.at(disj2).begin(), vectorDisjSet.at(disj2).end());
 	vectorDisjSet.erase(vectorDisjSet.begin() + disj2);
 }
 
-
-vector<Vertex*> Graph::calculateKruskal() {
+template <class T>
+vector<Vertex<T>*> Graph<T>::calculateKruskal() {
 	int edgesAccepted = 0;
 
-	priority_queue<Edge> h = buildHeap();
+	priority_queue<Edge<T>> h = buildHeap();
 	
-	vector<vector<Vertex *>> vectorDisjSet;
+	vector<vector<Vertex<T> *>> vectorDisjSet;
+	int i = 0;
 	for(auto v: vertexSet){
-		vector<Vertex * > DisjSet = {v};
+		vector<Vertex<T> * > DisjSet = {v};
 		vectorDisjSet.push_back(DisjSet);
 	}
 
 	while(edgesAccepted < getNumVertex()-1) {
-		Edge e = h.top();
+		Edge<T> e = h.top();
 		h.pop();
 		int oriDisjSet = findDisjSet(vectorDisjSet, e.orig);
 		int destDisjSet = findDisjSet(vectorDisjSet, e.dest);

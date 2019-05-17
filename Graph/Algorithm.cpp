@@ -2,13 +2,12 @@
 
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 
 using namespace std;
 
 /*
-vector<Vertex *> dfs(Graph * graph) {
-	vector<Vertex *> res;
+vector<Vertex<T> *> dfs(Graph * graph) {
+	vector<Vertex<T> *> res;
 	for(auto vertex: graph->getVertexSet())
 		vertex->setVisited(false);
 	for(auto vertex: graph->getVertexSet())
@@ -18,8 +17,8 @@ vector<Vertex *> dfs(Graph * graph) {
 }
 */
 
-
-static void dfsVisit(Vertex *v, vector<Vertex *> & res) {
+template <class T>
+static void dfsVisit(Vertex<T> *v, vector<Vertex<T> *> & res) {
 	v->setVisited(true);
 	res.push_back(v);
 	for(unsigned int i = 0; i < v->getAdj()->size(); i++)
@@ -27,56 +26,56 @@ static void dfsVisit(Vertex *v, vector<Vertex *> & res) {
 			dfsVisit(v->getAdj()->at(i).getDest(), res);
 }
 
-vector<Vertex *> dfs(Graph * graph, Vertex * initial) {
-	vector<Vertex *> res;
+template <class T>
+vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
+	vector<Vertex<T> *> res;
 	for(auto vertex: graph->getVertexSet())
 		vertex->setVisited(false);
 	dfsVisit(initial, res);
 	return res;
 }
 
-static void printVertex(vector<Vertex *> verts, ostream & output){
+template <class T>
+static void printVertex(vector<Vertex<T> *> verts, ostream & output){
 	for(auto v: verts)
 		output << v->getInfo() << " ; ";
 	output << endl;
 }
 
-static void prinntEdgesDest(vector<Edge> * edges){
+template <class T>
+static void prinntEdgesDest(vector<Edge<T>> * edges){
 	for(unsigned int i = 0; i < edges->size(); i++)
 		cout << edges->at(i).getDest()->getInfo() << " ; ";
 	cout << endl;
 }
 
-struct CompareVertexPointer
-{
-    long vertexInfo;
+template <class T>
+bool containsVertex(vector<Vertex<T> *> vectorVert, Vertex<T> * vert){
+	for(auto v : vectorVert)
+		if(vert->getInfo == v->getInfo())
+			return true;
+	return false;
+}
 
-    CompareVertexPointer(long info) : vertexInfo(info) {}
-
-    bool operator()(const Vertex * vertex) const
-    {
-        return (vertex->getInfo() == vertexInfo);
-    }
-};
-
-vector<Vertex *> scc(Graph * graph, Vertex * initial){
+template <class T>
+vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial){
 	ofstream out;
 	out.open("teste.txt");
-	vector<Vertex *> res_normal = dfs(graph, initial);
+	vector<Vertex<T> *> res_normal = dfs(graph, initial);
 	printVertex(res_normal, out);
 	// TODO: mudar para não alterar proprio grafo
-	Graph invertedGraph = graph->invert();
+	Graph<T> invertedGraph = graph->invert();
 
 	// TODO: optimize em vez de reaproveitar funcao
-	Vertex * invInitial = invertedGraph.findVertex(initial->getInfo());
+	Vertex<T> * invInitial = invertedGraph.findVertex(initial->getInfo());
 
-	vector<Vertex *> res_invert = dfs(&invertedGraph, invInitial);
+	vector<Vertex<T> *> res_invert = dfs(&invertedGraph, invInitial);
 
 	printVertex(res_invert, out);
 	
-	vector<Vertex *> res;
+	vector<Vertex<T> *> res;
 	for(auto v: res_normal)
-		if(find_if(res_invert.begin(), res_invert.end(), CompareVertexPointer(v->getInfo())) != res_invert.end())
+		if(containsVertex(res, v))
 			res.push_back(v);
 
 	printVertex(res, out);
@@ -89,8 +88,8 @@ vector<Vertex *> scc(Graph * graph, Vertex * initial){
  * Returns true if the target vertex was relaxed (dist, path).
  * Used by all single-source shortest path algorithms.
  */
-
-inline bool relax(Vertex *v, Vertex *w, double weight) {
+template <class T>
+inline bool relax(Vertex<T> *v, Vertex<T> *w, double weight) {
 	if (v->getDist() + weight < w->getDist()) {
 		w->setDist(v->getDist() + weight);
 		w->setPath(v);
@@ -100,9 +99,10 @@ inline bool relax(Vertex *v, Vertex *w, double weight) {
 		return false;
 }
 
-void dijkstraShortestPath(Graph * graph, const long &origin) {
+template <class T>
+void dijkstraShortestPath(Graph<T> * graph, const T &origin) {
 	auto s = graph->initSingleSource(origin);
-	MutablePriorityQueue<Vertex> q;
+	MutablePriorityQueue<Vertex<T>> q;
 	q.insert(s);
 	while( ! q.empty() ) {
 		auto v = q.extractMin();

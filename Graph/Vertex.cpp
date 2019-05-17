@@ -1,36 +1,40 @@
 #include "Vertex.h"
-#include <cmath>
 
 using namespace std;
 
-Vertex::Vertex(long in): info(in){}
-
-Vertex::Vertex(long in, double x, double y): info(in), x(x), y(y) {}
+template <class T>
+Vertex<T>::Vertex(T in, double x, double y): info(in), _x(x), _y(y) {}
 
 /*
  * Auxiliary function to add an outgoing edge to a vertex (this),
  * with a given destination vertex (d) and edge weight (w).
  */
-void Vertex::addEdge(Vertex *d, double w) {
-	adj.push_back(Edge(this, d, w));
+template <class T>
+void Vertex<T>::addEdge(Vertex<T> *d, double w) {
+	adj.push_back(Edge<T>(d, w));
 }
 
-bool Vertex::operator<(Vertex & vertex) const {
+template <class T>
+bool Vertex<T>::operator<(Vertex<T> & vertex) const {
 	return this->dist < vertex.dist;
 }
 
-long Vertex::getInfo() const {
+template <class T>
+T Vertex<T>::getInfo() const {
 	return this->info;
 }
 
-double Vertex::getDist() const {
+template <class T>
+double Vertex<T>::getDist() const {
 	return this->dist;
 }
 
-double Vertex::getEuclideanDist(const Vertex *  vertex2) const{
-	return sqrt(pow(vertex2->x - this->x, 2) + pow(vertex2->y - this->y, 2));
+template <class T>
+Vertex<T> *Vertex<T>::getPath() const {
+	return this->path;
 }
 
-Vertex *Vertex::getPath() const {
-	return this->path;
+template <class T>
+double Vertex<T>::getEuclideanDist(const Vertex<T> *  vertex2) const{
+	return sqrt(pow(vertex2->_x - this->_x, 2) + pow(vertex2->_y - this->_y, 2));
 }
