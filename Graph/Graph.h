@@ -13,8 +13,6 @@
 #include "Edge.h"
 #include "../Utilities/MutablePriorityQueue.h"
 
-using namespace std;
-
 class Edge;
 class Graph;
 class Vertex;
@@ -51,7 +49,7 @@ public:
 	double getBottomBound() const { return bottomBound; };
 	Vertex *findInitial() const;
 	Vertex *findFinal() const;
-	void invert();
+	Graph invert();
 	
 
 	// Fp05 - single source

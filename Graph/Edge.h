@@ -29,11 +29,10 @@ public:
 	double getWeight() const;
 
 	bool operator<(const Edge & e2) const;
+	bool operator==(const Edge & e2 ) const;
 
 	Vertex *  getOrig() const { return orig; };
 	Vertex *  getDest() const { return dest; };
-
-	void invert();
 	
 };
 

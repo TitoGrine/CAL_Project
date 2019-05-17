@@ -266,7 +266,7 @@ void ConnectionMenu(Graph * graph){
 	cout << " Calculating..." << endl;
 
 	Vertex * initial = graph->findInitial();
-	vector<Vertex *> res = dfs(graph, initial);
+	vector<Vertex *> res = scc(graph, initial);
 
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", res);

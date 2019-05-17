@@ -88,11 +88,17 @@ bool Graph::addVertex(const long &in, double x, double y){
 	return true;
 }
 
-
-void Graph::invert(){
+// TODO: meter isto direito
+Graph Graph::invert(){
+	Graph newGraph = Graph();
+	for(auto v: this->vertexSet)
+		newGraph.addVertex(v->getInfo());
+	
+	
 	for(auto v: this->vertexSet)
 		for(size_t j = 0; j < v->getAdj()->size(); j++)
-			v->getAdj()->at(j).invert();
+			newGraph.addEdge(v->getAdj()->at(j).getDest()->getInfo(), v->getAdj()->at(j).getOrig()->getInfo(), v->getAdj()->at(j).getWeight());
+	return newGraph;
 }
 
 /*

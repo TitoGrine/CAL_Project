@@ -6,12 +6,11 @@
 /************************* Vertex  **************************/
 
 #include <vector>
-#include "Graph.h"
+#include "Edge.h"
 #include "Vertex.h"
 #include "../Utilities/MutablePriorityQueue.h"
 
 class Edge;
-class Graph;
 
 class Vertex {
 	long info;                // contents
@@ -44,9 +43,9 @@ public:
 	void setFinal() { this->last = true; };
 	void setDist(double dist) { this->dist = dist; };
 	void setPath(Vertex * v) { this->path = v; };
+	void setVisited(bool visited) { this->visited = visited; };
 	void removeInitial() { this->initial = false; };
 	void removeFinal() { this->last = false; };
-	void setVisited(bool visited) { this->visited = visited; };
 
 	Vertex *getPath() const;
 	vector<Edge> * getAdj() { return &adj; };

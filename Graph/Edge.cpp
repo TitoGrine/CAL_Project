@@ -12,8 +12,6 @@ bool Edge::operator<(const Edge & e2 ) const {
 	return this->getWeight() > e2.getWeight();
 }
 
-void Edge::invert(){
-	Vertex * v = this->dest;
-	this->dest = this->orig;
-	this->orig = v;
+bool Edge::operator==(const Edge & e2 ) const {
+	return this->getDest() == e2.getDest() && this->getOrig() == e2.getOrig();
 }
