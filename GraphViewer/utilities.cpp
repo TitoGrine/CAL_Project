@@ -53,3 +53,10 @@ GraphViewer * createFullGraphViewer(const Graph * graph, int vertexSize, string 
 	addEdgesToGV(graph, gv);
 	return gv;
 }
+
+void paintVertexesGV(GraphViewer * gv, int vertexSize, string vertexColor, const vector<Vertex *> & vertexes){
+	for(auto v : vertexes){
+		gv->setVertexColor(v->getInfo(), vertexColor);
+		gv->setVertexSize(v->getInfo(), vertexSize);
+	}
+}

@@ -4,6 +4,7 @@
 #include "Utilities/parser.h"
 #include "Interface/ConsoleFunctions.h"
 #include "Interface/Input.h"
+#include "Graph/Algorithm.h"
 #include "GraphViewer/graphviewer.h"
 #include "GraphViewer/utilities.h"
 
@@ -250,6 +251,50 @@ void PointMenu(Graph * graph, bool initial){
     }
 }
 
+void ConnectionMenu(Graph * graph){
+	int option_number;
+
+	std::cout << " OPTIONS:" << endl << endl;
+
+	std::cout << "   1 - Show SCC in Terminal" << endl;
+	std::cout << "   2 - Show SCC in GraphViewer" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 2);
+
+	// TODO: fazer aquela animacao dos 3 pontos
+	cout << " Calculating..." << endl;
+
+	Vertex * initial = graph->findInitial();
+	vector<Vertex *> res = dfs(graph, initial);
+
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	paintVertexesGV(gv, 10, "YELLOW", res);
+	gv->setVertexSize(initial->getInfo(), 20);
+	gv->setVertexColor(initial->getInfo(), "GREEN");
+	gv->setVertexLabel(initial->getInfo(), "Start");
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+
+	switch (option_number)
+	{
+	case 1:
+		//addPoint(graph, initial);
+		ConnectionMenu(graph);
+		break;
+	case 2:
+		//removePoint(graph, initial);
+		ConnectionMenu(graph);
+		break;
+	case 0:
+		system("cls");
+		MapOperationsMenu(graph);
+		return;
+    default:break;
+    }
+}
+
 void MapOperationsMenu(Graph * graph){
 	header("MAP OPERATIONS");
 
@@ -274,7 +319,14 @@ void MapOperationsMenu(Graph * graph){
 		PointMenu(graph, false);
 		break;
 	case 3:
-		header("TEST CONNECTIVITY");
+		if(graph->findInitial() == NULL){
+			cout << "\n You must first enter a intial point\n\n";
+			MapOperationsMenu(graph);
+		}
+		else{
+			header("TEST CONNECTIVITY");
+			ConnectionMenu(graph);
+		}
 		break;
 	case 4:
 		header("SOLVE PROBLEMS");
@@ -386,8 +438,10 @@ void InicialMenu(Graph * graph)
 		InicialMenu(graph);
 		break;
 	case 3:
-		if(graph == NULL)
+		if(graph == NULL){
 			cout << "\n You must first choose a map\n\n";
+			InicialMenu(graph);
+		}
 		else
 			MapOperationsMenu(graph);
 		break;

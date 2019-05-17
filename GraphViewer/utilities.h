@@ -9,3 +9,5 @@ GraphViewer * createVertexGraphViewer(const Graph * graph, int vertexSize, std::
 void addEdgesToGV(const Graph * graph, GraphViewer * gv);
 
 GraphViewer * createFullGraphViewer(const Graph * graph, int vertexSize, std::string vertexColor);
+
+void paintVertexesGV(GraphViewer * gv, int vertexSize, std::string vertexColor, const std::vector<Vertex *> & vertexes);
