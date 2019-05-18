@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INPUT_H_
+#define INPUT_H_
 
 #include <string>
 
@@ -30,3 +31,5 @@ unsigned int intInput(std::string question);
 * @see		getlineZ		(@		ConsoleFunctions)
 */
 int menuInput(std::string question, int inferiorLimit, int superiorLimit);
+
+#endif
