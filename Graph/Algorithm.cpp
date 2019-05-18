@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <thread>
+#include <future>
 
 using namespace std;
 
@@ -120,6 +122,7 @@ inline bool relax(Vertex *v, Vertex *w, Vertex *dest, double weight, bool isDijk
 
 std::vector<long> shortestPath(Graph * graph, const long &origin, const long &dest, bool isDijkstra)
 {
+	vector<long> result;
 	auto s = graph->initSingleSource(origin);
 	Vertex* d = graph->findVertex(dest);
 	MutablePriorityQueue<Vertex> q;
@@ -128,7 +131,10 @@ std::vector<long> shortestPath(Graph * graph, const long &origin, const long &de
 	while( ! q.empty() ) {
 		auto v = q.extractMin();
 
-		if(v == d) return graph->getPath(origin, dest);
+		if(v == d) {
+			result = graph->getPath(origin, dest);
+			break;
+		}
 			
 		for(unsigned int i = 0; i < v->getAdj()->size(); i++) {
 			auto e = v->getAdj()->at(i);
@@ -141,6 +147,8 @@ std::vector<long> shortestPath(Graph * graph, const long &origin, const long &de
 			}
 		}
 	}
+
+	return result;
 }
 
 std::vector<long> dijkstraShortestPath(Graph * graph, const long &origin, const long &dest)
@@ -151,4 +159,40 @@ std::vector<long> dijkstraShortestPath(Graph * graph, const long &origin, const 
 std::vector<long> aStarShortestPath(Graph * graph, const long &origin, const long &dest)
 {
 	return shortestPath(graph, origin, dest, false);
+}
+
+std::vector<long> bidirectionalDijkstra(Graph * graph, const long &origin, const long &delivery, const long &dest)
+{
+	vector<long> final_path, path;
+
+	std::thread t1(dijkstraShortestPath(graph, origin, delivery));
+	std::thread t2(dijkstraShortestPath(graph, delivery, dest));
+	
+	t1.join();
+	t2.join();
+
+	final_path = graph->getPath(origin, delivery);
+	path = graph->getPath(delivery, origin);
+
+	final_path.insert(final_path.end(), path.begin(), path.end());
+
+	return final_path;
+}
+
+std::vector<long> bidirectionalAStar(Graph * graph, const long &origin, const long &delivery, const long &dest)
+{
+	vector<long> final_path, path;
+
+	std::thread t1(aStarShortestPath(graph, origin, delivery));
+	std::thread t2(aStarShortestPath(graph, delivery, dest));
+	
+	t1.join();
+	t2.join();
+
+	final_path = graph->getPath(origin, delivery);
+	path = graph->getPath(delivery, origin);
+
+	final_path.insert(final_path.end(), path.begin(), path.end());
+
+	return final_path;
 }
