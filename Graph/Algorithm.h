@@ -144,3 +144,35 @@ std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &des
 {
 	return shortestPath(graph, origin, dest, false);
 }
+
+template <class T>
+std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest) {
+	unsigned n = graph->getVertexSet().size();
+
+	graph->resetMatrixW(n);
+	graph->resetMatrixP(n);
+	
+	for (unsigned i = 0; i < n; i++) {
+		for (unsigned j = 0; j < n; j++) {
+			graph->setW(i, j, i == j? 0 : INF);
+			graph->setP(i, j, -1);
+		}
+		for (auto e : graph->getVertexSet().at(i)->adj) {
+			int j = graph->findVertexIdx(e.dest->info);
+			graph->setW(i, j, e.weight);
+			graph->setP(i, j, i);
+		}
+	}
+
+	for(unsigned k = 0; k < n; k++)
+		for(unsigned i = 0; i < n; i++)
+			for(unsigned j = 0; j < n; j++) {
+				if(graph->getW(i, k) == INF || graph->getW(k, j) == INF)
+					continue; // avoid overflow
+				int val = graph->getW(i, k) + graph->getW(k, j);
+				if (val < graph->getW(i, j)) {
+					graph->setW(i, j, val);
+					graph->setP(i, j, graph->getP(k, j));
+				}
+			}
+}
