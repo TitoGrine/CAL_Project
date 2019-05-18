@@ -42,6 +42,10 @@ public:
 	bool addEdge(const T &sourc, const T &dest, double w);
 	int getNumVertex() const;
 	vector<Vertex<T> *> getVertexSet() const;
+	double getW(int i, int j) const;
+	void setW(int i, int j, double value);
+	int getP(int i, int j) const;
+	void setP(int i, int j, int index);
 
 	// Fp05
 	Vertex<T> * initSingleSource(const T &orig);
@@ -52,9 +56,12 @@ public:
 	vector<T> getPath(const T &origin, const T &dest) const;
 
 	// Fp05 - all pairs
-	void floydWarshallShortestPath();
-	vector<T> getfloydWarshallPath(const T &origin, const T &dest) const;
+	vector<T> getFloydWarshallPath(const T &origin, const T &dest) const;
+
+	void resetMatrixW(int n);
+	void resetMatrixP(int n);
 	~Graph();
+	
 
 	// Fp07 - minimum spanning tree
 	vector<Vertex<T>*> calculatePrim();
@@ -81,6 +88,27 @@ template <class T>
 vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 	return vertexSet;
 }
+
+template <class T>
+double Graph<T>::getW(int i, int j) const{
+	return W[i][j];
+}
+
+template <class T>
+void Graph<T>::setW(int i, int j, double value){
+	W[i][j] = value;
+}
+
+template <class T>
+int Graph<T>::getP(int i, int j) const{
+	return P[i][j];
+}
+
+template <class T>
+void Graph<T>::setP(int i, int j, int index){
+	P[i][j] = index;
+}
+
 
 /*
  * Auxiliary function to find a vertex with a given content.
@@ -242,68 +270,56 @@ void Graph<T>::bellmanFordShortestPath(const T &orig) {
 
 /**************** All Pairs Shortest Path  ***************/
 
+template<class T>
+std::vector<T> Graph<T>::getFloydWarshallPath(const T &orig, const T &dest) const{
+	vector<T> res;
+
+	int i = findVertexIdx(orig);
+	int j = findVertexIdx(dest);
+	
+	if (i == -1 || j == -1 || this->W[i][j] == INF) // missing or disconnected
+		return res;
+	for ( ; j != -1; j = this->P[i][j])
+		res.push_back(vertexSet[j]->info);
+	reverse(res.begin(), res.end());
+	return res;
+}
+
 template <class T>
-void deleteMatrix(T **m, int n) {
-	if (m != nullptr) {
+void Graph<T>::resetMatrixW(int n) {
+	if (this->W != nullptr) {
 		for (int i = 0; i < n; i++)
-			if (m[i] != nullptr)
-				delete [] m[i];
-		delete [] m;
+			if (this->W[i] != nullptr)
+				delete [] this->W[i];
+		delete [] this->W;
 	}
+
+	this->W = new double *[n];
+
+	for(int i = 0; i < n; i++) 
+		this->W[i] = new double[n];
+}
+
+template <class T>
+void Graph<T>::resetMatrixP(int n) {
+	if (this->P != nullptr) {
+		for (int i = 0; i < n; i++)
+			if (this->P[i] != nullptr)
+				delete [] this->P[i];
+		delete [] this->P;
+	}
+
+	this->P = new int *[n];
+
+	for(int i = 0; i < n; i++) 
+		this->P[i] = new int[n];
+
 }
 
 template <class T>
 Graph<T>::~Graph() {
-	deleteMatrix(W, vertexSet.size());
-	deleteMatrix(P, vertexSet.size());
-}
-
-template<class T>
-void Graph<T>::floydWarshallShortestPath() {
-	unsigned n = vertexSet.size();
-	deleteMatrix(W, n);
-	deleteMatrix(P, n);
-	W = new double *[n];
-	P = new int *[n];
-	for (unsigned i = 0; i < n; i++) {
-		W[i] = new double[n];
-		P[i] = new int[n];
-		for (unsigned j = 0; j < n; j++) {
-			W[i][j] = i == j? 0 : INF;
-			P[i][j] = -1;
-		}
-		for (auto e : vertexSet[i]->adj) {
-			int j = findVertexIdx(e.dest->info);
-			W[i][j]  = e.weight;
-			P[i][j]  = i;
-		}
-	}
-
-	for(unsigned k = 0; k < n; k++)
-		for(unsigned i = 0; i < n; i++)
-			for(unsigned j = 0; j < n; j++) {
-				if(W[i][k] == INF || W[k][j] == INF)
-					continue; // avoid overflow
-				int val = W[i][k] + W[k][j];
-				if (val < W[i][j]) {
-					W[i][j] = val;
-					P[i][j] = P[k][j];
-				}
-			}
-}
-
-
-template<class T>
-vector<T> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) const{
-	vector<T> res;
-	int i = findVertexIdx(orig);
-	int j = findVertexIdx(dest);
-	if (i == -1 || j == -1 || W[i][j] == INF) // missing or disconnected
-		return res;
-	for ( ; j != -1; j = P[i][j])
-		res.push_back(vertexSet[j]->info);
-	reverse(res.begin(), res.end());
-	return res;
+	resetMatrixW(vertexSet.size());
+	resetMatrixP(vertexSet.size());
 }
 
 /**************** Minimum Spanning Tree  ***************/
