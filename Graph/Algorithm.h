@@ -5,7 +5,7 @@
 #include <iostream>
 #include <ostream>
 #include <fstream>
-#include <thread>
+//#include <thread>
 
 template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
@@ -18,6 +18,12 @@ std::vector<T> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &
 
 template <class T>
 std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
+
+template <class T>
+std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest); 
+
+template <class T>
+std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries);
 
 template <class T>
 std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest);
@@ -160,8 +166,8 @@ std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T 
     std::thread
     vector<T> final_path, path;
 
-	std::thread tm(dijkstraShortestPath(graph, origin, delivery));
-	std::thread t2(dijkstraShortestPath(graph, delivery, dest));
+	thread t1(callDijkstraShortestPath, graph, origin, delivery);
+	thread t2(callDijkstraShortestPath, graph, delivery, dest);
 	
 	t1.join();
 	t2.join();
@@ -179,8 +185,8 @@ std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &de
 {
     vector<T> final_path, path;
 
-	std::thread t1(aStarShortestPath(graph, origin, delivery));
-	std::thread t2(aStarShortestPath(graph, delivery, dest));
+	thread t1(aStarShortestPath, graph, origin, delivery);
+	thread t2(aStarShortestPath, graph, delivery, dest);
 	
 	t1.join();
 	t2.join();
@@ -191,8 +197,8 @@ std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &de
 	final_path.insert(final_path.end(), path.begin(), path.end());
 
 	return final_path;
-}*/
-
+}
+*/
 template <class T>
 std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest) {
 	unsigned n = graph->getVertexSet().size();
@@ -223,4 +229,37 @@ std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, cons
 					graph->setP(i, j, graph->getP(k, j));
 				}
 			}
+}
+
+template <class T>
+std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries){
+
+	vector<T> result;
+	Vertex<T>* start = graph->findVertex(origin);
+
+	for(auto vertex : graph->getVertexSet()){
+		vertex->setDist(start->getEuclideanDist(vertex));
+	}
+
+	MutablePriorityQueue<Vertex<T>*> Q;
+	MutablePriorityQueue<Vertex<T>*> aux;
+
+	for(T info : deliveries){
+		Q.insert(graph->findVertex(info));
+	}
+
+	while(!Q.empty()) {
+		Vertex<T>* vertex = Q.extractMin();
+
+		result.push_back(vertex->getInfo());
+
+		aux = Q;
+
+		while(!aux.empty()){
+			Vertex<T>* v = aux.extractMin();
+			v->setDist(vertex->getEuclideanDist(v));
+		}
+	}
+
+	return result;
 }
