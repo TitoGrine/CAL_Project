@@ -1,6 +1,10 @@
-#pragma once
+#ifndef PARSER_H_
+#define PARSER_H_
 
+#include "../Utilities/MapInfo.h"
 #include "../Graph/Graph.h"
-#include <string.h>
+#include <string>
 
-Graph * buildGraph(std::string MapName);
+Graph<MapInfo> buildGraph(std::string MapName);
+
+#endif
