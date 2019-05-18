@@ -4,7 +4,7 @@
 #include <ostream>
 
 class MapInfo {
-	const long mapID;                // contents
+	long mapID;                // contents
 
 	bool initial = false;
 	bool end = false;
@@ -24,6 +24,9 @@ public:
 	void removeFinal() { this->end = false; };
 
 	bool operator==(const MapInfo & mapInfo) const;
+
+	MapInfo& operator=(const MapInfo& mi);
+
 	friend std::ostream & operator<< (std::ostream &os, const MapInfo &p);
 
 };

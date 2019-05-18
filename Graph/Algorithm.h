@@ -152,12 +152,15 @@ std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &des
 	return shortestPath(graph, origin, dest, false);
 }
 
+/*
 template <class T>
 std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest)
 {
+
+    std::thread
     vector<T> final_path, path;
 
-	std::thread t1(dijkstraShortestPath(graph, origin, delivery));
+	std::thread tm(dijkstraShortestPath(graph, origin, delivery));
 	std::thread t2(dijkstraShortestPath(graph, delivery, dest));
 	
 	t1.join();
@@ -188,7 +191,7 @@ std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &de
 	final_path.insert(final_path.end(), path.begin(), path.end());
 
 	return final_path;
-}
+}*/
 
 template <class T>
 std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest) {

@@ -66,5 +66,58 @@ Graph<MapInfo> buildGraph(string MapName){
 
 	edgesFile.close();
 
+	//Tags
+
+	ifstream tagsFile;
+	tagsFile.open("T04_tags_" + MapName + ".txt");
+
+	if(!tagsFile.is_open()){
+		cerr << "Error opening tags file\n";
+		return graph;
+	}
+
+	string tagType;
+	unsigned int numTags, numVertexes, numShops;
+
+	getline(tagsFile, line);
+	iss = istringstream(line);
+	iss >> numTags;
+
+	//Deposits
+	for(unsigned int i = 0; i < numTags; i++) {
+		getline(tagsFile, tagType);
+		if(tagType.find("shop=") != string::npos) {
+			numShops = numTags - i;
+			break;
+		}
+		getline(tagsFile, line);
+		iss = istringstream(line);
+		iss >> numVertexes;
+		for(unsigned int j = 0; j < numVertexes; j++) {
+			getline(tagsFile, line);
+			iss = istringstream(line);
+			iss >> id;
+			MapInfo mi(id);
+			graph.addShop(mi, i);
+		}
+	}
+
+	//Shops
+	for(unsigned int i = 0; i < numShops; i++) {
+		if(i != 0) getline(tagsFile, tagType);
+		getline(tagsFile, line);
+		iss = istringstream(line);
+		iss >> numVertexes;
+		for(unsigned int j = 0; j < numVertexes; j++) {
+			getline(tagsFile, line);
+			iss = istringstream(line);
+			iss >> id;
+			MapInfo mi(id);
+			graph.addShop(mi, i);
+		}
+	}
+
+	tagsFile.close();
+
 	return graph;
 }

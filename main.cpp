@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 #include "Graph/Algorithm.h"
 
@@ -206,6 +207,69 @@ void removePoint(Graph<MapInfo> * graph, bool initial){
 *  +------------------------+
 */
 
+void DeliveryPlaceMenu(Graph<MapInfo> * graph) {
+	header("DELIVERY PLACE");
+
+	int option_number;
+
+	std::cout << " CHOOSE A DELIVERY PLACE:" << endl;
+	std::cout << " OPTIONS:" << endl << endl;
+
+	std::cout << "   1 - Department Store" << endl;
+	std::cout << "   2 - Variety Store" << endl;
+	std::cout << "   3 - SuperMarket" << endl;
+	std::cout << "   4 - DoItYourself" << endl;
+	std::cout << "   5 - Convenience" << endl;
+	std::cout << "   6 - Clothes" << endl;
+	std::cout << "   7 - Hardware" << endl;
+	std::cout << "   8 - Furniture" << endl;
+	std::cout << "   9 - Eletronics" << endl;
+	std::cout << "   10 - Mobile Phone" << endl;
+	std::cout << "   11 - Shoes" << endl;
+	std::cout << "   12 - Alcohol" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 12);
+
+	if(option_number == 0) return;
+
+	graph->addDelivery(graph->getShop(option_number));
+}
+
+void ProblemsMenu(Graph<MapInfo> * graph) {
+	header("PROBLEMS");
+
+	int option_number;
+
+	std::cout << " OPTIONS:" << endl << endl;
+
+	std::cout << "   1 - One Truck - One Delivery" << endl;
+	std::cout << "   2 - One Truck - Multiple Deliveries" << endl;
+	std::cout << "   3 - Mutiple Trucks - Multiple Deliveries" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 3);
+
+	switch (option_number)
+	{
+		case 1: 
+			DeliveryPlaceMenu(graph);
+
+			break;
+		case 2:
+
+			break;
+		case 3:
+
+			break;
+		case 0:
+			MapOperationsMenu(graph);
+			break;
+		default: 
+			break;
+	}
+}
+
 // TODO: ver melhor como vai ser a seleção de um ponto
 
 void PointMenu(Graph<MapInfo> * graph, bool initial){
@@ -247,11 +311,13 @@ void PointMenu(Graph<MapInfo> * graph, bool initial){
 		system("cls");
 		MapOperationsMenu(graph);
 		return;
-    default:break;
+  default:break;
     }
 }
 
 void ConnectionMenu(Graph<MapInfo> * graph){
+	header("TEST CONNECTIVITY");
+
 	int option_number;
 
 	std::cout << " OPTIONS:" << endl << endl;
@@ -324,12 +390,12 @@ void MapOperationsMenu(Graph<MapInfo> * graph){
 			MapOperationsMenu(graph);
 		}
 		else{
-			header("TEST CONNECTIVITY");
 			ConnectionMenu(graph);
 		}
 		break;
 	case 4:
 		header("SOLVE PROBLEMS");
+		ProblemsMenu(graph);
 		break;
 	case 0:
 		system("cls");
