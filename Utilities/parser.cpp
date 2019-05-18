@@ -1,15 +1,10 @@
 #include "parser.h"
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
-using namespace std;
-
-template <class T>
-Graph<MapInfo> * buildGraph(string MapName)
-{
-	Graph<MapInfo> * graph = new Graph<MapInfo>();
+Graph<MapInfo> buildGraph(string MapName){
+	Graph<MapInfo> graph;
 
 	ifstream nodesFile;
 	nodesFile.open("./Maps/" + MapName + "/T04_nodes_X_Y_" + MapName + ".txt");
@@ -17,7 +12,7 @@ Graph<MapInfo> * buildGraph(string MapName)
 	// TODO: change to exception
 	if(!nodesFile.is_open()){
 		cerr << "Error opening edges file\n";
-		return NULL;
+		return graph;
 	}
 
 	string line;
@@ -35,7 +30,7 @@ Graph<MapInfo> * buildGraph(string MapName)
 		iss = istringstream(line);
 		iss >> p >> id >> p >> nodeX >> p >> nodeY >> p;
 		MapInfo mi(id);
-		graph->addVertex(mi, nodeX, nodeY);
+		graph.addVertex(mi, nodeX, nodeY);
 	}
 	
 	nodesFile.close();
@@ -47,7 +42,7 @@ Graph<MapInfo> * buildGraph(string MapName)
 
 	if(!edgesFile.is_open()){
 		cerr << "Error opening edges file\n";
-		return NULL;
+		return graph;
 	}
 
 	
@@ -63,10 +58,10 @@ Graph<MapInfo> * buildGraph(string MapName)
 		iss >> p >> pt1 >> p >> pt2 >> p;
 		MapInfo mi1(pt1);
 		MapInfo mi2(pt2);
-		Vertex<T> * v1 = graph->findVertex(mi1);
-		Vertex<T> * v2 = graph->findVertex(mi2);
+		Vertex<MapInfo> * v1 = graph.findVertex(mi1);
+		Vertex<MapInfo> * v2 = graph.findVertex(mi2);
 	
-		graph->addEdge(v1->getInfo(), v2->getInfo(), v1->getEuclideanDist(v2));
+		graph.addEdge(*(v1->getInfo()), *(v2->getInfo()), v1->getEuclideanDist(v2));
 	}
 
 	edgesFile.close();

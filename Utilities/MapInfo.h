@@ -1,6 +1,8 @@
 #ifndef MAPINFO_H_
 #define MAPINFO_H_
 
+#include <ostream>
+
 class MapInfo {
 	const long mapID;                // contents
 
@@ -22,6 +24,8 @@ public:
 	void removeFinal() { this->end = false; };
 
 	bool operator==(const MapInfo & mapInfo) const;
+	friend std::ostream & operator<< (std::ostream &os, const MapInfo &p);
+
 };
 
 #endif

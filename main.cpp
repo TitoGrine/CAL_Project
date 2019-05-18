@@ -1,9 +1,13 @@
 #include <iostream>
+
+#include "Graph/Algorithm.h"
+
 #include "Utilities/parser.h"
-// #include "Utilities/MapInfo.h"
-// #include "Graph/Graph.h"
+#include "Utilities/MapInfo.h"
+#include "Graph/Graph.h"
 #include "Interface/Input.h"
 #include "Interface/ConsoleFunctions.h"
+#include "GraphViewer/utilities.h"
 
 using namespace std;
 
@@ -72,7 +76,7 @@ void header(const string &header)
 *  |                        |
 *  +------------------------+
 */
-/*
+
 void showGraph(Graph<MapInfo> * graph){
 	cout << " Map shown in the GraphViewer" << endl;
 	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW");
@@ -91,14 +95,14 @@ void showPointTerminal(Graph<MapInfo> * graph, bool initial){
 			cout << "\n There is no initial point to be shown\n\n";
 			return;
 		}
-		cout << "\n Info:\t" << v->getInfo().getID() << "\n X:\t" << v->getX() << "\n Y:\t" << v->getY() << endl;
+		cout << "\n Info:\t" << v->getInfo()->getID() << "\n X:\t" << v->getX() << "\n Y:\t" << v->getY() << endl;
 		return;
 	}
 	if((v = graph->findFinal()) == NULL){
 		cout << "\n There is no final point to be shown\n\n";
 		return;
 	}
-	cout << "\n Info:\t" << v->getInfo().getID() << "\n X:\t" << v->getX() << "\n Y:\t" << v->getY() << endl;
+	cout << "\n Info:\t" << v->getInfo()->getID() << "\n X:\t" << v->getX() << "\n Y:\t" << v->getY() << endl;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------//
@@ -112,9 +116,9 @@ void showPointGV(Graph<MapInfo> * graph, bool initial){
 		}
 		cout << " Map shown in the GraphViewer" << endl;
 		GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
-		gv->setVertexSize(v->getInfo().getID(), 20);
-		gv->setVertexColor(v->getInfo().getID(), "GREEN");
-		gv->setVertexLabel(v->getInfo().getID(), "Start");
+		gv->setVertexSize(v->getInfo()->getID(), 20);
+		gv->setVertexColor(v->getInfo()->getID(), "GREEN");
+		gv->setVertexLabel(v->getInfo()->getID(), "Start");
 		gv->rearrange();
 		getchar();
 		gv->closeWindow();
@@ -126,14 +130,14 @@ void showPointGV(Graph<MapInfo> * graph, bool initial){
 	}
 	cout << " Map shown in the GraphViewer" << endl;
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
-	gv->setVertexSize(v->getInfo().getID(), 20);
-	gv->setVertexColor(v->getInfo().getID(), "RED");
-	gv->setVertexLabel(v->getInfo().getID(), "End");
+	gv->setVertexSize(v->getInfo()->getID(), 20);
+	gv->setVertexColor(v->getInfo()->getID(), "RED");
+	gv->setVertexLabel(v->getInfo()->getID(), "End");
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
 }
-*/
+
 //=======================================================================================================================//
 
 /**
@@ -143,7 +147,7 @@ void showPointGV(Graph<MapInfo> * graph, bool initial){
 *  |                        |
 *  +------------------------+
 */
-/*
+
 void addPoint(Graph<MapInfo> * graph, bool initial){
 	string question = initial? " Initial Vertex ID (0 - " :  " Final Vertex ID (0 - ";
 	question += to_string(graph->getNumVertex());
@@ -154,7 +158,7 @@ void addPoint(Graph<MapInfo> * graph, bool initial){
 		else{
 			
 			int initialID =  menuInput(question, 0, graph->getNumVertex() - 1);
-			graph->getVertexSet().at(initialID)->getInfo().setInitial();
+			graph->getVertexSet().at(initialID)->getInfo()->setInitial();
 		}
 		return;
 	}
@@ -162,10 +166,10 @@ void addPoint(Graph<MapInfo> * graph, bool initial){
 		cout << "\n There is already a final point\n\n";
 	else{
 		int finalID =  menuInput(question, 0, graph->getNumVertex() - 1);
-		graph->getVertexSet().at(finalID)->getInfo().setFinal();
+		graph->getVertexSet().at(finalID)->getInfo()->setFinal();
 	}
 }
-*/
+
 //=======================================================================================================================//
 
 /**
@@ -175,23 +179,23 @@ void addPoint(Graph<MapInfo> * graph, bool initial){
 *  |                        |
 *  +------------------------+
 */
-/*
+
 void removePoint(Graph<MapInfo> * graph, bool initial){
 	Vertex<MapInfo> *v;
 	if(initial){
 		if((v = graph->findInitial()) != NULL)
-			v->getInfo().removeInitial();
+			v->getInfo()->removeInitial();
 		else
 			cout << "\n There is no initial point to be removed\n\n";
 		return;
 	}
 	if((v = graph->findFinal()) != NULL)
-		v->getInfo().removeFinal();
+		v->getInfo()->removeFinal();
 	else
 		cout << "\n There is no final point to be removed\n\n";
 
 }
-*/
+
 //=======================================================================================================================//
 
 /**
@@ -203,7 +207,7 @@ void removePoint(Graph<MapInfo> * graph, bool initial){
 */
 
 // TODO: ver melhor como vai ser a seleção de um ponto
-/*
+
 void PointMenu(Graph<MapInfo> * graph, bool initial){
 	if(initial)	header("INITIAL POINT");
 	else header("FINAL POINT");
@@ -262,13 +266,13 @@ void ConnectionMenu(Graph<MapInfo> * graph){
 	cout << " Calculating..." << endl;
 
 	Vertex<MapInfo> * initial = graph->findInitial();
-	vector<Vertex<MapInfo> *> res = scc(graph, initial);
+	vector<Vertex<MapInfo> *> res = dfs(graph, initial);
 
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", res);
-	gv->setVertexSize(initial->getInfo().getID(), 20);
-	gv->setVertexColor(initial->getInfo().getID(), "GREEN");
-	gv->setVertexLabel(initial->getInfo().getID(), "Start");
+	gv->setVertexSize(initial->getInfo()->getID(), 20);
+	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
+	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
@@ -276,11 +280,11 @@ void ConnectionMenu(Graph<MapInfo> * graph){
 	switch (option_number)
 	{
 	case 1:
-		//addPoint(graph, initial);
+		addPoint(graph, initial);
 		ConnectionMenu(graph);
 		break;
 	case 2:
-		//removePoint(graph, initial);
+		removePoint(graph, initial);
 		ConnectionMenu(graph);
 		break;
 	case 0:
@@ -335,7 +339,7 @@ void MapOperationsMenu(Graph<MapInfo> * graph){
     }
 
 }
-*/
+
 void MapMenu(Graph<MapInfo> * graph)
 {
 	int option_number;
@@ -358,37 +362,37 @@ void MapMenu(Graph<MapInfo> * graph)
 	switch (option_number)
 	{
 	case 1:
-		graph = buildGraph("Aveiro");
+		*graph = buildGraph("Aveiro");
 		break;
 	case 2:
-		graph = buildGraph("Braga");		
+		*graph = buildGraph("Braga");		
 		break;
 	case 3:
-		graph = buildGraph("Coimbra");		
+		*graph = buildGraph("Coimbra");		
 		break;
 	case 4:
-		graph = buildGraph("Ermesinde");
+		*graph = buildGraph("Ermesinde");
 		break;
 	case 5:
-		graph = buildGraph("Fafe");		
+		*graph = buildGraph("Fafe");		
 		break;
 	case 6:
-		graph = buildGraph("Gondomar");		
+		*graph = buildGraph("Gondomar");		
 		break;
 	case 7:
-		graph = buildGraph("Lisboa");		
+		*graph = buildGraph("Lisboa");		
 		break;
 	case 8:
-		graph = buildGraph("Maia");		
+		*graph = buildGraph("Maia");		
 		break;
 	case 9:
-		graph = buildGraph("Porto");		
+		*graph = buildGraph("Porto");		
 		break;
 	case 10:
-		graph = buildGraph("Portugal");		
+		*graph = buildGraph("Portugal");		
 		break;
 	case 11:
-		graph = buildGraph("Viseu");		
+		*graph = buildGraph("Viseu");		
 		break;
 	case 0:
 		break;
@@ -427,7 +431,7 @@ void InicialMenu(Graph<MapInfo> * graph)
 			cout << "\n You must first choose a map\n\n";
 		else{
 			header("MAP");
-		//	showGraph(graph);
+			showGraph(graph);
 			system("cls");
 		}
 		InicialMenu(graph);
@@ -438,7 +442,7 @@ void InicialMenu(Graph<MapInfo> * graph)
 			InicialMenu(graph);
 		}
 		else
-		//	MapOperationsMenu(graph);
+			MapOperationsMenu(graph);
 		break;
 	case 0:
 		system("cls");
@@ -453,11 +457,9 @@ void InicialMenu(Graph<MapInfo> * graph)
 int main() {	
 	system("title   SMART DELIVERY");
 
-	Graph<MapInfo> * graph = NULL;
+	Graph<MapInfo> graph;
 
-	InicialMenu(graph);
-
-	free(graph);
+	InicialMenu(&graph);
 
 	return 0;
 }
