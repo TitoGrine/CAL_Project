@@ -19,6 +19,12 @@ template <class T>
 std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
+std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest); 
+
+template <class T>
+std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries);
+
+template <class T>
 static void dfsVisit(Vertex<T> *v, vector<Vertex<T> *> & res) {
 	v->setVisited(true);
 	res.push_back(v);
@@ -175,4 +181,9 @@ std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, cons
 					graph->setP(i, j, graph->getP(k, j));
 				}
 			}
+}
+
+template <class T>
+std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries){
+	
 }
