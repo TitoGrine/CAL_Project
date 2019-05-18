@@ -41,7 +41,8 @@ static void printVertex(vector<Vertex *> verts, ostream & output){
 	output << endl;
 }
 
-static void prinntEdgesDest(vector<Edge> * edges){
+
+static void printEdgesDest(vector<Edge> * edges){
 	for(unsigned int i = 0; i < edges->size(); i++)
 		cout << edges->at(i).getDest()->getInfo() << " ; ";
 	cout << endl;
@@ -87,10 +88,10 @@ vector<Vertex *> scc(Graph * graph, Vertex * initial){
 /**
  * Analyzes an edge in single source shortest path algorithm.
  * Returns true if the target vertex was relaxed (dist, path).
- * Used by all single-source shortest path algorithms.
+ * Used by Dijkstra and A* shortest path algorithms.
  */
 
-inline bool relax(Vertex *v, Vertex *w, double weight) {
+inline bool dijkstraRelax(Vertex *v, Vertex *w, double weight) {
 	if (v->getDist() + weight < w->getDist()) {
 		w->setDist(v->getDist() + weight);
 		w->setPath(v);
@@ -100,16 +101,39 @@ inline bool relax(Vertex *v, Vertex *w, double weight) {
 		return false;
 }
 
-void dijkstraShortestPath(Graph * graph, const long &origin) {
+inline bool aStarRelax(Vertex *v, Vertex *w, Vertex *dest, double weight) {
+	double heuristicDistance = v->getDist() - v->getEuclideanDist(dest) + weight + w->getEuclideanDist(dest);
+	if (w->getDist() > heuristicDistance) {
+		w->setDist(heuristicDistance);
+		w->setPath(v); 
+		return true;
+	}
+	else
+		return false;
+}
+
+inline bool relax(Vertex *v, Vertex *w, Vertex *dest, double weight, bool isDijkstra) 
+{
+	if(isDijkstra) return dijkstraRelax(v, w, weight);
+	return aStarRelax(v, w, dest, weight);
+}
+
+std::vector<long> shortestPath(Graph * graph, const long &origin, const long &dest, bool isDijkstra)
+{
 	auto s = graph->initSingleSource(origin);
+	Vertex* d = graph->findVertex(dest);
 	MutablePriorityQueue<Vertex> q;
 	q.insert(s);
+
 	while( ! q.empty() ) {
 		auto v = q.extractMin();
+
+		if(v == d) return graph->getPath(origin, dest);
+			
 		for(unsigned int i = 0; i < v->getAdj()->size(); i++) {
 			auto e = v->getAdj()->at(i);
 			auto oldDist = e.getDest()->getDist();
-			if (relax(v, e.getDest(), e.getWeight())) {
+			if (relax(v, e.getDest(), d, e.getWeight(), isDijkstra)) {
 				if (oldDist == INF)
 					q.insert(e.getDest());
 				else
@@ -117,4 +141,14 @@ void dijkstraShortestPath(Graph * graph, const long &origin) {
 			}
 		}
 	}
+}
+
+std::vector<long> dijkstraShortestPath(Graph * graph, const long &origin, const long &dest)
+{
+	return shortestPath(graph, origin, dest, true);
+}
+
+std::vector<long> aStarShortestPath(Graph * graph, const long &origin, const long &dest)
+{
+	return shortestPath(graph, origin, dest, false);
 }
