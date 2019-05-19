@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-Graph<MapInfo> buildGraph(string MapName){
+Graph<MapInfo> buildGraph(string MapName, bool bidirectional){
 	Graph<MapInfo> graph;
 
 	ifstream nodesFile;
@@ -62,6 +62,9 @@ Graph<MapInfo> buildGraph(string MapName){
 		Vertex<MapInfo> * v2 = graph.findVertex(mi2);
 	
 		graph.addEdge(*(v1->getInfo()), *(v2->getInfo()), v1->getEuclideanDist(v2));
+		
+		if(bidirectional)
+			graph.addEdge(*(v2->getInfo()), *(v1->getInfo()), v2->getEuclideanDist(v1));
 	}
 
 	edgesFile.close();

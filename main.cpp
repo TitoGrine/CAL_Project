@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#define UNDIRECTED true
+
 void InicialMenu(Graph<MapInfo> * graph);
 void MapOperationsMenu(Graph<MapInfo> * graph);
 
@@ -80,7 +82,7 @@ void header(const string &header)
 
 void showGraph(Graph<MapInfo> * graph){
 	cout << " Map shown in the GraphViewer" << endl;
-	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW");
+	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED);
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
@@ -332,7 +334,7 @@ void ConnectionMenu(Graph<MapInfo> * graph){
 	cout << " Calculating..." << endl;
 
 	Vertex<MapInfo> * initial = graph->findInitial();
-	vector<Vertex<MapInfo> *> res = dfs(graph, initial);
+	vector<Vertex<MapInfo> *> res = scc(graph, initial, UNDIRECTED);
 
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", res);
@@ -360,6 +362,8 @@ void ConnectionMenu(Graph<MapInfo> * graph){
     default:break;
     }
 }
+
+//-----------------------------------------------------------------------------------------------------------------------//
 
 void MapOperationsMenu(Graph<MapInfo> * graph){
 	header("MAP OPERATIONS");
@@ -389,9 +393,8 @@ void MapOperationsMenu(Graph<MapInfo> * graph){
 			cout << "\n You must first enter a intial point\n\n";
 			MapOperationsMenu(graph);
 		}
-		else{
+		else
 			ConnectionMenu(graph);
-		}
 		break;
 	case 4:
 		header("SOLVE PROBLEMS");
@@ -405,6 +408,8 @@ void MapOperationsMenu(Graph<MapInfo> * graph){
     }
 
 }
+
+//-----------------------------------------------------------------------------------------------------------------------//
 
 void MapMenu(Graph<MapInfo> * graph)
 {
@@ -428,37 +433,37 @@ void MapMenu(Graph<MapInfo> * graph)
 	switch (option_number)
 	{
 	case 1:
-		*graph = buildGraph("Aveiro");
+		*graph = buildGraph("Aveiro", UNDIRECTED);
 		break;
 	case 2:
-		*graph = buildGraph("Braga");		
+		*graph = buildGraph("Braga", UNDIRECTED);		
 		break;
 	case 3:
-		*graph = buildGraph("Coimbra");		
+		*graph = buildGraph("Coimbra", UNDIRECTED);
 		break;
 	case 4:
-		*graph = buildGraph("Ermesinde");
+		*graph = buildGraph("Ermesinde", UNDIRECTED);
 		break;
 	case 5:
-		*graph = buildGraph("Fafe");		
+		*graph = buildGraph("Fafe", UNDIRECTED);
 		break;
 	case 6:
-		*graph = buildGraph("Gondomar");		
+		*graph = buildGraph("Gondomar", UNDIRECTED);	
 		break;
 	case 7:
-		*graph = buildGraph("Lisboa");		
+		*graph = buildGraph("Lisboa", UNDIRECTED);
 		break;
 	case 8:
-		*graph = buildGraph("Maia");		
+		*graph = buildGraph("Maia", UNDIRECTED);
 		break;
 	case 9:
-		*graph = buildGraph("Porto");		
+		*graph = buildGraph("Porto", UNDIRECTED);
 		break;
 	case 10:
-		*graph = buildGraph("Portugal");		
+		*graph = buildGraph("Portugal", UNDIRECTED);
 		break;
 	case 11:
-		*graph = buildGraph("Viseu");		
+		*graph = buildGraph("Viseu", UNDIRECTED);
 		break;
 	case 0:
 		break;
@@ -516,7 +521,6 @@ void InicialMenu(Graph<MapInfo> * graph)
     default:break;
     }
 }
-
 
 //=======================================================================================================================//
 

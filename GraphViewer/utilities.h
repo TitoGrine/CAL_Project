@@ -8,7 +8,7 @@ template <class T>
 GraphViewer * createVertexGraphViewer(const Graph<T> * graph, int vertexSize, std::string vertexColor);
 
 template <class T>
-void addEdgesToGV(const Graph<T> * graph, GraphViewer * gv);
+void addEdgesToGV(const Graph<T> * graph, GraphViewer * gv, bool bidirectional);
 
 template <class T>
 GraphViewer * createFullGraphViewer(const Graph<T> * graph, int vertexSize, std::string vertexColor);
@@ -50,23 +50,26 @@ GraphViewer * createVertexGraphViewer(const Graph<T> * graph, int vertexSize, st
 	return gv;	
 }
 
+// TODO: ver se se importam estar a desenhar 2 vezes
 template <class T>
-void addEdgesToGV(const Graph<T> * graph, GraphViewer * gv){
+void addEdgesToGV(const Graph<T> * graph, GraphViewer * gv, bool bidirectional){
 	// Edges
 	int edgeID = 0;
 	gv->defineEdgeCurved(false);
 	for(auto i = 0; i < graph->getNumVertex(); i++){
 		Vertex<T> * v = graph->getVertexSet().at(i);
 		for(size_t j = 0; j < v->getAdj()->size(); j++)
-			gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
-
+			if(bidirectional)
+				gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::UNDIRECTED);
+			else
+				gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
 	}
 }
 
 template <class T>
-GraphViewer * createFullGraphViewer(const Graph<T> * graph, int vertexSize, string vertexColor){
+GraphViewer * createFullGraphViewer(const Graph<T> * graph, int vertexSize, string vertexColor, bool bidirectional){
 	GraphViewer * gv = createVertexGraphViewer(graph, vertexSize, vertexColor);
-	addEdgesToGV(graph, gv);
+	addEdgesToGV(graph, gv, bidirectional);
 	return gv;
 }
 
