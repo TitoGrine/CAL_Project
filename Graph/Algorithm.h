@@ -27,10 +27,10 @@ template <class T>
 std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries);
 
 template <class T>
-std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest);
+std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
 
 template <class T>
-std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest);
+std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
 
 /* ------------------------------------------------------------------------------------------------ */
 template <class T>
@@ -169,40 +169,71 @@ std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &des
 
 
 template <class T>
-std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest)
+std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
 
     vector<T> final_path, path;
 
 	thread t1(dijkstraShortestPath, graph, origin, delivery);
-	thread t2(dijkstraShortestPath, graph, delivery, dest);
-	
-	t1.join();
-	t2.join();
+	if(bidirectional){
+		thread t2(dijkstraShortestPath, graph, delivery, dest);
 
-	final_path = graph->getPath(origin, delivery);
-	path = graph->getPath(delivery, origin);
+		t1.join();
+		t2.join();
 
-	final_path.insert(final_path.end(), path.begin(), path.end());
+		final_path = graph->getPath(origin, delivery);
+		path = graph->getPath(delivery, dest);
+
+		final_path.insert(final_path.end(), path.begin(), path.end());
+	}
+	else{
+		Graph<T> invertedGraph = graph->invert();
+		thread t2(dijkstraShortestPath, invertedGraph, dest, delivery);
+
+		t1.join();
+		t2.join();
+
+		final_path = graph->getPath(origin, delivery);
+		path = invertedGraph->getPath(dest, delivery);
+
+		// TODO: verify
+		final_path.insert(final_path.end(), path.rbegin(), path.rend());
+	}
 
 	return final_path;
 }
 
 template <class T>
-std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest)
+std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
     vector<T> final_path, path;
 
 	thread t1(aStarShortestPath, graph, origin, delivery);
-	thread t2(aStarShortestPath, graph, delivery, dest);
 	
-	t1.join();
-	t2.join();
+	if(bidirectional){
+		thread t2(aStarShortestPath, graph, delivery, dest);
 
-	final_path = graph->getPath(origin, delivery);
-	path = graph->getPath(delivery, origin);
+		t1.join();
+		t2.join();
 
-	final_path.insert(final_path.end(), path.begin(), path.end());
+		final_path = graph->getPath(origin, delivery);
+		path = graph->getPath(delivery, dest);
+
+		final_path.insert(final_path.end(), path.begin(), path.end());
+	}
+	else{
+		Graph<T> invertedGraph = graph->invert();
+		thread t2(aStarShortestPath, invertedGraph, dest, delivery);
+
+		t1.join();
+		t2.join();
+
+		final_path = graph->getPath(origin, delivery);
+		path = invertedGraph->getPath(dest, delivery);
+
+		// TODO: verify
+		final_path.insert(final_path.end(), path.rbegin(), path.rend());
+	}
 
 	return final_path;
 }
