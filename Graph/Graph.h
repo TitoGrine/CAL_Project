@@ -166,11 +166,11 @@ template <class T>
 Graph<T> Graph<T>::invert(){
 	Graph<T> newGraph = Graph();
 	for(auto v: this->vertexSet)
-		newGraph.addVertex(v->getInfo(), v->getX(), v->getY());
+		newGraph.addVertex( *(v->getInfo()), v->getX(), v->getY());
 	
 	for(auto v: this->vertexSet)
 		for(size_t j = 0; j < v->getAdj()->size(); j++)
-			newGraph.addEdge(v->getAdj()->at(j).getDest()->getInfo(), v->getAdj()->at(j).getOrig()->getInfo(), v->getAdj()->at(j).getWeight());
+			newGraph.addEdge( *(v->getAdj()->at(j).getDest()->getInfo()), *(v->getAdj()->at(j).getOrig()->getInfo()), v->getAdj()->at(j).getWeight());
 	return newGraph;
 }
 

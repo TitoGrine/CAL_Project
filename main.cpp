@@ -5,12 +5,15 @@
 
 #include "Utilities/parser.h"
 #include "Utilities/MapInfo.h"
+#include "Utilities/debugGraph.h"
 #include "Graph/Graph.h"
 #include "Interface/Input.h"
 #include "Interface/ConsoleFunctions.h"
 #include "GraphViewer/utilities.h"
 
 using namespace std;
+
+#define UNDIRECTED false
 
 void InicialMenu(Graph<MapInfo> * graph);
 void MapOperationsMenu(Graph<MapInfo> * graph);
@@ -81,7 +84,7 @@ void header(const string &header)
 
 void showGraph(Graph<MapInfo> * graph){
 	cout << " Map shown in the GraphViewer" << endl;
-	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW");
+	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED);
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
@@ -137,6 +140,21 @@ void showPointGV(Graph<MapInfo> * graph, bool initial){
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
+}
+
+//-----------------------------------------------------------------------------------------------------------------------//
+
+// TODO: escolher nome melhor
+void showPathGV(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, vector<Vertex<MapInfo> *> * points){
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	paintVertexesGV(gv, 10, "YELLOW", *points);
+	gv->setVertexSize(initial->getInfo()->getID(), 20);
+	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
+	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+
 }
 
 //=======================================================================================================================//
@@ -237,6 +255,9 @@ bool DeliveryPlaceMenu(Graph<MapInfo> * graph) {
 
 void oneTruckOneDelProb(Graph<MapInfo> * graph) {
 	
+	//TEMP
+	bool bidirectional = true;
+
 	while (DeliveryPlaceMenu(graph));
 
 	header("ONE TRUCK - ONE DELIVERY");
@@ -255,11 +276,11 @@ void oneTruckOneDelProb(Graph<MapInfo> * graph) {
 	vector<MapInfo> solutionPath;
 	switch (option_number) {
 		case 1 :
-			solutionPath = bidirectionalDijkstra(graph, *(graph->findInitial()->getInfo()), delivery, *(graph->findFinal()->getInfo()));
+			solutionPath = bidirectionalDijkstra(graph, *(graph->findInitial()->getInfo()), delivery, *(graph->findFinal()->getInfo()), bidirectional);
 			//TODO: Show solution to user
 			break;
 		case 2 :
-			solutionPath = bidirectionalAStar(graph, *(graph->findInitial()->getInfo()), delivery, *(graph->findFinal()->getInfo()));
+			solutionPath = bidirectionalAStar(graph, *(graph->findInitial()->getInfo()), delivery, *(graph->findFinal()->getInfo()), bidirectional);
 			//TODO: Show solution to user
 			break;
 		case 3 :
@@ -336,6 +357,7 @@ void PointMenu(Graph<MapInfo> * graph, bool initial){
 		break;
 	case 3:
 		showPointTerminal(graph, initial);
+		system("pause");
 		PointMenu(graph, initial);
 		break;
 	case 4:
@@ -362,30 +384,27 @@ void ConnectionMenu(Graph<MapInfo> * graph){
 	std::cout << "   0 - Go Back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 2);
+	
+	Vertex<MapInfo> * initial;
+	vector<Vertex<MapInfo> *> res;
 
-	// TODO: fazer aquela animacao dos 3 pontos
-	cout << " Calculating..." << endl;
+	if(option_number != 0){
+		// TODO: fazer aquela animacao dos 3 pontos
+		cout << " Calculating..." << endl;
 
-	Vertex<MapInfo> * initial = graph->findInitial();
-	vector<Vertex<MapInfo> *> res = dfs(graph, initial);
-
-	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
-	paintVertexesGV(gv, 10, "YELLOW", res);
-	gv->setVertexSize(initial->getInfo()->getID(), 20);
-	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
-	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
-	gv->rearrange();
-	getchar();
-	gv->closeWindow();
+		initial = graph->findInitial();
+		res = scc(graph, initial, UNDIRECTED);
+	}
 
 	switch (option_number)
 	{
 	case 1:
-		addPoint(graph, initial);
+		printVertex(res, cout);
+		system("pause");
 		ConnectionMenu(graph);
 		break;
 	case 2:
-		removePoint(graph, initial);
+		showPathGV(graph, initial, &res);
 		ConnectionMenu(graph);
 		break;
 	case 0:
@@ -395,6 +414,8 @@ void ConnectionMenu(Graph<MapInfo> * graph){
     default:break;
     }
 }
+
+//-----------------------------------------------------------------------------------------------------------------------//
 
 void MapOperationsMenu(Graph<MapInfo> * graph){
 	header("MAP OPERATIONS");
@@ -424,9 +445,8 @@ void MapOperationsMenu(Graph<MapInfo> * graph){
 			cout << "\n You must first enter a intial point\n\n";
 			MapOperationsMenu(graph);
 		}
-		else{
+		else
 			ConnectionMenu(graph);
-		}
 		break;
 	case 4:
 		header("SOLVE PROBLEMS");
@@ -440,6 +460,8 @@ void MapOperationsMenu(Graph<MapInfo> * graph){
     }
 
 }
+
+//-----------------------------------------------------------------------------------------------------------------------//
 
 void MapMenu(Graph<MapInfo> * graph)
 {
@@ -463,37 +485,37 @@ void MapMenu(Graph<MapInfo> * graph)
 	switch (option_number)
 	{
 	case 1:
-		*graph = buildGraph("Aveiro");
+		*graph = buildGraph("Aveiro", UNDIRECTED);
 		break;
 	case 2:
-		*graph = buildGraph("Braga");		
+		*graph = buildGraph("Braga", UNDIRECTED);		
 		break;
 	case 3:
-		*graph = buildGraph("Coimbra");		
+		*graph = buildGraph("Coimbra", UNDIRECTED);
 		break;
 	case 4:
-		*graph = buildGraph("Ermesinde");
+		*graph = buildGraph("Ermesinde", UNDIRECTED);
 		break;
 	case 5:
-		*graph = buildGraph("Fafe");		
+		*graph = buildGraph("Fafe", UNDIRECTED);
 		break;
 	case 6:
-		*graph = buildGraph("Gondomar");		
+		*graph = buildGraph("Gondomar", UNDIRECTED);	
 		break;
 	case 7:
-		*graph = buildGraph("Lisboa");		
+		*graph = buildGraph("Lisboa", UNDIRECTED);
 		break;
 	case 8:
-		*graph = buildGraph("Maia");		
+		*graph = buildGraph("Maia", UNDIRECTED);
 		break;
 	case 9:
-		*graph = buildGraph("Porto");		
+		*graph = buildGraph("Porto", UNDIRECTED);
 		break;
 	case 10:
-		*graph = buildGraph("Portugal");		
+		*graph = buildGraph("Portugal", UNDIRECTED);
 		break;
 	case 11:
-		*graph = buildGraph("Viseu");		
+		*graph = buildGraph("Viseu", UNDIRECTED);
 		break;
 	case 0:
 		break;
@@ -551,7 +573,6 @@ void InicialMenu(Graph<MapInfo> * graph)
     default:break;
     }
 }
-
 
 //=======================================================================================================================//
 

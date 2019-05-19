@@ -8,11 +8,13 @@
 #include <fstream>
 #include <thread>
 
+// #include "../GraphViewer/graphviewer.h"
+
 template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
 
 template <class T>
-std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial);
+std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirectional);
 
 template <class T>
 std::vector<T> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
@@ -27,13 +29,22 @@ template <class T>
 std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries);
 
 template <class T>
-std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest);
+std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
 
 template <class T>
-std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest);
+std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+
+/* ------------------------------------------------------------------------------------------------ */
+template <class T>
+void dfsVisit(Vertex<T> *v, std::vector<Vertex<T> *> & res);
 
 template <class T>
-static void dfsVisit(Vertex<T> *v, vector<Vertex<T> *> & res) {
+bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert);
+
+/* ------------------------------------------------------------------------------------------------ */
+
+template <class T>
+void dfsVisit(Vertex<T> *v, std::vector<Vertex<T> *> & res) {
 	v->setVisited(true);
 	res.push_back(v);
 	for(unsigned int i = 0; i < v->getAdj()->size(); i++)
@@ -42,8 +53,8 @@ static void dfsVisit(Vertex<T> *v, vector<Vertex<T> *> & res) {
 }
 
 template <class T>
-vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
-	vector<Vertex<T> *> res;
+std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
+	std::vector<Vertex<T> *> res;
 	for(auto vertex: graph->getVertexSet())
 		vertex->setVisited(false);
 	dfsVisit(initial, res);
@@ -51,37 +62,52 @@ vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
 }
 
 template <class T>
-static bool containsVertex(vector<Vertex<T> *> vectorVert, Vertex<T> * vert){
+bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert){
 	for(auto v : vectorVert)
-		if(vert->getInfo() == v->getInfo())
+		if( *(vert->getInfo()) == *(v->getInfo()))
 			return true;
 	return false;
 }
 
 
 template <class T>
-vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial){
-	ofstream out;
-	out.open("teste.txt");
+std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirectional){
+	// ofstream out;
+	// out.open("teste.txt");
+
 	vector<Vertex<T> *> res_normal = dfs(graph, initial);
-	printVertex(res_normal, out);
+
+	// printVertex(res_normal, out);
+
+	if(bidirectional)
+		return res_normal;
+
 	// TODO: mudar para não alterar proprio grafo
 	Graph<T> invertedGraph = graph->invert();
 
 	// TODO: optimize em vez de reaproveitar funcao
-	Vertex<T> * invInitial = invertedGraph.findVertex(initial->getInfo());
+	Vertex<T> * invInitial = invertedGraph.findVertex( *(initial->getInfo()));
 
 	vector<Vertex<T> *> res_invert = dfs(&invertedGraph, invInitial);
 
-	printVertex(res_invert, out);
-	
+	// printVertex(res_invert, out);
+
 	vector<Vertex<T> *> res;
 	for(auto v: res_normal)
-		if(containsVertex(res, v))
+		if(containsVertex(res_invert, v))
 			res.push_back(v);
 
-	printVertex(res, out);
-	out.close();
+	
+	// printVertex(res, out);
+	// out.close();
+
+	// GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	// paintVertexesGV(gv, 10, "GREEN", res_invert);
+	// paintVertexesGV(gv, 10, "RED", res_normal);
+	// gv->rearrange();
+	// getchar();
+	// gv->closeWindow();
+
 	return res;
 }
 
@@ -167,40 +193,71 @@ std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &des
 
 
 template <class T>
-std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest)
+std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
-
     vector<T> final_path, path;
 
 	thread t1(dijkstraShortestPath<T>, graph, origin, delivery);
-	thread t2(dijkstraShortestPath<T>, graph, delivery, dest);
 	
-	t1.join();
-	t2.join();
+	if(bidirectional){
+		thread t2(dijkstraShortestPath<T>, graph, delivery, dest);
 
-	final_path = graph->getPath(origin, delivery);
-	path = graph->getPath(delivery, dest);
+		t1.join();
+		t2.join();
 
-	final_path.insert(final_path.end(), path.begin(), path.end());
+		final_path = graph->getPath(origin, delivery);
+		path = graph->getPath(delivery, dest);
+
+		final_path.insert(final_path.end(), path.begin(), path.end());
+	}
+	else{ 
+		Graph<T> invertedGraph = graph->invert();
+		thread t2(dijkstraShortestPath<T>, &invertedGraph, dest, delivery);
+
+		t1.join();
+		t2.join();
+
+		final_path = graph->getPath(origin, delivery);
+		path = invertedGraph.getPath(dest, delivery);
+
+		// TODO: verify
+		final_path.insert(final_path.end(), path.rbegin(), path.rend());
+	}
 
 	return final_path;
 }
 
 template <class T>
-std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest)
+std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
     vector<T> final_path, path;
 
 	thread t1(aStarShortestPath<T>, graph, origin, delivery);
-	thread t2(aStarShortestPath<T>, graph, delivery, dest);
 	
-	t1.join();
-	t2.join();
+	if(bidirectional){
+		thread t2(aStarShortestPath<T>, graph, delivery, dest);
 
-	final_path = graph->getPath(origin, delivery);
-	path = graph->getPath(delivery, origin);
+		t1.join();
+		t2.join();
 
-	final_path.insert(final_path.end(), path.begin(), path.end());
+		final_path = graph->getPath(origin, delivery);
+		path = graph->getPath(delivery, dest);
+
+		final_path.insert(final_path.end(), path.begin(), path.end());
+	}
+	else{ 
+		Graph<T> invertedGraph = graph->invert();
+		thread t2(aStarShortestPath<T>, &invertedGraph, dest, delivery);
+
+		t1.join();
+		t2.join();
+
+		final_path = graph->getPath(origin, delivery);
+		path = invertedGraph.getPath(dest, delivery);
+
+		// TODO: verify
+		final_path.insert(final_path.end(), path.rbegin(), path.rend());
+	}
 
 	return final_path;
 }

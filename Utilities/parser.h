@@ -5,6 +5,6 @@
 #include "../Graph/Graph.h"
 #include <string>
 
-Graph<MapInfo> buildGraph(std::string MapName);
+Graph<MapInfo> buildGraph(std::string MapName, bool bidirectional);
 
 #endif
