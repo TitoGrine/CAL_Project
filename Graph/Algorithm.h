@@ -2,10 +2,11 @@
 
 #include "Graph.h"
 #include "../Utilities/debugGraph.h"
+#include "../Utilities/mingw.thread.h"
 #include <iostream>
 #include <ostream>
 #include <fstream>
-//#include <thread>
+#include <thread>
 
 template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
@@ -158,16 +159,15 @@ std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &des
 	return shortestPath(graph, origin, dest, false);
 }
 
-/*
+
 template <class T>
 std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest)
 {
 
-    std::thread
     vector<T> final_path, path;
 
-	thread t1(callDijkstraShortestPath, graph, origin, delivery);
-	thread t2(callDijkstraShortestPath, graph, delivery, dest);
+	thread t1(dijkstraShortestPath, graph, origin, delivery);
+	thread t2(dijkstraShortestPath, graph, delivery, dest);
 	
 	t1.join();
 	t2.join();
@@ -198,7 +198,7 @@ std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &de
 
 	return final_path;
 }
-*/
+
 template <class T>
 std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest) {
 	unsigned n = graph->getVertexSet().size();
