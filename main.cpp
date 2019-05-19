@@ -18,6 +18,7 @@ using namespace std;
 void InicialMenu(Graph<MapInfo> * graph);
 void MapOperationsMenu(Graph<MapInfo> * graph);
 void ProblemsMenu(Graph<MapInfo> * graph);
+void oneTruckMultDelProb(Graph<MapInfo> * graph);
 
 /**
 *  +------------------------+
@@ -151,6 +152,23 @@ void showPathGV(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, vector<Vertex
 	gv->setVertexSize(initial->getInfo()->getID(), 20);
 	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
 	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+
+}
+
+void showPathGV(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, Vertex<MapInfo> * final, vector<Vertex<MapInfo> *> * points){
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	paintVertexesGV(gv, 10, "YELLOW", *points);
+	gv->setVertexSize(initial->getInfo()->getID(), 20);
+	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
+	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+
+	gv->setVertexSize(final->getInfo()->getID(), 20);
+	gv->setVertexColor(final->getInfo()->getID(), "RED");
+	gv->setVertexLabel(final->getInfo()->getID(), "End");
+	
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
@@ -293,6 +311,76 @@ void oneTruckOneDelProb(Graph<MapInfo> * graph) {
 	
 }
 
+void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* solutionPath){
+	header("ONE TRUCK - MULTIPLE DELIVERIES");
+
+		int option_number;
+
+		std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
+
+		std::cout << "   1 - Using Euclidean Distance" << endl;
+		std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
+		std::cout << "   0 - Go Back" << endl << endl;
+
+		option_number = menuInput(" Option ? ", 0, 2);
+
+		switch (option_number) {
+		case 1 :
+			*solutionPath = NearestNeighborEuclidean(graph, *(graph->findInitial()->getInfo()), graph->getDeliveries(), *(graph->findFinal()->getInfo()));
+			system("pause");		
+			showPathGV(graph, graph->findInitial(), graph->findFinal(), solutionPath);
+			break;
+		case 2 :
+			*solutionPath = NearestNeighborFloyd(graph, *(graph->findInitial()->getInfo()), graph->getDeliveries(), *(graph->findFinal()->getInfo()));
+			system("pause");
+			showPathGV(graph, graph->findInitial(), graph->findFinal(), solutionPath);
+			//TODO: Show solution to user
+			break;
+		case 0 :
+			system("cls");
+			oneTruckMultDelProb(graph);
+			return;
+		default:
+			break;
+	}
+}
+
+void oneTruckMultDelProb(Graph<MapInfo> * graph) {
+
+	while (DeliveryPlaceMenu(graph));
+
+	header("ONE TRUCK - MULTIPLE DELIVERIES");
+
+	int option_number;
+
+	std::cout << " CHOOSE AN ALGORITHM:" << endl << endl;
+
+	std::cout << "   1 - Nearest Neighbor Algorithm" << endl;
+	std::cout << "   2 - Local Search (2-opt) Algorithm" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 2);
+
+	std::vector<Vertex<MapInfo> *> solutionPath;
+
+	switch (option_number) {
+		case 1 :
+			NearestNeighbourMenu(graph, &solutionPath);
+			//TODO: Show solution to user
+			break;
+		case 2 :
+			//TODO: Call 2-opt function
+			//TODO: Show solution to user
+			break;
+		case 0 :
+			system("cls");
+			ProblemsMenu(graph);
+			return;
+		default:
+			break;
+	}
+}
+
 void ProblemsMenu(Graph<MapInfo> * graph) {
 	header("PROBLEMS");
 
@@ -313,12 +401,13 @@ void ProblemsMenu(Graph<MapInfo> * graph) {
 			oneTruckOneDelProb(graph);
 			break;
 		case 2:
-
+			oneTruckMultDelProb(graph);
 			break;
 		case 3:
 
 			break;
 		case 0:
+			system("cls");
 			MapOperationsMenu(graph);
 			break;
 		default: 
@@ -389,9 +478,7 @@ void ConnectionMenu(Graph<MapInfo> * graph){
 	vector<Vertex<MapInfo> *> res;
 
 	if(option_number != 0){
-		// TODO: fazer aquela animacao dos 3 pontos
-		cout << " Calculating..." << endl;
-
+		cout << " Calculating...";		// Animation needs a while loop, couldn't find a good one
 		initial = graph->findInitial();
 		res = scc(graph, initial, UNDIRECTED);
 	}

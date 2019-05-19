@@ -23,10 +23,13 @@ template <class T>
 std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
-std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest); 
+void FloydWarshallShortestPath(Graph<T> * graph); 
 
 template <class T>
-std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries);
+std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
+
+template <class T>
+std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
 
 template <class T>
 std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
@@ -93,9 +96,10 @@ std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirec
 	// printVertex(res_invert, out);
 
 	vector<Vertex<T> *> res;
-	for(auto v: res_normal)
+	for(auto v: res_normal){
 		if(containsVertex(res_invert, v))
 			res.push_back(v);
+	}
 
 	
 	// printVertex(res, out);
@@ -263,7 +267,7 @@ std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &de
 }
 
 template <class T>
-std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, const T &dest) {
+void FloydWarshallShortestPath(Graph<T> * graph) {
 	unsigned n = graph->getVertexSet().size();
 
 	graph->resetMatrixW(n);
@@ -274,9 +278,9 @@ std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, cons
 			graph->setW(i, j, i == j? 0 : INF);
 			graph->setP(i, j, -1);
 		}
-		for (auto e : graph->getVertexSet().at(i)->adj) {
-			int j = graph->findVertexIdx(e.dest->info);
-			graph->setW(i, j, e.weight);
+		for (Edge<T> e : *(graph->getVertexSet().at(i)->getAdj())) {
+			int j = graph->findVertexIdx(*e.getDest()->getInfo());
+			graph->setW(i, j, e.getWeight());
 			graph->setP(i, j, i);
 		}
 	}
@@ -295,26 +299,33 @@ std::vector<T> FloydWarshallShortestPath(Graph<T> * graph, const T &origin, cons
 }
 
 template <class T>
-std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T> deliveries){
+std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest){
 
-	vector<T> result;
+	vector<Vertex<T> *>result;
 	Vertex<T>* start = graph->findVertex(origin);
 
-	for(auto vertex : graph->getVertexSet()){
+	for(Vertex<T>* vertex : graph->getVertexSet()){
 		vertex->setDist(start->getEuclideanDist(vertex));
 	}
 
-	MutablePriorityQueue<Vertex<T>*> Q;
-	MutablePriorityQueue<Vertex<T>*> aux;
+	MutablePriorityQueue<Vertex<T>> Q;
+	MutablePriorityQueue<Vertex<T>> aux;
 
 	for(T info : deliveries){
 		Q.insert(graph->findVertex(info));
 	}
 
+	result.push_back(graph->findVertex(origin));
+
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
 
-		result.push_back(vertex->getInfo());
+		vector<T> path = graph->getPath(*(result.back()->getInfo()), *(vertex->getInfo()));
+		for(unsigned i = 0; i < path.size(); i++ ){
+			result.push_back(graph->findVertex(path.at(i)));
+		}
+
+		result.push_back(vertex);
 
 		aux = Q;
 
@@ -324,5 +335,63 @@ std::vector<T> NearestNeighbor(Graph<T> * graph, const T &origin, const vector<T
 		}
 	}
 
+	vector<T> path = graph->getPath(*(result.back()->getInfo()), dest);
+		for(unsigned i = 0; i < path.size(); i++ ){
+			result.push_back(graph->findVertex(path.at(i)));
+		}
+
+	result.erase(result.begin());
+
 	return result;
 }
+
+template <class T>
+std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest){
+
+	FloydWarshallShortestPath(graph);
+
+	vector<Vertex<T> *> result;
+	int inicial = graph->findVertexIdx(origin);
+
+	for(T info : deliveries){
+		Vertex<T>* vertex = graph->findVertex(info);
+		vertex->setDist(graph->getW(inicial, graph->findVertexIdx(info)));
+	}
+
+	MutablePriorityQueue<Vertex<T>> Q;
+	MutablePriorityQueue<Vertex<T>> aux;
+
+	for(T info : deliveries){
+		Q.insert(graph->findVertex(info));
+	}
+
+	result.push_back(graph->findVertex(origin));
+
+	while(!Q.empty()) {
+		Vertex<T>* vertex = Q.extractMin();
+
+		vector<T> path = graph->getFloydWarshallPath(*(result.back()->getInfo()), *(vertex->getInfo()));
+		for(unsigned i = 0; i < path.size(); i++ ){
+			result.push_back(graph->findVertex(path.at(i)));
+		}
+
+		result.push_back(vertex); // Not sure if it's not already inlcuded in the FWPath
+
+		aux = Q;
+
+		while(!aux.empty()){
+			Vertex<T>* v = aux.extractMin();
+			v->setDist(graph->getW(graph->findVertexIdx(*(vertex->getInfo())), graph->findVertexIdx(*(v->getInfo()))));
+		}
+	}
+	
+	vector<T> path = graph->getFloydWarshallPath(*(result.back()->getInfo()), dest);
+	for(unsigned i = 0; i < path.size(); i++ ){
+			result.push_back(graph->findVertex(path.at(i)));
+	}
+
+	result.erase(result.begin());
+
+	return result;
+}
+
