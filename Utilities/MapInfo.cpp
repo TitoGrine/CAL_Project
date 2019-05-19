@@ -15,7 +15,7 @@ bool MapInfo::operator==(const MapInfo & mapInfo) const{
 	return this->mapID == mapInfo.getID();
 }
 
-MapInfo& MapInfo::operator=(const MapInfo& mi) {
+MapInfo& MapInfo::operator=(const MapInfo & mi) {
 	if(this == &mi) return *this;
 	this->mapID = mi.getID();
 	return *this;

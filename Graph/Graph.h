@@ -76,8 +76,9 @@ public:
 	//Temp
 	void addDeposit(const T &info, int tagNum);
 	void addShop(const T &info, int tagNum);
-	void addDelivery(const T &info);
+	bool addDelivery(const T &info); //TODO: throw exception
 	void removeDelivery(const T &info);
+	std::vector<T> getDeliveries();
 	T getShop(int shopType);
 };
 
@@ -211,11 +212,13 @@ Vertex<T> * Graph<T>::initSingleSource(const T &origin) {
 template<class T>
 vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
 	vector<T> res;
+	auto o = findVertex(origin);
 	auto v = findVertex(dest);
 	if (v == nullptr || v->dist == INF) // missing or disconnected
 		return res;
-	for ( ; v != nullptr; v = v->path)
+	for ( ; v != o && v != nullptr; v = v->path)
 		res.push_back(v->info);
+	res.push_back(o->info);
 	reverse(res.begin(), res.end());
 	return res;
 }
@@ -416,7 +419,7 @@ vector<Vertex<T>*> Graph<T>::calculateKruskal() {
 template <class T>
 void Graph<T>::addDeposit(const T &info, int tagNum)
 {
-	if(deposits.at(tagNum) == NULL) {
+	if(deposits.size() <= (unsigned int) tagNum) {
 		vector<T> newDepositTag;
 		newDepositTag.push_back(info);
 		deposits.push_back(newDepositTag);
@@ -442,9 +445,14 @@ void Graph<T>::addShop(const T &info, int tagNum)
 
 //Temp
 template <class T>
-void Graph<T>::addDelivery(const T &info)
+bool Graph<T>::addDelivery(const T &info)
 {
+	for(T inf : deliveries) {
+		if(inf == info) return false;
+	}
+
 	deliveries.push_back(info);
+	return true;
 }
 
 //Temp
@@ -465,6 +473,13 @@ T Graph<T>::getShop(int shopType)
 {
 	vector<T> typeShops = shops.at(shopType);
 	return typeShops.at(rand() % typeShops.size());
+}
+
+//Temp
+template <class T>
+std::vector<T> Graph<T>::getDeliveries()
+{
+	return deliveries;
 }
 
 #endif /* GRAPH_H_ */

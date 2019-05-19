@@ -124,6 +124,7 @@ inline bool relax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight, bo
 template <class T>
 static std::vector<T> shortestPath(Graph<T> * graph, const T &origin, const T &dest, bool isDijkstra)
 {
+	std::vector<T> result;
 	auto s = graph->initSingleSource(origin);
 	Vertex<T>* d = graph->findVertex(dest);
 	MutablePriorityQueue<Vertex<T>> q;
@@ -132,7 +133,10 @@ static std::vector<T> shortestPath(Graph<T> * graph, const T &origin, const T &d
 	while( ! q.empty() ) {
 		auto v = q.extractMin();
 
-		if(v == d) return graph->getPath(origin, dest);
+		if(v == d) {
+			result = graph->getPath(origin, dest);
+			break;
+		}
 			
 		for(unsigned int i = 0; i < v->getAdj()->size(); i++) {
 			auto e = v->getAdj()->at(i);
@@ -145,6 +149,8 @@ static std::vector<T> shortestPath(Graph<T> * graph, const T &origin, const T &d
 			}
 		}
 	}
+
+	return result;
 }
 
 template <class T>
@@ -166,14 +172,14 @@ std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T 
 
     vector<T> final_path, path;
 
-	thread t1(dijkstraShortestPath, graph, origin, delivery);
-	thread t2(dijkstraShortestPath, graph, delivery, dest);
+	thread t1(dijkstraShortestPath<T>, graph, origin, delivery);
+	thread t2(dijkstraShortestPath<T>, graph, delivery, dest);
 	
 	t1.join();
 	t2.join();
 
 	final_path = graph->getPath(origin, delivery);
-	path = graph->getPath(delivery, origin);
+	path = graph->getPath(delivery, dest);
 
 	final_path.insert(final_path.end(), path.begin(), path.end());
 
@@ -185,8 +191,8 @@ std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &de
 {
     vector<T> final_path, path;
 
-	thread t1(aStarShortestPath, graph, origin, delivery);
-	thread t2(aStarShortestPath, graph, delivery, dest);
+	thread t1(aStarShortestPath<T>, graph, origin, delivery);
+	thread t2(aStarShortestPath<T>, graph, delivery, dest);
 	
 	t1.join();
 	t2.join();

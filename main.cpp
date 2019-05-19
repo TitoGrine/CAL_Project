@@ -14,6 +14,7 @@ using namespace std;
 
 void InicialMenu(Graph<MapInfo> * graph);
 void MapOperationsMenu(Graph<MapInfo> * graph);
+void ProblemsMenu(Graph<MapInfo> * graph);
 
 /**
 *  +------------------------+
@@ -84,7 +85,6 @@ void showGraph(Graph<MapInfo> * graph){
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
-
 }
 
 //-----------------------------------------------------------------------------------------------------------------------//
@@ -207,13 +207,12 @@ void removePoint(Graph<MapInfo> * graph, bool initial){
 *  +------------------------+
 */
 
-void DeliveryPlaceMenu(Graph<MapInfo> * graph) {
+bool DeliveryPlaceMenu(Graph<MapInfo> * graph) {
 	header("DELIVERY PLACE");
 
 	int option_number;
 
-	std::cout << " CHOOSE A DELIVERY PLACE:" << endl;
-	std::cout << " OPTIONS:" << endl << endl;
+	std::cout << " CHOOSE A DELIVERY PLACE:" << endl << endl;
 
 	std::cout << "   1 - Department Store" << endl;
 	std::cout << "   2 - Variety Store" << endl;
@@ -231,9 +230,46 @@ void DeliveryPlaceMenu(Graph<MapInfo> * graph) {
 
 	option_number = menuInput(" Option ? ", 0, 12);
 
-	if(option_number == 0) return;
+	if(option_number == 0) return false;
 
-	graph->addDelivery(graph->getShop(option_number));
+	return graph->addDelivery(graph->getShop(option_number));
+}
+
+void oneTruckOneDelProb(Graph<MapInfo> * graph) {
+	
+	while (DeliveryPlaceMenu(graph));
+
+	header("ONE TRUCK - ONE DELIVERY");
+
+	int option_number;
+
+	std::cout << " CHOOSE AN ALGORITHM:" << endl << endl;
+
+	std::cout << "   1 - Dijkstra Algorithm" << endl;
+	std::cout << "   2 - A* Algorithm" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 2);
+
+	MapInfo delivery = graph->getDeliveries().at(0);
+	vector<MapInfo> solutionPath;
+	switch (option_number) {
+		case 1 :
+			solutionPath = bidirectionalDijkstra(graph, *(graph->findInitial()->getInfo()), delivery, *(graph->findFinal()->getInfo()));
+			//TODO: Show solution to user
+			break;
+		case 2 :
+			solutionPath = bidirectionalAStar(graph, *(graph->findInitial()->getInfo()), delivery, *(graph->findFinal()->getInfo()));
+			//TODO: Show solution to user
+			break;
+		case 3 :
+			ProblemsMenu(graph);
+			return;
+		default:
+			break;
+	}
+
+	
 }
 
 void ProblemsMenu(Graph<MapInfo> * graph) {
@@ -253,8 +289,7 @@ void ProblemsMenu(Graph<MapInfo> * graph) {
 	switch (option_number)
 	{
 		case 1: 
-			DeliveryPlaceMenu(graph);
-
+			oneTruckOneDelProb(graph);
 			break;
 		case 2:
 
