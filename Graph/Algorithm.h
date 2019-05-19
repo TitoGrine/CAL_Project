@@ -8,6 +8,8 @@
 #include <fstream>
 #include <thread>
 
+// #include "../GraphViewer/graphviewer.h"
+
 template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
 
@@ -62,7 +64,7 @@ std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
 template <class T>
 bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert){
 	for(auto v : vectorVert)
-		if(vert->getInfo() == v->getInfo())
+		if( *(vert->getInfo()) == *(v->getInfo()))
 			return true;
 	return false;
 }
@@ -70,8 +72,12 @@ bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert){
 
 template <class T>
 std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirectional){
+	// ofstream out;
+	// out.open("teste.txt");
 
 	vector<Vertex<T> *> res_normal = dfs(graph, initial);
+
+	// printVertex(res_normal, out);
 
 	if(bidirectional)
 		return res_normal;
@@ -84,11 +90,23 @@ std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirec
 
 	vector<Vertex<T> *> res_invert = dfs(&invertedGraph, invInitial);
 
-	
+	// printVertex(res_invert, out);
+
 	vector<Vertex<T> *> res;
 	for(auto v: res_normal)
-		if(containsVertex(res, v))
+		if(containsVertex(res_invert, v))
 			res.push_back(v);
+
+	
+	// printVertex(res, out);
+	// out.close();
+
+	// GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	// paintVertexesGV(gv, 10, "GREEN", res_invert);
+	// paintVertexesGV(gv, 10, "RED", res_normal);
+	// gv->rearrange();
+	// getchar();
+	// gv->closeWindow();
 
 	return res;
 }

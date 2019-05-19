@@ -5,6 +5,7 @@
 
 #include "Utilities/parser.h"
 #include "Utilities/MapInfo.h"
+#include "Utilities/debugGraph.h"
 #include "Graph/Graph.h"
 #include "Interface/Input.h"
 #include "Interface/ConsoleFunctions.h"
@@ -12,7 +13,7 @@
 
 using namespace std;
 
-#define UNDIRECTED true
+#define UNDIRECTED false
 
 void InicialMenu(Graph<MapInfo> * graph);
 void MapOperationsMenu(Graph<MapInfo> * graph);
@@ -139,6 +140,21 @@ void showPointGV(Graph<MapInfo> * graph, bool initial){
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
+}
+
+//-----------------------------------------------------------------------------------------------------------------------//
+
+// TODO: escolher nome melhor
+void showPathGV(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, vector<Vertex<MapInfo> *> * points){
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	paintVertexesGV(gv, 10, "YELLOW", *points);
+	gv->setVertexSize(initial->getInfo()->getID(), 20);
+	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
+	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+
 }
 
 //=======================================================================================================================//
@@ -303,6 +319,7 @@ void PointMenu(Graph<MapInfo> * graph, bool initial){
 		break;
 	case 3:
 		showPointTerminal(graph, initial);
+		system("pause");
 		PointMenu(graph, initial);
 		break;
 	case 4:
@@ -329,30 +346,27 @@ void ConnectionMenu(Graph<MapInfo> * graph){
 	std::cout << "   0 - Go Back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 2);
+	
+	Vertex<MapInfo> * initial;
+	vector<Vertex<MapInfo> *> res;
 
-	// TODO: fazer aquela animacao dos 3 pontos
-	cout << " Calculating..." << endl;
+	if(option_number != 0){
+		// TODO: fazer aquela animacao dos 3 pontos
+		cout << " Calculating..." << endl;
 
-	Vertex<MapInfo> * initial = graph->findInitial();
-	vector<Vertex<MapInfo> *> res = scc(graph, initial, UNDIRECTED);
-
-	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
-	paintVertexesGV(gv, 10, "YELLOW", res);
-	gv->setVertexSize(initial->getInfo()->getID(), 20);
-	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
-	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
-	gv->rearrange();
-	getchar();
-	gv->closeWindow();
+		initial = graph->findInitial();
+		res = scc(graph, initial, UNDIRECTED);
+	}
 
 	switch (option_number)
 	{
 	case 1:
-		addPoint(graph, initial);
+		printVertex(res, cout);
+		system("pause");
 		ConnectionMenu(graph);
 		break;
 	case 2:
-		removePoint(graph, initial);
+		showPathGV(graph, initial, &res);
 		ConnectionMenu(graph);
 		break;
 	case 0:
