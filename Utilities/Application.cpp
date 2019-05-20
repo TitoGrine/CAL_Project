@@ -84,11 +84,8 @@ bool Application::addSmallGraph(Graph<MapInfo> * graph){
 	return true;
 }
 
-bool Application::addMainGraph(Graph<MapInfo> & mainGraph){
-	if(this->mainGraph != NULL)
-		return false;
-	*this->mainGraph = mainGraph;
-	return true;
+void Application::addMainGraph(Graph<MapInfo> * mainGraph){
+	this->mainGraph = mainGraph;
 }
 
 
@@ -122,3 +119,21 @@ bool Application::removeDelivery(const MapInfo &info)
 	return true;
 }
 
+void Application::clear(){
+	free(this->mainGraph);
+	this->mainGraph = NULL;
+	free(this->smallGraph);
+	this->smallGraph = NULL;
+
+	free(this->initial);
+	this->initial = NULL;
+	free(this->last);
+	this->last = NULL;
+
+	deposits.clear();
+
+	for(unsigned int i = 0; i < (unsigned int) _N_SHOPS_TYPE; i++)
+		shops[i].clear();
+
+	deliveries.clear();
+}

@@ -13,10 +13,9 @@
 
 using namespace std;
 
-#define UNDIRECTED false
+#define UNDIRECTED true
 
 Application mainApp;
-	Graph<MapInfo> graph;
 
 
 void InicialMenu();
@@ -443,6 +442,8 @@ void MapOperationsMenu(){
 void MapMenu()
 {
 	int option_number;
+	Graph<MapInfo> * graph = new Graph<MapInfo>();
+
 
 	std::cout << " Which Map do you want:" << endl << endl;
 	std::cout << "   1 - Aveiro" << endl;
@@ -461,38 +462,48 @@ void MapMenu()
 	switch (option_number)
 	{
 	case 1:
-		graph = buildGraph("Aveiro", UNDIRECTED);
-		mainApp = buildApplication("Aveiro", UNDIRECTED, graph);
+		*graph = buildGraph("Aveiro", UNDIRECTED);
+		buildApplication(&mainApp, "Aveiro", graph);
 		break;
 	case 2:
-		graph = buildGraph("Braga", UNDIRECTED);		
+		*graph = buildGraph("Braga", UNDIRECTED);
+		buildApplication(&mainApp, "Braga", graph);		
 		break;
 	case 3:
-		graph = buildGraph("Coimbra", UNDIRECTED);
+		*graph = buildGraph("Coimbra", UNDIRECTED);
+		buildApplication(&mainApp, "Coimbra", graph);		
 		break;
 	case 4:
-		graph = buildGraph("Ermesinde", UNDIRECTED);
+		*graph = buildGraph("Ermesinde", UNDIRECTED);
+		buildApplication(&mainApp, "Ermesinde", graph);		
 		break;
 	case 5:
-		graph = buildGraph("Fafe", UNDIRECTED);
+		*graph = buildGraph("Fafe", UNDIRECTED);
+		buildApplication(&mainApp, "Fafe", graph);
 		break;
 	case 6:
-		graph = buildGraph("Gondomar", UNDIRECTED);	
+		*graph = buildGraph("Gondomar", UNDIRECTED);	
+		buildApplication(&mainApp, "Gondomar", graph);		
 		break;
 	case 7:
-		graph = buildGraph("Lisboa", UNDIRECTED);
+		*graph = buildGraph("Lisboa", UNDIRECTED);
+		buildApplication(&mainApp, "Lisboa", graph);		
 		break;
 	case 8:
-		graph = buildGraph("Maia", UNDIRECTED);
+		*graph = buildGraph("Maia", UNDIRECTED);
+		buildApplication(&mainApp, "Maia", graph);		
 		break;
 	case 9:
-		graph = buildGraph("Porto", UNDIRECTED);
+		*graph = buildGraph("Porto", UNDIRECTED);
+		buildApplication(&mainApp, "Porto", graph);		
 		break;
 	case 10:
-		graph = buildGraph("Portugal", UNDIRECTED);
+		*graph = buildGraph("Portugal", UNDIRECTED);
+		buildApplication(&mainApp, "Portugal", graph);		
 		break;
 	case 11:
-		graph = buildGraph("Viseu", UNDIRECTED);
+		*graph = buildGraph("Viseu", UNDIRECTED);
+		buildApplication(&mainApp, "Viseu", graph);		
 		break;
 	case 0:
 		break;

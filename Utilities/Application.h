@@ -66,10 +66,12 @@ public:
 	bool addShop(const MapInfo &info, map_info_t tagNum);
 
 	bool addSmallGraph(Graph<MapInfo> * graph);
-	bool addMainGraph(Graph<MapInfo> & mainGraph);
+	void addMainGraph(Graph<MapInfo> * mainGraph);
 	
 	void addDelivery(const MapInfo &info);
 	bool removeDelivery(const MapInfo &info);
+
+	void clear();
 
 	~Application();
 };

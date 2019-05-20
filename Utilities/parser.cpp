@@ -85,13 +85,15 @@ Graph<MapInfo> buildGraph(std::string MapName, bool bidirectional){
 	return graph;
 }
 
-Application buildApplication(std::string MapName, bool bidirectional, Graph<MapInfo> mainGraph){
+void buildApplication(Application * app, std::string MapName, Graph<MapInfo> * mainGraph){
+
+	app->clear();
 
 	string line;
 	istringstream iss;
 	long id;
 
-	Application app;
+	app->addMainGraph(mainGraph);
 
 	//Tags
 
@@ -100,7 +102,7 @@ Application buildApplication(std::string MapName, bool bidirectional, Graph<MapI
 
 	if(!tagsFile.is_open()){
 		cerr << "Couldn't open tags file\n";
-		return app;
+		return;
 	}
 
 	string tagType, shopType;
@@ -122,7 +124,7 @@ Application buildApplication(std::string MapName, bool bidirectional, Graph<MapI
 				iss = istringstream(line);
 				iss >> id;
 				MapInfo mi(id);
-				app.addDeposit(mi);
+				app->addDeposit(mi);
 			}
 		}
 		// Shops
@@ -136,12 +138,11 @@ Application buildApplication(std::string MapName, bool bidirectional, Graph<MapI
 				iss = istringstream(line);
 				iss >> id;
 				MapInfo mi(id);
-				app.addShop(mi, stringToMapInfoType(shopType));
+				app->addShop(mi, stringToMapInfoType(shopType));
 			}
 		}		
 	}
 
 	tagsFile.close();
 cout << "Aqui\n";
-	return app;
 }

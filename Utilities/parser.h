@@ -9,6 +9,6 @@
 
 Graph<MapInfo> buildGraph(std::string MapName, bool bidirectional);
 
-Application buildApplication(std::string MapName, bool bidirectional, Graph<MapInfo> mainGraph);
+void buildApplication(Application * app, std::string MapName, Graph<MapInfo> * mainGraph);
 
 #endif
