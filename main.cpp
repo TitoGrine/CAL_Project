@@ -557,11 +557,19 @@ void MapOperationsMenu(){
 		}
 		else{
 			cout << "\n Shrinking graph size...\n\n";
-			*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), UNDIRECTED);
-			mainApp.addSmallGraph(smallGraph);
-			showGraph(mainApp.getSmallGraph());
-			header("SOLVE PROBLEMS");
-			ProblemsMenu();
+			try
+			{
+				*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), mainApp.getMainGraph()->findVertex(*(mainApp.getLast())), UNDIRECTED);
+				mainApp.addSmallGraph(smallGraph);
+				showGraph(mainApp.getSmallGraph());
+				header("SOLVE PROBLEMS");
+				ProblemsMenu();
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << " " << e.what() << '\n';
+				MapOperationsMenu();
+			}
 		}
 		break;
 	case 0:
