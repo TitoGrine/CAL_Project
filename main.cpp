@@ -326,17 +326,17 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 		switch (option_number) {
 		case 1 :
 			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
-			system("pause");		
+			std::system("pause");		
 			showPathGV(graph, graph->findVertex(*mainApp.getInitial()), graph->findVertex(*mainApp.getLast()), solutionPath);
 			break;
 		case 2 :
 			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
-			system("pause");
+			std::system("pause");
 			showPathGV(graph, graph->findVertex(*mainApp.getInitial()), graph->findVertex(*mainApp.getLast()), solutionPath);
 			//TODO: Show solution to user
 			break;
 		case 0 :
-			system("cls");
+			std::system("cls");
 			Prob2Menu();
 			return;
 		default:
@@ -372,7 +372,7 @@ void Prob2Menu() {
 			//TODO: Show solution to user
 			break;
 		case 0 :
-			system("cls");
+			std::system("cls");
 			ProblemsMenu();
 			return;
 		default:
@@ -406,7 +406,7 @@ void ProblemsMenu() {
 
 			break;
 		case 0:
-			system("cls");
+			std::system("cls");
 			MapOperationsMenu();
 			break;
 		default: 
@@ -445,7 +445,7 @@ void PointMenu(bool initial){
 		break;
 	case 3:
 		showPointTerminal(mainApp.getMainGraph(), initial);
-		system("pause");
+		std::system("pause");
 		PointMenu(initial);
 		break;
 	case 4:
@@ -453,7 +453,7 @@ void PointMenu(bool initial){
 		PointMenu(initial);
 		break;
 	case 0:
-		system("cls");
+		std::system("cls");
 		MapOperationsMenu();
 		return;
   default:break;
@@ -492,7 +492,7 @@ void ConnectionMenu(){
 	{
 	case 1:
 		printVertex(res, cout);
-		system("pause");
+		std::system("pause");
 		ConnectionMenu();
 		break;
 	case 2:
@@ -506,9 +506,10 @@ void ConnectionMenu(){
 			cout << " The Initial and Final Points are connected\n\n";
 		else
 			cout << " There is no connection between the Initial and the Final Point\n\n";
+		MapOperationsMenu();
 		break;
 	case 0:
-		system("cls");
+		std::system("cls");
 		MapOperationsMenu();
 		return;
     default:break;
@@ -519,6 +520,7 @@ void ConnectionMenu(){
 
 void MapOperationsMenu(){
 	header("MAP OPERATIONS");
+	Graph<MapInfo> * smallGraph = new Graph<MapInfo>();
 
 	int option_number;
 
@@ -549,11 +551,21 @@ void MapOperationsMenu(){
 			ConnectionMenu();
 		break;
 	case 4:
-		header("SOLVE PROBLEMS");
-		ProblemsMenu();
+		if(mainApp.getInitial() == NULL || mainApp.getLast() == NULL){
+			cout << "\n You must first enter a intial and final point\n\n";
+			MapOperationsMenu();
+		}
+		else{
+			cout << "\n Shrinking graph size...\n\n";
+			*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), UNDIRECTED);
+			mainApp.addSmallGraph(smallGraph);
+			showGraph(mainApp.getSmallGraph());
+			header("SOLVE PROBLEMS");
+			ProblemsMenu();
+		}
 		break;
 	case 0:
-		system("cls");
+		std::system("cls");
 		InicialMenu();
 		return;
     default:break;
@@ -633,7 +645,7 @@ void MapMenu()
 		break;
     default:break;
     }
-	system("cls");
+	std::system("cls");
 	InicialMenu();
 
 }
@@ -667,7 +679,7 @@ void InicialMenu()
 		else{
 			header("MAP");
 			showGraph(mainApp.getMainGraph());
-			system("cls");
+			std::system("cls");
 		}
 		InicialMenu();
 		break;
@@ -680,7 +692,7 @@ void InicialMenu()
 			MapOperationsMenu();
 		break;
 	case 0:
-		system("cls");
+		std::system("cls");
 		return;
     default:break;
     }
@@ -689,7 +701,7 @@ void InicialMenu()
 //=======================================================================================================================//
 
 int main() {	
-	system("title   SMART DELIVERY");
+	std::system("title   SMART DELIVERY");
 
 	InicialMenu();
 

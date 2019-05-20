@@ -17,6 +17,9 @@ template <class T>
 std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirectional);
 
 template <class T>
+Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, bool bidirectional);
+
+template <class T>
 std::vector<T> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
@@ -113,6 +116,20 @@ std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirec
 	// gv->closeWindow();
 
 	return res;
+}
+
+template <class T>
+Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, bool bidirectional){
+	Graph<T> shrunkGraph;
+	vector<Vertex<T> *> remainingVertexes = scc(mainGraph, initial, bidirectional);
+	for(Vertex<T> * rV : remainingVertexes)
+		shrunkGraph.addVertex(*(rV->getInfo()), rV->getX(), rV->getY());
+	
+	for(Vertex<T> * rV : remainingVertexes)
+		for(auto eAdj : *(rV->getAdj()))
+			shrunkGraph.addEdge(*(rV->getInfo()), *(eAdj.getDest()->getInfo()), eAdj.getWeight());
+
+	return shrunkGraph;
 }
 
 /**

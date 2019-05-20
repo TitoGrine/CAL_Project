@@ -65,7 +65,7 @@ public:
 	void addDeposit(const MapInfo &info);
 	bool addShop(const MapInfo &info, map_info_t tagNum);
 
-	bool addSmallGraph(Graph<MapInfo> * graph);
+	void addSmallGraph(Graph<MapInfo> * graph);
 	void addMainGraph(Graph<MapInfo> * mainGraph);
 	
 	void addDelivery(const MapInfo &info);

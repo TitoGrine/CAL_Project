@@ -77,11 +77,8 @@ bool Application::removeLast(){
 	return true;
 }
 
-bool Application::addSmallGraph(Graph<MapInfo> * graph){
-	if(this->smallGraph != NULL)
-		return false;
+void Application::addSmallGraph(Graph<MapInfo> * graph){
 	this->smallGraph = graph;
-	return true;
 }
 
 void Application::addMainGraph(Graph<MapInfo> * mainGraph){
