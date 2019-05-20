@@ -53,7 +53,7 @@ public:
 	// Fp05 - single source
 	void unweightedShortestPath(const T &s);
 	void bellmanFordShortestPath(const T &s);
-	vector<T> getPath(const T &origin, const T &dest) const;
+	vector<Vertex<T> *> getPath(const T &origin, const T &dest) const;
 
 	// Fp05 - all pairs
 	vector<T> getFloydWarshallPath(const T &origin, const T &dest) const;
@@ -204,15 +204,15 @@ Vertex<T> * Graph<T>::initSingleSource(const T &origin) {
 
 
 template<class T>
-vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
-	vector<T> res;
+vector<Vertex<T> *> Graph<T>::getPath(const T &origin, const T &dest) const{
+	vector<Vertex<T> *> res;
 	auto o = findVertex(origin);
 	auto v = findVertex(dest);
 	if (v == nullptr || v->dist == INF) // missing or disconnected
 		return res;
 	for ( ; v != o && v != nullptr; v = v->path)
-		res.push_back(v->info);
-	res.push_back(o->info);
+		res.push_back(v);
+	res.push_back(o);
 	reverse(res.begin(), res.end());
 	return res;
 }

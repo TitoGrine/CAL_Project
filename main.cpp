@@ -13,7 +13,7 @@
 
 using namespace std;
 
-#define UNDIRECTED true
+#define UNDIRECTED_GRAPH true
 
 Application mainApp;
 
@@ -88,7 +88,7 @@ void header(const string &header)
 
 void showGraph(Graph<MapInfo> * graph){
 	cout << " Map shown in the GraphViewer" << endl;
-	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED);
+	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED_GRAPH);
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
@@ -96,17 +96,17 @@ void showGraph(Graph<MapInfo> * graph){
 
 //-----------------------------------------------------------------------------------------------------------------------//
 
-void showGraph(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, Vertex<MapInfo> * final){
+void showGraph(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final){
 	cout << " Map shown in the GraphViewer" << endl;
-	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED);
+	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED_GRAPH);
 	
-	gv->setVertexSize(initial->getInfo()->getID(), 20);
-	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
-	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+	gv->setVertexSize(initial->getID(), 20);
+	gv->setVertexColor(initial->getID(), "GREEN");
+	gv->setVertexLabel(initial->getID(), "Start");
 
-	gv->setVertexSize(final->getInfo()->getID(), 20);
-	gv->setVertexColor(final->getInfo()->getID(), "RED");
-	gv->setVertexLabel(final->getInfo()->getID(), "End");
+	gv->setVertexSize(final->getID(), 20);
+	gv->setVertexColor(final->getID(), "RED");
+	gv->setVertexLabel(final->getID(), "End");
 	
 	gv->rearrange();
 	getchar();
@@ -171,28 +171,68 @@ void showPointGV(Graph<MapInfo> * graph, bool initial){
 //-----------------------------------------------------------------------------------------------------------------------//
 
 // TODO: escolher nome melhor
-void showPathGV(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, vector<Vertex<MapInfo> *> * points){
+void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, vector<Vertex<MapInfo> *> * points){
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", *points);
-	gv->setVertexSize(initial->getInfo()->getID(), 20);
-	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
-	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+	gv->setVertexSize(initial->getID(), 20);
+	gv->setVertexColor(initial->getID(), "GREEN");
+	gv->setVertexLabel(initial->getID(), "Start");
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
 
 }
 
-void showPathGV(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, Vertex<MapInfo> * final, vector<Vertex<MapInfo> *> * points){
+void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, vector<Vertex<MapInfo> *> * points){
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", *points);
-	gv->setVertexSize(initial->getInfo()->getID(), 20);
-	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
-	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+	gv->setVertexSize(initial->getID(), 20);
+	gv->setVertexColor(initial->getID(), "GREEN");
+	gv->setVertexLabel(initial->getID(), "Start");
 
-	gv->setVertexSize(final->getInfo()->getID(), 20);
-	gv->setVertexColor(final->getInfo()->getID(), "RED");
-	gv->setVertexLabel(final->getInfo()->getID(), "End");
+	gv->setVertexSize(final->getID(), 20);
+	gv->setVertexColor(final->getID(), "RED");
+	gv->setVertexLabel(final->getID(), "End");
+	
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+
+}
+
+void paintMapInfoVertexes(GraphViewer * gv, int vertexSize, string vertexColor, const vector<MapInfo> & points){
+	for(auto mi :  points){
+		gv->setVertexColor(mi.getID(), vertexColor);
+		gv->setVertexSize(mi.getID(), vertexSize);
+	}
+}
+
+void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<Vertex<MapInfo> *> * points){
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	paintVertexesGV(gv, 10, "YELLOW", *points);
+	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
+	gv->setVertexSize(initial->getID(), 20);
+	gv->setVertexColor(initial->getID(), "GREEN");
+	gv->setVertexLabel(initial->getID(), "Start");
+
+	gv->setVertexSize(final->getID(), 20);
+	gv->setVertexColor(final->getID(), "RED");
+	gv->setVertexLabel(final->getID(), "End");
+
+	int edgeID = 0;
+	gv->defineEdgeCurved(false);
+	for(auto i = 0; i < graph->getNumVertex(); i++){
+		Vertex<MapInfo> * v = graph->getVertexSet().at(i);
+		if(containsVertex(*points, v)){
+			for(size_t j = 0; j < v->getAdj()->size(); j++)
+				if(containsVertex(*points,  v->getAdj()->at(j).getDest())){
+					if(UNDIRECTED_GRAPH)
+						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::UNDIRECTED);
+					else
+						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
+				}
+		}
+	}
 	
 	gv->rearrange();
 	getchar();
@@ -231,7 +271,7 @@ void addPoint(bool initial){
 	if(mainApp.getInitial() != NULL){
 		cout << " Consider choosing one of the vertexes in the scc.txt file\n\n";
 		ofstream out("scc.txt");
-		printVertexIndex(mainApp.getMainGraph(), scc( mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*mainApp.getInitial()), UNDIRECTED), out);
+		printVertexIndex(mainApp.getMainGraph(), scc( mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*mainApp.getInitial()), UNDIRECTED_GRAPH), out);
 		out.close();
 	}
 	int finalID =  menuInput(question, 0, mainApp.getMainGraph()->getNumVertex() - 1);
@@ -343,24 +383,24 @@ void Prob1Menu() {
 	option_number = menuInput(" Option ? ", 0, 2);
 
 	MapInfo delivery = mainApp.getDeliveries().at(0);
-	vector<MapInfo> solutionPath;
+	vector<Vertex<MapInfo> *>  solutionPath;
 	switch (option_number) {
 		case 1 :
-			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED);
+			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
 			//TODO: Show solution to user
 			break;
 		case 2 :
-			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED);
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
 			//TODO: Show solution to user
 			break;
-		case 3 :
-			mainApp.clearDelivery();
-			ProblemsMenu();
-			return;
+		case 0 :
 		default:
 			break;
 	}
-
+	mainApp.clearDelivery();
+	ProblemsMenu();
 	
 }
 
@@ -381,12 +421,12 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 		case 1 :
 			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
 			std::system("pause");		
-			showPathGV(graph, graph->findVertex(*mainApp.getInitial()), graph->findVertex(*mainApp.getLast()), solutionPath);
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), solutionPath);
 			break;
 		case 2 :
 			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
 			std::system("pause");
-			showPathGV(graph, graph->findVertex(*mainApp.getInitial()), graph->findVertex(*mainApp.getLast()), solutionPath);
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), solutionPath);
 			//TODO: Show solution to user
 			break;
 		case 0 :
@@ -462,7 +502,7 @@ void ProblemsMenu() {
 		case 3:
 			break;
 		case 4:
-			showGraph(mainApp.getSmallGraph(), mainApp.getSmallGraph()->findVertex(*mainApp.getInitial()), mainApp.getSmallGraph()->findVertex(*mainApp.getLast()));
+			showGraph(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast());
 			ProblemsMenu();
 			break;
 		case 0:
@@ -536,7 +576,6 @@ void ConnectionMenu(){
 
 	option_number = menuInput(" Option ? ", 0, 3);
 	
-	Vertex<MapInfo> * initial;
 	MapInfo * lastMI = mainApp.getLast();
 	vector<Vertex<MapInfo> *> res;
 
@@ -544,8 +583,7 @@ void ConnectionMenu(){
 		// TODO: fazer aquela animacao dos 3 pontos
 		cout << " Calculating..." << endl;
 
-		initial = mainApp.getMainGraph()->findVertex(*(mainApp.getInitial()));
-		res = scc(mainApp.getMainGraph(), initial, UNDIRECTED);
+		res = scc(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*mainApp.getInitial()), UNDIRECTED_GRAPH);
 	}
 
 	switch (option_number)
@@ -556,7 +594,7 @@ void ConnectionMenu(){
 		ConnectionMenu();
 		break;
 	case 2:
-		showPathGV(mainApp.getMainGraph(), initial, &res);
+		showPathGV(mainApp.getMainGraph(), mainApp.getInitial(), &res);
 		ConnectionMenu();
 		break;
 	case 3:
@@ -619,7 +657,7 @@ void MapOperationsMenu(){
 			cout << "\n Shrinking graph size...\n\n";
 			try
 			{
-				*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), mainApp.getMainGraph()->findVertex(*(mainApp.getLast())), UNDIRECTED);
+				*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), mainApp.getMainGraph()->findVertex(*(mainApp.getLast())), UNDIRECTED_GRAPH);
 				mainApp.addSmallGraph(smallGraph);
 				header("SOLVE PROBLEMS");
 				ProblemsMenu();
@@ -665,47 +703,47 @@ void MapMenu()
 	switch (option_number)
 	{
 	case 1:
-		*graph = buildGraph("Aveiro", UNDIRECTED);
+		*graph = buildGraph("Aveiro", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Aveiro", graph);
 		break;
 	case 2:
-		*graph = buildGraph("Braga", UNDIRECTED);
+		*graph = buildGraph("Braga", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Braga", graph);		
 		break;
 	case 3:
-		*graph = buildGraph("Coimbra", UNDIRECTED);
+		*graph = buildGraph("Coimbra", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Coimbra", graph);		
 		break;
 	case 4:
-		*graph = buildGraph("Ermesinde", UNDIRECTED);
+		*graph = buildGraph("Ermesinde", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Ermesinde", graph);		
 		break;
 	case 5:
-		*graph = buildGraph("Fafe", UNDIRECTED);
+		*graph = buildGraph("Fafe", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Fafe", graph);
 		break;
 	case 6:
-		*graph = buildGraph("Gondomar", UNDIRECTED);	
+		*graph = buildGraph("Gondomar", UNDIRECTED_GRAPH);	
 		buildApplication(&mainApp, "Gondomar", graph);		
 		break;
 	case 7:
-		*graph = buildGraph("Lisboa", UNDIRECTED);
+		*graph = buildGraph("Lisboa", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Lisboa", graph);		
 		break;
 	case 8:
-		*graph = buildGraph("Maia", UNDIRECTED);
+		*graph = buildGraph("Maia", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Maia", graph);		
 		break;
 	case 9:
-		*graph = buildGraph("Porto", UNDIRECTED);
+		*graph = buildGraph("Porto", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Porto", graph);		
 		break;
 	case 10:
-		*graph = buildGraph("Portugal", UNDIRECTED);
+		*graph = buildGraph("Portugal", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Portugal", graph);		
 		break;
 	case 11:
-		*graph = buildGraph("Viseu", UNDIRECTED);
+		*graph = buildGraph("Viseu", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Viseu", graph);		
 		break;
 	case 0:

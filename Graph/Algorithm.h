@@ -20,10 +20,10 @@ template <class T>
 Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, Vertex<T> * last, bool bidirectional);
 
 template <class T>
-std::vector<T> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
+std::vector<Vertex<T> *> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
-std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
+std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
 void FloydWarshallShortestPath(Graph<T> * graph); 
@@ -35,10 +35,10 @@ template <class T>
 std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
 
 template <class T>
-std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
 
 template <class T>
-std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
 
 /* ------------------------------------------------------------------------------------------------ */
 template <class T>
@@ -172,9 +172,9 @@ inline bool relax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight, bo
 }
 
 template <class T>
-static std::vector<T> shortestPath(Graph<T> * graph, const T &origin, const T &dest, bool isDijkstra)
+static std::vector<Vertex<T> *> shortestPath(Graph<T> * graph, const T &origin, const T &dest, bool isDijkstra)
 {
-	std::vector<T> result;
+	std::vector<Vertex<T> *> result;
 	auto s = graph->initSingleSource(origin);
 	Vertex<T>* d = graph->findVertex(dest);
 	MutablePriorityQueue<Vertex<T>> q;
@@ -183,10 +183,8 @@ static std::vector<T> shortestPath(Graph<T> * graph, const T &origin, const T &d
 	while( ! q.empty() ) {
 		auto v = q.extractMin();
 
-		if(v == d) {
-			result = graph->getPath(origin, dest);
-			break;
-		}
+		if(v == d)
+			return graph->getPath(origin, dest);
 			
 		for(unsigned int i = 0; i < v->getAdj()->size(); i++) {
 			auto e = v->getAdj()->at(i);
@@ -204,22 +202,22 @@ static std::vector<T> shortestPath(Graph<T> * graph, const T &origin, const T &d
 }
 
 template <class T>
-std::vector<T> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest)
+std::vector<Vertex<T> *> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest)
 {
 	return shortestPath(graph, origin, dest, true);
 }
 
 template <class T>
-std::vector<T> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest)
+std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest)
 {
 	return shortestPath(graph, origin, dest, false);
 }
 
 
 template <class T>
-std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
+std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
-    vector<T> final_path, path;
+    vector<Vertex<T> *> final_path, path;
 
 	thread t1(dijkstraShortestPath<T>, graph, origin, delivery);
 	
@@ -252,9 +250,9 @@ std::vector<T> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T 
 }
 
 template <class T>
-std::vector<T> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
+std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
-    vector<T> final_path, path;
+    vector<Vertex<T> *> final_path, path;
 
 	thread t1(aStarShortestPath<T>, graph, origin, delivery);
 	
@@ -340,9 +338,9 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
 
-		vector<T> path = graph->getPath(*(result.back()->getInfo()), *(vertex->getInfo()));
+		vector<Vertex<T> *> path = graph->getPath(*(result.back()->getInfo()), *(vertex->getInfo()));
 		for(unsigned i = 0; i < path.size(); i++ ){
-			result.push_back(graph->findVertex(path.at(i)));
+			result.push_back(path.at(i));
 		}
 
 		result.push_back(vertex);
@@ -355,9 +353,9 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 		}
 	}
 
-	vector<T> path = graph->getPath(*(result.back()->getInfo()), dest);
+	vector<Vertex<T> *> path = graph->getPath(*(result.back()->getInfo()), dest);
 		for(unsigned i = 0; i < path.size(); i++ ){
-			result.push_back(graph->findVertex(path.at(i)));
+			result.push_back(path.at(i));
 		}
 
 	result.erase(result.begin());
