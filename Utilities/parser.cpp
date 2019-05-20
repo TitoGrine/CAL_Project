@@ -3,17 +3,33 @@
 #include <fstream>
 #include <sstream>
 
-Graph<MapInfo> buildGraph(string MapName, bool bidirectional){
-	Graph<MapInfo> graph;
+using namespace std;
 
+map_info_t stringToMapInfoType(string shopTypeString){
+
+	if("department_store" == shopTypeString) return DEPARTMENT_STORE;
+	if("variety_store" == shopTypeString) return VARIETY_STORE;
+	if("supermarket" == shopTypeString) return SUPERMARKET;
+	if("doityourself" == shopTypeString) return DIY;
+	if("convenience" == shopTypeString) return CONVENIENCE;
+	if("clothes" == shopTypeString) return CLOTHES;
+	if("hardware" == shopTypeString) return HARDWARE;
+	if("furniture" == shopTypeString) return FURNITURE;
+	if("electronics" == shopTypeString) return ELECTRONICS;
+	if("mobile_phone" == shopTypeString) return MOBILE_PHONE;
+	if("shoes" == shopTypeString) return SHOES;
+	if("alcohol" == shopTypeString) return ALCOHOL;
+	else return OTHER;	
+}
+
+Graph<MapInfo> buildGraph(std::string MapName, bool bidirectional){
+	Graph<MapInfo> graph;
 	ifstream nodesFile;
 	nodesFile.open("./Maps/" + MapName + "/T04_nodes_X_Y_" + MapName + ".txt");
 
 	// TODO: change to exception
-	if(!nodesFile.is_open()){
-		cerr << "Error opening edges file\n";
-		return graph;
-	}
+	if(!nodesFile.is_open())
+		throw invalid_argument("Couldn't open coord file");
 
 	string line;
 	istringstream iss;
@@ -40,12 +56,9 @@ Graph<MapInfo> buildGraph(string MapName, bool bidirectional){
 	ifstream edgesFile;
 	edgesFile.open("./Maps/" + MapName + "/T04_edges_" + MapName + ".txt");
 
-	if(!edgesFile.is_open()){
-		cerr << "Error opening edges file\n";
-		return graph;
-	}
+	if(!edgesFile.is_open())
+		throw invalid_argument("Couldn't open edges file");
 
-	
 	unsigned int pt1, pt2, numberEdeges;
 
 	getline(edgesFile, line);
@@ -69,58 +82,66 @@ Graph<MapInfo> buildGraph(string MapName, bool bidirectional){
 
 	edgesFile.close();
 
+	return graph;
+}
+
+void buildApplication(Application * app, std::string MapName, Graph<MapInfo> * mainGraph){
+
+	app->clear();
+
+	string line;
+	istringstream iss;
+	long id;
+
+	app->addMainGraph(mainGraph);
+
 	//Tags
 
 	ifstream tagsFile;
-	tagsFile.open("T04_tags_" + MapName + ".txt");
+	tagsFile.open("./Maps/" + MapName + "/T04_tags_" + MapName + ".txt");
 
 	if(!tagsFile.is_open()){
-		cerr << "Error opening tags file\n";
-		return graph;
+		cerr << "Couldn't open tags file\n";
+		return;
 	}
 
-	string tagType;
-	unsigned int numTags, numVertexes, numShops;
+	string tagType, shopType;
+	unsigned int numTags, numVertexes;
 
 	getline(tagsFile, line);
 	iss = istringstream(line);
 	iss >> numTags;
 
-	//Deposits
 	for(unsigned int i = 0; i < numTags; i++) {
 		getline(tagsFile, tagType);
-		if(tagType.find("shop=") != string::npos) {
-			numShops = numTags - i;
-			break;
-		}
-		getline(tagsFile, line);
-		iss = istringstream(line);
-		iss >> numVertexes;
-		for(unsigned int j = 0; j < numVertexes; j++) {
+		// Deposit
+		if(tagType.find("shop=") == string::npos) {
 			getline(tagsFile, line);
 			iss = istringstream(line);
-			iss >> id;
-			MapInfo mi(id);
-			graph.addShop(mi, i);
+			iss >> numVertexes;
+			for(unsigned int j = 0; j < numVertexes; j++) {
+				getline(tagsFile, line);
+				iss = istringstream(line);
+				iss >> id;
+				MapInfo mi(id);
+				app->addDeposit(mi);
+			}
 		}
-	}
-
-	//Shops
-	for(unsigned int i = 0; i < numShops; i++) {
-		if(i != 0) getline(tagsFile, tagType);
-		getline(tagsFile, line);
-		iss = istringstream(line);
-		iss >> numVertexes;
-		for(unsigned int j = 0; j < numVertexes; j++) {
+		// Shops
+		else{
 			getline(tagsFile, line);
 			iss = istringstream(line);
-			iss >> id;
-			MapInfo mi(id);
-			graph.addShop(mi, i);
-		}
+			iss >> numVertexes;
+			shopType = tagType.substr(tagType.find("=") + 1);
+			for(unsigned int j = 0; j < numVertexes; j++) {
+				getline(tagsFile, line);
+				iss = istringstream(line);
+				iss >> id;
+				MapInfo mi(id);
+				app->addShop(mi, stringToMapInfoType(shopType));
+			}
+		}		
 	}
 
 	tagsFile.close();
-
-	return graph;
 }
