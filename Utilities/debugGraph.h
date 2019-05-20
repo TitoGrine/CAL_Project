@@ -9,11 +9,21 @@ void printVertex(vector<Vertex<T> *> verts, ostream & output);
 template <class T>
 void prinntEdgesDest(vector<Edge<T>> * edges);
 
+template <class T>
+void printVertexIndex(Graph<T> * graph, vector<Vertex<T> *> verts, ostream & output);
+
 
 template <class T>
 void printVertex(vector<Vertex<T> *> verts, ostream & output){
 	for(auto v: verts)
 		output << *(v->getInfo()) << " ; ";
+	output << endl;
+}
+
+template <class T>
+void printVertexIndex(Graph<T> * graph, vector<Vertex<T> *> verts, ostream & output){
+	for(auto v: verts)
+		output << *(v->getInfo()) << " ; "  << graph->findVertexIdx(*(v->getInfo())) << endl;
 	output << endl;
 }
 

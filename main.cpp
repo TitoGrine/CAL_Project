@@ -85,6 +85,7 @@ void header(const string &header)
 *  +------------------------+
 */
 
+
 void showGraph(Graph<MapInfo> * graph){
 	cout << " Map shown in the GraphViewer" << endl;
 	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED);
@@ -204,13 +205,20 @@ void addPoint(bool initial){
 		}
 		return;
 	}
-	if(mainApp.getLast() != NULL)
+	if(mainApp.getLast() != NULL){
 		cout << "\n There is already a final point\n\n";
-	else{
-		int finalID =  menuInput(question, 0, mainApp.getMainGraph()->getNumVertex() - 1);
-		if(!mainApp.addLast(*(mainApp.getMainGraph()->getVertexSet().at(finalID)->getInfo())))
-			cout << "\n Error adding final point\n\n";
+		return;
 	}
+	if(mainApp.getInitial() != NULL){
+		cout << " Consider choosing one of the vertexes in the scc.txt file\n\n";
+		ofstream out("scc.txt");
+		printVertexIndex(mainApp.getMainGraph(), scc( mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*mainApp.getInitial()), UNDIRECTED), out);
+		out.close();
+	}
+	int finalID =  menuInput(question, 0, mainApp.getMainGraph()->getNumVertex() - 1);
+	if(!mainApp.addLast(*(mainApp.getMainGraph()->getVertexSet().at(finalID)->getInfo())))
+		cout << "\n Error adding final point\n\n";
+	
 }
 
 //=======================================================================================================================//
@@ -390,9 +398,10 @@ void ProblemsMenu() {
 	std::cout << "   1 - One Truck - One Delivery" << endl;
 	std::cout << "   2 - One Truck - Multiple Deliveries" << endl;
 	std::cout << "   3 - Mutiple Trucks - Multiple Deliveries" << endl;
+	std::cout << "   4 - Show Samller Graph" << endl;
 	std::cout << "   0 - Go Back" << endl << endl;
 
-	option_number = menuInput(" Option ? ", 0, 3);
+	option_number = menuInput(" Option ? ", 0, 4);
 
 	switch (option_number)
 	{
@@ -403,7 +412,10 @@ void ProblemsMenu() {
 			Prob2Menu();
 			break;
 		case 3:
-
+			break;
+		case 4:
+			showGraph(mainApp.getSmallGraph());
+			Prob2Menu();
 			break;
 		case 0:
 			std::system("cls");
@@ -561,7 +573,6 @@ void MapOperationsMenu(){
 			{
 				*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), mainApp.getMainGraph()->findVertex(*(mainApp.getLast())), UNDIRECTED);
 				mainApp.addSmallGraph(smallGraph);
-				showGraph(mainApp.getSmallGraph());
 				header("SOLVE PROBLEMS");
 				ProblemsMenu();
 			}
