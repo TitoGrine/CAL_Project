@@ -420,14 +420,13 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 		switch (option_number) {
 		case 1 :
 			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
-			std::system("pause");		
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), solutionPath);
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), solutionPath);
+			NearestNeighbourMenu(graph, solutionPath);
 			break;
 		case 2 :
 			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
-			std::system("pause");
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), solutionPath);
-			//TODO: Show solution to user
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), solutionPath);
+			NearestNeighbourMenu(graph, solutionPath);
 			break;
 		case 0 :
 			std::system("cls");
