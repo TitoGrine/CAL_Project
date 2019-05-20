@@ -35,11 +35,6 @@ class Graph {
 
 	priority_queue<Edge<T>> buildHeap();
 
-	//temp
-	vector<vector<T>> deposits;
-	vector<vector<T>> shops;
-	vector<T> deliveries;
-
 public:
 	Vertex<T> *findVertex(const T &in) const;
 	bool addVertex(const T &in, double x, double y);
@@ -69,16 +64,7 @@ public:
 	double getTopBound() const { return this->topBound; };
 	double getBottomBound() const { return this->bottomBound; };
 
-	Vertex<T> *findInitial() const;
-	Vertex<T> *findFinal() const;
 	Graph<T> invert();
-	
-	//Temp
-	void addDeposit(const T &info, int tagNum);
-	void addShop(const T &info, int tagNum);
-	void addDelivery(const T &info);
-	void removeDelivery(const T &info);
-	T getShop(int shopType);
 };
 
 template <class T>
@@ -141,23 +127,6 @@ bool Graph<T>::addVertex(const T &in, double x, double y) {
 	
 	vertexSet.push_back(new Vertex<T>(in, x, y));
 	return true;
-}
-
-
-template <class T>
-Vertex<T> * Graph<T>::findInitial() const {
-	for(auto v: vertexSet)
-		if(v->getInfo()->isInitial())
-			return v;
-	return nullptr;
-}
-
-template <class T>
-Vertex<T> * Graph<T>::findFinal() const {
-	for(auto v: vertexSet)
-		if(v->getInfo()->isFinal())
-			return v;
-	return nullptr;
 }
 
 // TODO: meter isto direito
@@ -412,59 +381,5 @@ vector<Vertex<T>*> Graph<T>::calculateKruskal() {
 	return vertexSet;
 }
 
-//Temp
-template <class T>
-void Graph<T>::addDeposit(const T &info, int tagNum)
-{
-	if(deposits.at(tagNum) == NULL) {
-		vector<T> newDepositTag;
-		newDepositTag.push_back(info);
-		deposits.push_back(newDepositTag);
-	}
-	else {
-		deposits.at(tagNum).push_back(info);
-	}
-}
-
-//Temp
-template <class T>
-void Graph<T>::addShop(const T &info, int tagNum)
-{
-	if(shops.size() <= (unsigned int) tagNum) {
-		vector<T> newShopTag;
-		newShopTag.push_back(info);
-		shops.push_back(newShopTag);
-	}
-	else {
-		shops.at(tagNum).push_back(info);
-	}
-}
-
-//Temp
-template <class T>
-void Graph<T>::addDelivery(const T &info)
-{
-	deliveries.push_back(info);
-}
-
-//Temp
-template <class T>
-void Graph<T>::removeDelivery(const T &info)
-{
-	for(auto it = deliveries.begin(); it != deliveries.end(); it++) {
-		if( (*it) == info) {
-			deliveries.erase(it);
-			break;
-		}
-	}
-}
-
-//Temp
-template <class T>
-T Graph<T>::getShop(int shopType)
-{
-	vector<T> typeShops = shops.at(shopType);
-	return typeShops.at(rand() % typeShops.size());
-}
 
 #endif /* GRAPH_H_ */
