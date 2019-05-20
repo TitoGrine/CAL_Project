@@ -39,6 +39,10 @@ class Application {
 	std::vector<MapInfo> deposits;
 
 	std::vector<MapInfo> shops[_N_SHOPS_TYPE];
+
+	std::vector<MapInfo> smallShops[_N_SHOPS_TYPE];
+
+
 	std::vector<MapInfo> deliveries;
 
 public:
@@ -59,7 +63,9 @@ public:
 
 	const std::vector<MapInfo> & getDeposits() const { return this->deposits; };
 	const std::vector<MapInfo> & getAllShopsByType(map_info_t shopType) const;
+	const std::vector<MapInfo> & getSmallShopsByType(map_info_t shopType) const;
 	MapInfo getRandomShopByType(map_info_t shopType);
+	MapInfo getRandomSmallShopByType(map_info_t shopType);
 	const std::vector < MapInfo> & getDeliveries() const { return this->deliveries; };
 
 	void addDeposit(const MapInfo &info);
@@ -70,6 +76,7 @@ public:
 	
 	void addDelivery(const MapInfo &info);
 	bool removeDelivery(const MapInfo &info);
+	void clearDelivery() { this->deliveries.clear(); };
 
 	void clear();
 

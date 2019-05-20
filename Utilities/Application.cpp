@@ -27,11 +27,24 @@ const vector<MapInfo> & Application::getAllShopsByType(map_info_t shopType) cons
 	throw invalid_argument("shopType must be less than " + _N_SHOPS_TYPE);
 }
 
+const std::vector<MapInfo> & Application::getSmallShopsByType(map_info_t shopType) const {
+	if(shopType < _N_SHOPS_TYPE)
+		return this->smallShops[shopType];
+	throw invalid_argument("shopType must be less than " + _N_SHOPS_TYPE);
+}
+
+
 MapInfo Application::getRandomShopByType(map_info_t shopType)
 {
 	vector<MapInfo> typeShops = getAllShopsByType(shopType);
 	return typeShops.at(rand() % typeShops.size());
 }
+
+MapInfo Application::getRandomSmallShopByType(map_info_t shopType){
+	vector<MapInfo> typeShops = getSmallShopsByType(shopType);
+	return typeShops.at(rand() % typeShops.size());
+}
+
 
 bool Application::addInitial(MapInfo initialPoint){
 	if(this->initial != NULL)
@@ -79,6 +92,10 @@ bool Application::removeLast(){
 
 void Application::addSmallGraph(Graph<MapInfo> * graph){
 	this->smallGraph = graph;
+	for(unsigned int i = 0; i < _N_SHOPS_TYPE; i++)
+		for(unsigned int j = 0; j < this->shops[i].size(); j++)
+			if(this->smallGraph->findVertex(this->shops[i].at(j)) != NULL)
+				this->smallShops[i].push_back(this->shops[i].at(j));
 }
 
 void Application::addMainGraph(Graph<MapInfo> * mainGraph){

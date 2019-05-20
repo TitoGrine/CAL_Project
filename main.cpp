@@ -96,6 +96,25 @@ void showGraph(Graph<MapInfo> * graph){
 
 //-----------------------------------------------------------------------------------------------------------------------//
 
+void showGraph(Graph<MapInfo> * graph, Vertex<MapInfo> * initial, Vertex<MapInfo> * final){
+	cout << " Map shown in the GraphViewer" << endl;
+	GraphViewer * gv = createFullGraphViewer(graph, 10, "YELLOW", UNDIRECTED);
+	
+	gv->setVertexSize(initial->getInfo()->getID(), 20);
+	gv->setVertexColor(initial->getInfo()->getID(), "GREEN");
+	gv->setVertexLabel(initial->getInfo()->getID(), "Start");
+
+	gv->setVertexSize(final->getInfo()->getID(), 20);
+	gv->setVertexColor(final->getInfo()->getID(), "RED");
+	gv->setVertexLabel(final->getInfo()->getID(), "End");
+	
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+}
+
+//-----------------------------------------------------------------------------------------------------------------------//
+
 void showPointTerminal(Graph<MapInfo> * graph, bool initial){
 	MapInfo * mi;
 	Vertex<MapInfo> * v;
@@ -255,35 +274,61 @@ void removePoint(bool initial){
 bool DeliveryPlaceMenu() {
 	header("DELIVERY PLACE");
 
-	int option_number;
-
 	std::cout << " CHOOSE A DELIVERY PLACE:" << endl << endl;
 
-	std::cout << "   1 - Department Store" << endl;
-	std::cout << "   2 - Variety Store" << endl;
-	std::cout << "   3 - SuperMarket" << endl;
-	std::cout << "   4 - DoItYourself" << endl;
-	std::cout << "   5 - Convenience" << endl;
-	std::cout << "   6 - Clothes" << endl;
-	std::cout << "   7 - Hardware" << endl;
-	std::cout << "   8 - Furniture" << endl;
-	std::cout << "   9 - Eletronics" << endl;
-	std::cout << "   10 - Mobile Phone" << endl;
-	std::cout << "   11 - Shoes" << endl;
-	std::cout << "   12 - Alcohol" << endl;
+	vector<string> shopsOptions = {
+	"   1 - Department Store\n",
+	"   2 - Variety Store\n",
+	"   3 - SuperMarket\n",
+	"   4 - DoItYourself\n",
+	"   5 - Convenience\n",
+	"   6 - Clothes\n",
+	"   7 - Hardware\n",
+	"   8 - Furniture\n",
+	"   9 - Eletronics\n",
+	"   10 - Mobile Phone\n",
+	"   11 - Shoes\n",
+	"   12 - Alcohol\n"
+	};
+
+	bool existStore = false;
+	for(unsigned int i = 0; i < _N_SHOPS_TYPE; i++)
+		if(!mainApp.getSmallShopsByType(static_cast<map_info_t>(i)).empty()){
+			existStore = true;
+			cout << shopsOptions.at(i);
+		}
+	if(!existStore){
+		cout << "\n There is no delivery place in this SCC\n\n";
+		return false;
+	}
+
+	int option_number;
+
+
+	
 	std::cout << "   0 - Go Back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 12);
+	bool valid = false;
+	while(!valid){
+		if(option_number == 0) return false;
+		if(mainApp.getSmallShopsByType(static_cast<map_info_t>(option_number - 1)).empty()){
+			cout << " There is no delivery place of that type in this SCC\n";
+			option_number = menuInput(" Option ? ", 0, 12);
+		}
+		else{
+			valid = true;
+		}
+	}
 
-	if(option_number == 0) return false;
-
-	mainApp.addDelivery(mainApp.getRandomShopByType((map_info_t)option_number));
+	mainApp.addDelivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
 	return true;
 }
 
 void Prob1Menu() {
 	
-	DeliveryPlaceMenu();
+	if(!DeliveryPlaceMenu())
+		ProblemsMenu();
 
 	header("ONE TRUCK - ONE DELIVERY");
 
@@ -309,6 +354,7 @@ void Prob1Menu() {
 			//TODO: Show solution to user
 			break;
 		case 3 :
+			mainApp.clearDelivery();
 			ProblemsMenu();
 			return;
 		default:
@@ -355,6 +401,8 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 void Prob2Menu() {
 
 	while (DeliveryPlaceMenu());
+	if(mainApp.getDeliveries().empty())
+		ProblemsMenu();
 
 	header("ONE TRUCK - MULTIPLE DELIVERIES");
 
@@ -414,8 +462,8 @@ void ProblemsMenu() {
 		case 3:
 			break;
 		case 4:
-			showGraph(mainApp.getSmallGraph());
-			Prob2Menu();
+			showGraph(mainApp.getSmallGraph(), mainApp.getSmallGraph()->findVertex(*mainApp.getInitial()), mainApp.getSmallGraph()->findVertex(*mainApp.getLast()));
+			ProblemsMenu();
 			break;
 		case 0:
 			std::system("cls");
