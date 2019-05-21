@@ -421,12 +421,12 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 		case 1 :
 			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
 			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), solutionPath);
-			NearestNeighbourMenu(graph, solutionPath);
+			Prob2Menu();
 			break;
 		case 2 :
 			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
 			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), solutionPath);
-			NearestNeighbourMenu(graph, solutionPath);
+			Prob2Menu();
 			break;
 		case 0 :
 			std::system("cls");
@@ -460,7 +460,6 @@ void Prob2Menu() {
 	switch (option_number) {
 		case 1 :
 			NearestNeighbourMenu(mainApp.getSmallGraph(), &solutionPath);
-			//TODO: Show solution to user
 			break;
 		case 2 :
 			//TODO: Call 2-opt function
@@ -485,7 +484,7 @@ void ProblemsMenu() {
 	std::cout << "   1 - One Truck - One Delivery" << endl;
 	std::cout << "   2 - One Truck - Multiple Deliveries" << endl;
 	std::cout << "   3 - Mutiple Trucks - Multiple Deliveries" << endl;
-	std::cout << "   4 - Show Samller Graph" << endl;
+	std::cout << "   4 - Show Smaller Graph" << endl;
 	std::cout << "   0 - Go Back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 4);
@@ -642,6 +641,7 @@ void MapOperationsMenu(){
 	case 3:
 		if(mainApp.getInitial() == NULL){
 			cout << "\n You must first enter a intial point\n\n";
+			system("pause");
 			MapOperationsMenu();
 		}
 		else
@@ -650,6 +650,7 @@ void MapOperationsMenu(){
 	case 4:
 		if(mainApp.getInitial() == NULL || mainApp.getLast() == NULL){
 			cout << "\n You must first enter a intial and final point\n\n";
+			system("pause");
 			MapOperationsMenu();
 		}
 		else{
@@ -664,6 +665,7 @@ void MapOperationsMenu(){
 			catch(const std::exception& e)
 			{
 				std::cerr << " " << e.what() << '\n';
+				system("pause");
 				MapOperationsMenu();
 			}
 		}
