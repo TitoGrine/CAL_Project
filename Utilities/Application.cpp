@@ -14,11 +14,14 @@ Application::Application() {
 Application::Application(Graph<MapInfo> * mainGraph): mainGraph(mainGraph) {};
 
 // TODO: verificar
+
 Application::~Application() {
-	mainGraph->~Graph();
-	smallGraph->~Graph();
+	//mainGraph->~Graph();
+	//smallGraph->~Graph();
 	free(mainGraph);
 	free(smallGraph);
+	free(initial);
+	free(last);
 }
 
 const vector<MapInfo> & Application::getAllShopsByType(map_info_t shopType) const {
