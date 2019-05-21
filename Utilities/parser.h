@@ -7,7 +7,7 @@
 #include "../Graph/Graph.h"
 
 
-Graph<MapInfo> buildGraph(std::string MapName, bool bidirectional);
+void buildGraph(Graph<MapInfo> & graph, std::string MapName, bool bidirectional);
 
 void buildApplication(Application * app, std::string MapName, Graph<MapInfo> * mainGraph);
 
