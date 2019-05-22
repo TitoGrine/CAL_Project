@@ -10,6 +10,7 @@ class Truck {
     int truckID;
 
     int capacity;
+    int availableCapacity;
 
     std::string pathColor;
 
@@ -22,10 +23,12 @@ class Truck {
 
         int getID() const;
         int getCapacity() const;
+        int getAvailableCapacity() const;
 
         std::string getPathColor() const;
         void setPathColor(std::string pathColor);
 
+        bool addDelivery(const Delivery &delivery);
         std::vector<Delivery> getDeliveries() const;
         void setDeliveries(const std::vector<Delivery> &deliveries);
 

@@ -488,7 +488,11 @@ void Prob3Menu() {
 
 	header("MULTIPLE TRUCKS - MULTIPLE DELIVERIES");
 
-	
+	//Distribuir mainApp.deliveries pelos camioes
+
+	//Escolher algoritmo a usar
+
+	//Aplicar esse algoritmo para a lista de deliveries de cada camiao
 	
 }
 
