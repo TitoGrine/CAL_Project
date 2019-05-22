@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ALGORITHM_H_
+#define ALGORITHM_H_
 
 #include "Graph.h"
 #include "../Utilities/debugGraph.h"
@@ -26,6 +27,12 @@ template <class T>
 std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
+std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+
+template <class T>
+std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+
+template <class T>
 void FloydWarshallShortestPath(Graph<T> * graph); 
 
 template <class T>
@@ -35,17 +42,32 @@ template <class T>
 std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
 
 template <class T>
-std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+vector<Vertex<T> *> twoOptSwap(const vector<Vertex<T> *> &current_path, int i, int k);
 
 template <class T>
-std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path);  
+
+template <class T>
+bool validPath(Graph<T> * graph, const vector<Vertex<T> *> &path);
+
+template <class T>
+std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path);
+
+template <class T>
+std::vector<Vertex<T> *> twoOptAlgorithm(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
 
 /* ------------------------------------------------------------------------------------------------ */
 template <class T>
 void dfsVisit(Vertex<T> *v, std::vector<Vertex<T> *> & res);
 
 template <class T>
+bool dfsVisit(Vertex<T> *v, Vertex<T> *end);
+
+template <class T>
 bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert);
+
+template <class T>
+bool checkConnection(Graph<T> * graph, Vertex<T> *start, Vertex<T> *end);
 
 /* ------------------------------------------------------------------------------------------------ */
 
@@ -59,12 +81,37 @@ void dfsVisit(Vertex<T> *v, std::vector<Vertex<T> *> & res) {
 }
 
 template <class T>
+bool dfsVisit(Vertex<T> *v, Vertex<T> *end) {
+	v->setVisited(true);
+	for(unsigned int i = 0; i < v->getAdj()->size(); i++){
+		if(v->getAdj()->at(i).getDest() == end)
+			return true;
+
+		if(!v->getAdj()->at(i).getDest()->getVisited())
+			return dfsVisit(v->getAdj()->at(i).getDest(), end);
+	}
+
+	return false;
+}
+
+template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
 	std::vector<Vertex<T> *> res;
 	for(auto vertex: graph->getVertexSet())
 		vertex->setVisited(false);
+	
 	dfsVisit(initial, res);
 	return res;
+}
+
+template <class T>
+bool checkConnection(Graph<T> * graph, Vertex<T> *start, Vertex<T> *end){
+	for(auto vertex: graph->getVertexSet())
+		vertex->setVisited(false);
+	
+	start->setVisited(true);
+
+	return dfsVisit(start, end);
 }
 
 template <class T>
@@ -73,6 +120,23 @@ bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert){
 		if( *(vert->getInfo()) == *(v->getInfo()))
 			return true;
 	return false;
+}
+
+template <class T>
+Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, Vertex<T> * last, bool bidirectional){
+	Graph<T> shrunkGraph;
+	vector<Vertex<T> *> remainingVertexes = scc(mainGraph, initial, bidirectional);
+	if(!containsVertex(remainingVertexes, last))
+		throw logic_error("Last vertex is not in the same SCC");
+
+	for(Vertex<T> * rV : remainingVertexes)
+		shrunkGraph.addVertex(*(rV->getInfo()), rV->getX(), rV->getY());
+	
+	for(Vertex<T> * rV : remainingVertexes)
+		for(auto eAdj : *(rV->getAdj()))
+			shrunkGraph.addEdge(*(rV->getInfo()), *(eAdj.getDest()->getInfo()), eAdj.getWeight());
+
+	return shrunkGraph;
 }
 
 
@@ -119,20 +183,12 @@ std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirec
 }
 
 template <class T>
-Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, Vertex<T> * last, bool bidirectional){
-	Graph<T> shrunkGraph;
-	vector<Vertex<T> *> remainingVertexes = scc(mainGraph, initial, bidirectional);
-	if(!containsVertex(remainingVertexes, last))
-		throw logic_error("Last vertex is not in the same SCC");
+void append(vector<Vertex<T>*> &vec, vector<Vertex<T>*> &appendix){
+	if(appendix.empty())
+		return;
 
-	for(Vertex<T> * rV : remainingVertexes)
-		shrunkGraph.addVertex(*(rV->getInfo()), rV->getX(), rV->getY());
-	
-	for(Vertex<T> * rV : remainingVertexes)
-		for(auto eAdj : *(rV->getAdj()))
-			shrunkGraph.addEdge(*(rV->getInfo()), *(eAdj.getDest()->getInfo()), eAdj.getWeight());
-
-	return shrunkGraph;
+	for(Vertex<T>* vertex : appendix)
+		vec.push_back(vertex);
 }
 
 /**
@@ -379,6 +435,8 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 	MutablePriorityQueue<Vertex<T>> Q;
 	MutablePriorityQueue<Vertex<T>> aux;
 
+	Q.insert(graph->findVertex(origin));
+
 	for(T info : deliveries){
 		Q.insert(graph->findVertex(info));
 	}
@@ -408,8 +466,97 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 			result.push_back(graph->findVertex(path.at(i)));
 	}
 
-	result.erase(result.begin());
+	result.push_back(graph->findVertex(dest));
 
 	return result;
 }
 
+
+
+
+template <class T>
+vector<Vertex<T> *> twoOptSwap(const vector<Vertex<T> *> &current_path, int i, int k){
+	vector<Vertex<T> *> new_path = current_path;
+
+	while (i < k) {
+        swap(new_path.at(i), new_path.at(k));
+        i++;
+        k--;
+    }
+
+	return new_path;
+}
+
+template <class T>
+double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
+	double weight = 0;
+	vector<Vertex<T> *> new_path;
+	vector<Vertex<T> *> intermediate_path;
+	
+	for(int i = 0; i < path.size() - 1; i++){
+		intermediate_path =  dijkstraShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()));
+		append(new_path, intermediate_path);
+		weight += new_path.back()->getDist();
+		new_path.pop_back();
+	}
+
+	new_path.push_back(path.back());
+
+	return weight;
+}
+
+template <class T>
+bool validPath(Graph<T> * graph, const vector<Vertex<T> *> &path){
+	for(int i = 0; i < path.size() - 1; i++)
+		if(!checkConnection(graph, path.at(i), path.at(i + 1))) return false;
+
+	return true;
+}
+
+template <class T>
+std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path){
+	double currentBestWeight = calculatePathWeight(graph, path);
+	double lastBestWeight = -1;
+	double pathWeight = -1;
+	
+	vector<Vertex<T> *> bestPath = path;
+
+
+	while(currentBestWeight != lastBestWeight){
+		lastBestWeight = currentBestWeight;
+
+		for(int i = 1; i < path.size() - 3; i++)
+			for(int k = i + 1; k < path.size() - 2; k++){
+				path = twoOptSwap(bestPath, i, k);
+
+				if(validPath(graph, path)){
+					pathWeight = calculatePathWeight(graph, path);
+
+					if(pathWeight < currentBestWeight){
+						bestPath = path;
+						currentBestWeight = pathWeight;
+					}
+				}
+			}
+
+	}
+
+	return bestPath;
+}
+
+template <class T>
+std::vector<Vertex<T> *> twoOptAlgorithm(Graph<T> * graph, const T &origin, const T &dest, const vector<T> deliveries){
+	vector<Vertex<T> *> possible_solution;
+
+	possible_solution.push_back(graph->findVertex(origin));
+	
+	for(T info : deliveries){
+		possible_solution.push_back(graph->findVertex(info));
+	}
+
+	possible_solution.push_back(graph->findVertex(dest));
+
+	return improvePath(graph, possible_solution);
+}
+
+#endif

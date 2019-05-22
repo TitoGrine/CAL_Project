@@ -462,10 +462,12 @@ void Prob2Menu() {
 	switch (option_number) {
 		case 1 :
 			NearestNeighbourMenu(mainApp.getSmallGraph(), &solutionPath);
+			ProblemsMenu();
 			break;
 		case 2 :
-			//TODO: Call 2-opt function
-			//TODO: Show solution to user
+			solutionPath = twoOptAlgorithm(mainApp.getSmallGraph(), *mainApp.getInitial(), *mainApp.getLast(), mainApp.getDeliveries());
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
+			ProblemsMenu();
 			break;
 		case 0 :
 			std::system("cls");
