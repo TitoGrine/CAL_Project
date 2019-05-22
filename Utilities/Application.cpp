@@ -108,7 +108,8 @@ void Application::addMainGraph(Graph<MapInfo> * mainGraph){
 void Application::removeSmallGraph(){
 	for(unsigned int i = 0; i < _N_SHOPS_TYPE; i++)
 		this->smallShops[i].clear();
-	free(smallGraph);
+	//free(smallGraph);
+	this->smallGraph = NULL;
 }
 
 

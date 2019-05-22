@@ -384,6 +384,7 @@ void Prob1Menu() {
 
 	option_number = menuInput(" Option ? ", 0, 2);
 
+
 	MapInfo delivery = mainApp.getDeliveries().at(0);
 	vector<Vertex<MapInfo> *>  solutionPath;
 	switch (option_number) {
@@ -394,6 +395,7 @@ void Prob1Menu() {
 			break;
 		case 2 :
 			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			cout << solutionPath.size() << " <- solutionPath\n";
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
 			//TODO: Show solution to user
 			break;
@@ -431,7 +433,7 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 			Prob2Menu();
 			break;
 		case 0 :
-			std::system("cls");
+			//std::system("cls");
 			Prob2Menu();
 			return;
 		default:
@@ -468,8 +470,8 @@ void Prob2Menu() {
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
 			break;
 		case 0 :
-			std::system("cls");
-			return;
+			//std::system("cls");
+			break;
 		default:
 			break;
 	}
@@ -507,7 +509,7 @@ void ProblemsMenu() {
 			ProblemsMenu();
 			break;
 		case 0:
-			std::system("cls");
+			//std::system("cls");
 			mainApp.removeSmallGraph();
 			MapOperationsMenu();
 			break;
@@ -621,7 +623,7 @@ void ConnectionMenu(){
 
 void MapOperationsMenu(){
 	header("MAP OPERATIONS");
-	Graph<MapInfo> * smallGraph = new Graph<MapInfo>();
+	Graph<MapInfo> smallGraph;
 
 	int option_number;
 
@@ -662,8 +664,8 @@ void MapOperationsMenu(){
 			cout << "\n Shrinking graph size...\n\n";
 			try
 			{
-				*smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), mainApp.getMainGraph()->findVertex(*(mainApp.getLast())), UNDIRECTED_GRAPH);
-				mainApp.addSmallGraph(smallGraph);
+				smallGraph = shrinkGraph(mainApp.getMainGraph(), mainApp.getMainGraph()->findVertex(*(mainApp.getInitial())), mainApp.getMainGraph()->findVertex(*(mainApp.getLast())), UNDIRECTED_GRAPH);
+				mainApp.addSmallGraph(&smallGraph);
 				header("SOLVE PROBLEMS");
 				ProblemsMenu();
 			}

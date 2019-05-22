@@ -302,6 +302,7 @@ std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin
 		// TODO: verify
 		final_path.insert(final_path.end(), path.rbegin(), path.rend());
 	}
+//	cout << final_path.size() << " <- final_path\n";
 
 	return final_path;
 }
