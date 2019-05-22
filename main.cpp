@@ -509,6 +509,7 @@ void ProblemsMenu() {
 			break;
 		case 0:
 			std::system("cls");
+			free(mainApp.getSmallGraph());
 			MapOperationsMenu();
 			break;
 		default: 
