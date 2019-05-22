@@ -105,6 +105,12 @@ void Application::addMainGraph(Graph<MapInfo> * mainGraph){
 	this->mainGraph = mainGraph;
 }
 
+void Application::freeSmallGraph(){
+	for(unsigned int i = 0; i < _N_SHOPS_TYPE; i++)
+		this->smallShops[i].clear();
+	free(smallGraph);
+}
+
 
 
 // A partir daqui
