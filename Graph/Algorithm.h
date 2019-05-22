@@ -275,25 +275,26 @@ std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin
 {
     vector<Vertex<T> *> final_path, path;
 
+
 	thread t1(dijkstraShortestPath<T>, graph, origin, delivery);
 	
 	if(bidirectional){
-		thread t2(dijkstraShortestPath<T>, graph, delivery, dest);
+	//	thread t2(dijkstraShortestPath<T>, graph, delivery, dest);
+		Graph<T> newGraph = graph->duplicate();
+		dijkstraShortestPath<T>(&newGraph, delivery, dest);
 
 		t1.join();
-		t2.join();
 
 		final_path = graph->getPath(origin, delivery);
-		path = graph->getPath(delivery, dest);
+		path = newGraph.getPath(delivery, dest);
 
 		final_path.insert(final_path.end(), path.begin(), path.end());
 	}
 	else{ 
 		Graph<T> invertedGraph = graph->invert();
-		thread t2(dijkstraShortestPath<T>, &invertedGraph, dest, delivery);
+		dijkstraShortestPath<T>(&invertedGraph, dest, delivery);
 
 		t1.join();
-		t2.join();
 
 		final_path = graph->getPath(origin, delivery);
 		path = invertedGraph.getPath(dest, delivery);
@@ -313,22 +314,22 @@ std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, c
 	thread t1(aStarShortestPath<T>, graph, origin, delivery);
 	
 	if(bidirectional){
-		thread t2(aStarShortestPath<T>, graph, delivery, dest);
+		Graph<T> newGraph = graph->duplicate();
+		aStarShortestPath<T>(&newGraph, delivery, dest);
 
 		t1.join();
-		t2.join();
 
 		final_path = graph->getPath(origin, delivery);
-		path = graph->getPath(delivery, dest);
+		path = newGraph.getPath(delivery, dest);
+
 
 		final_path.insert(final_path.end(), path.begin(), path.end());
 	}
 	else{ 
 		Graph<T> invertedGraph = graph->invert();
-		thread t2(aStarShortestPath<T>, &invertedGraph, dest, delivery);
+		aStarShortestPath<T>(&invertedGraph, dest, delivery);
 
 		t1.join();
-		t2.join();
 
 		final_path = graph->getPath(origin, delivery);
 		path = invertedGraph.getPath(dest, delivery);
@@ -493,7 +494,7 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 	vector<Vertex<T> *> new_path;
 	vector<Vertex<T> *> intermediate_path;
 	
-	for(int i = 0; i < path.size() - 1; i++){
+	for(unsigned int i = 0; i < path.size() - 1; i++){
 		intermediate_path =  dijkstraShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()));
 		append(new_path, intermediate_path);
 		weight += new_path.back()->getDist();
@@ -507,7 +508,7 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 
 template <class T>
 bool validPath(Graph<T> * graph, const vector<Vertex<T> *> &path){
-	for(int i = 0; i < path.size() - 1; i++)
+	for(unsigned int i = 0; i < path.size() - 1; i++)
 		if(!checkConnection(graph, path.at(i), path.at(i + 1))) return false;
 
 	return true;
@@ -525,8 +526,8 @@ std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path)
 	while(currentBestWeight != lastBestWeight){
 		lastBestWeight = currentBestWeight;
 
-		for(int i = 1; i < path.size() - 3; i++)
-			for(int k = i + 1; k < path.size() - 2; k++){
+		for(unsigned int i = 1; i < path.size() - 3; i++)
+			for(unsigned int k = i + 1; k < path.size() - 2; k++){
 				path = twoOptSwap(bestPath, i, k);
 
 				if(validPath(graph, path)){

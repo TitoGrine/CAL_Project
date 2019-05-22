@@ -462,20 +462,19 @@ void Prob2Menu() {
 	switch (option_number) {
 		case 1 :
 			NearestNeighbourMenu(mainApp.getSmallGraph(), &solutionPath);
-			ProblemsMenu();
 			break;
 		case 2 :
 			solutionPath = twoOptAlgorithm(mainApp.getSmallGraph(), *mainApp.getInitial(), *mainApp.getLast(), mainApp.getDeliveries());
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
-			ProblemsMenu();
 			break;
 		case 0 :
 			std::system("cls");
-			ProblemsMenu();
 			return;
 		default:
 			break;
 	}
+	mainApp.clearDelivery();
+	ProblemsMenu();
 }
 
 void ProblemsMenu() {
@@ -509,6 +508,7 @@ void ProblemsMenu() {
 			break;
 		case 0:
 			std::system("cls");
+			mainApp.removeSmallGraph();
 			MapOperationsMenu();
 			break;
 		default: 

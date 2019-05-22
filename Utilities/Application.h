@@ -79,6 +79,8 @@ public:
 	void clearDelivery() { this->deliveries.clear(); };
 
 	void clear();
+	void removeSmallGraph();
+
 
 	~Application();
 };
