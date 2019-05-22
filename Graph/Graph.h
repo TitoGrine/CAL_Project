@@ -270,10 +270,10 @@ void Graph<T>::resetMatrixW(int n) {
 					delete [] this->W[i];
 		delete [] this->W;
 	}
-	this->W = new double *[n];
+	// this->W = new double *[n];
 
-	for(int i = 0; i < n; i++) 
-		this->W[i] = new double[n];
+	// for(int i = 0; i < n; i++) 
+	// 	this->W[i] = new double[n];
 }
 
 template <class T>
@@ -285,16 +285,21 @@ void Graph<T>::resetMatrixP(int n) {
 		delete [] this->P;
 	}
 
-	this->P = new int *[n];
+	// this->P = new int *[n];
 
-	for(int i = 0; i < n; i++) 
-		this->P[i] = new int[n];
+	// for(int i = 0; i < n; i++) 
+	// 	this->P[i] = new int[n];
 }
 
 template <class T>
 Graph<T>::~Graph() {
+	//cout << "begin destroying graph: " << vertexSet.size() << endl;
+
 	resetMatrixW(vertexSet.size());
+	//cout << "destroyed W graph\n";
+
 	resetMatrixP(vertexSet.size());
+	//cout << "destroyed graph\n";
 }
 
 template<class T>
