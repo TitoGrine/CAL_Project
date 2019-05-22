@@ -606,6 +606,7 @@ void ConnectionMenu(){
 			cout << " The Initial and Final Points are connected\n\n";
 		else
 			cout << " There is no connection between the Initial and the Final Point\n\n";
+		system("pause");
 		MapOperationsMenu();
 		break;
 	case 0:
