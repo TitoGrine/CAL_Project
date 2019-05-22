@@ -22,7 +22,9 @@ Application mainApp;
 void InicialMenu();
 void MapOperationsMenu();
 void ProblemsMenu();
+void Prob1Menu();
 void Prob2Menu();
+void Prob3Menu();
 
 /**
 *  +------------------------+
@@ -313,7 +315,7 @@ void removePoint(bool initial){
 *  +------------------------+
 */
 
-bool DeliveryPlaceMenu() {
+bool DeliveryPlaceMenu(bool getVolume) {
 	header("DELIVERY PLACE");
 
 	std::cout << " CHOOSE A DELIVERY PLACE:" << endl << endl;
@@ -346,8 +348,6 @@ bool DeliveryPlaceMenu() {
 
 	int option_number;
 
-
-	
 	std::cout << "   0 - Go Back" << endl << endl;
 
 	option_number = menuInput(" Option ? ", 0, 12);
@@ -363,13 +363,18 @@ bool DeliveryPlaceMenu() {
 		}
 	}
 
-	mainApp.addDelivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
+	Delivery newDelivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
+
+	if(getVolume) 
+		newDelivery.setVolume(menuInput(" Delivery Volume: ", 1, 200)); //TODO VER MELHOR MIN E MAX DE VOL
+
+	mainApp.addDelivery(newDelivery);
 	return true;
 }
 
 void Prob1Menu() {
 	
-	if(!DeliveryPlaceMenu())
+	if(!DeliveryPlaceMenu(false))
 		ProblemsMenu();
 
 	header("ONE TRUCK - ONE DELIVERY");
@@ -385,19 +390,16 @@ void Prob1Menu() {
 	option_number = menuInput(" Option ? ", 0, 2);
 
 
-	MapInfo delivery = mainApp.getDeliveries().at(0);
+	Delivery delivery = mainApp.getDeliveries().at(0);
 	vector<Vertex<MapInfo> *>  solutionPath;
 	switch (option_number) {
 		case 1 :
-			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED_GRAPH);
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
-			//TODO: Show solution to user
+			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
 			break;
 		case 2 :
-			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery, *(mainApp.getLast()), UNDIRECTED_GRAPH);
-			cout << solutionPath.size() << " <- solutionPath\n";
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
-			//TODO: Show solution to user
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
 			break;
 		case 0 :
 		default:
@@ -405,7 +407,6 @@ void Prob1Menu() {
 	}
 	mainApp.clearDelivery();
 	ProblemsMenu();
-	
 }
 
 void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* solutionPath){
@@ -423,13 +424,13 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 
 		switch (option_number) {
 		case 1 :
-			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), solutionPath);
+			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
 			Prob2Menu();
 			break;
 		case 2 :
-			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), solutionPath);
+			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
 			Prob2Menu();
 			break;
 		case 0 :
@@ -443,7 +444,7 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 
 void Prob2Menu() {
 
-	while (DeliveryPlaceMenu());
+	while (DeliveryPlaceMenu(false));
 	if(mainApp.getDeliveries().empty())
 		ProblemsMenu();
 
@@ -466,8 +467,8 @@ void Prob2Menu() {
 			NearestNeighbourMenu(mainApp.getSmallGraph(), &solutionPath);
 			break;
 		case 2 :
-			solutionPath = twoOptAlgorithm(mainApp.getSmallGraph(), *mainApp.getInitial(), *mainApp.getLast(), mainApp.getDeliveries());
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveries(), &solutionPath);
+			solutionPath = twoOptAlgorithm(mainApp.getSmallGraph(), *mainApp.getInitial(), *mainApp.getLast(), mainApp.getDeliveriesInfo());
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
 			break;
 		case 0 :
 			//std::system("cls");
@@ -477,6 +478,18 @@ void Prob2Menu() {
 	}
 	mainApp.clearDelivery();
 	ProblemsMenu();
+}
+
+void Prob3Menu() {
+
+	while (DeliveryPlaceMenu(true));
+	if(mainApp.getDeliveries().empty())
+		ProblemsMenu();
+
+	header("MULTIPLE TRUCKS - MULTIPLE DELIVERIES");
+
+	
+	
 }
 
 void ProblemsMenu() {
@@ -503,6 +516,7 @@ void ProblemsMenu() {
 			Prob2Menu();
 			break;
 		case 3:
+			Prob3Menu();
 			break;
 		case 4:
 			showGraph(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast());
