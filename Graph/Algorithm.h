@@ -351,25 +351,20 @@ void FloydWarshallShortestPath(Graph<T> * graph) {
 	
 	for (unsigned i = 0; i < n; i++) {
 		for (unsigned j = 0; j < n; j++) {
-			graph->setW(i, j, i == j? 0 : INF);
-			graph->setP(i, j, -1);
-		}
-		for (Edge<T> e : *(graph->getVertexSet().at(i)->getAdj())) {
-			int j = graph->findVertexIdx(*e.getDest()->getInfo());
-			graph->setW(i, j, e.getWeight());
-			graph->setP(i, j, i);
+			graph->setW(i, j, graph->edgeWeight(i, j));
+			graph->setP(i, j, graph->nextVertex(i, j));
 		}
 	}
 
 	for(unsigned k = 0; k < n; k++)
-		for(unsigned i = 0; i < n; i++)
-			for(unsigned j = 0; j < n; j++) {
+		for(unsigned j = 0; j < n; j++)
+			for(unsigned i = 0; i < n; i++) {
 				if(graph->getW(i, k) == INF || graph->getW(k, j) == INF)
 					continue; // avoid overflow
-				int val = graph->getW(i, k) + graph->getW(k, j);
+				double val = graph->getW(i, k) + graph->getW(k, j);
 				if (val < graph->getW(i, j)) {
 					graph->setW(i, j, val);
-					graph->setP(i, j, graph->getP(k, j));
+					graph->setP(i, j, graph->getP(i, k));
 				}
 			}
 }
@@ -380,43 +375,32 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 	vector<Vertex<T> *>result;
 	Vertex<T>* start = graph->findVertex(origin);
 
-	for(Vertex<T>* vertex : graph->getVertexSet()){
-		vertex->setDist(start->getEuclideanDist(vertex));
-	}
-
 	MutablePriorityQueue<Vertex<T>> Q;
-	MutablePriorityQueue<Vertex<T>> aux;
-
+	
 	for(T info : deliveries){
+		graph->findVertex(info)->setDist(start->getEuclideanDist(graph->findVertex(info)));
 		Q.insert(graph->findVertex(info));
 	}
 
-	result.push_back(graph->findVertex(origin));
+	result.push_back(start);
 
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
 
-		vector<Vertex<T> *> path = graph->getPath(*(result.back()->getInfo()), *(vertex->getInfo()));
-		for(unsigned i = 0; i < path.size(); i++ ){
+		vector<Vertex<T> *> path = dijkstraShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()));
+		for(unsigned i = 1; i < path.size(); i++){
 			result.push_back(path.at(i));
 		}
 
-		result.push_back(vertex);
-
-		aux = Q;
-
-		while(!aux.empty()){
-			Vertex<T>* v = aux.extractMin();
-			v->setDist(vertex->getEuclideanDist(v));
+		for(T info : deliveries){
+			graph->findVertex(info)->setDist(vertex->getEuclideanDist(graph->findVertex(info)));
 		}
 	}
 
 	vector<Vertex<T> *> path = graph->getPath(*(result.back()->getInfo()), dest);
-		for(unsigned i = 0; i < path.size(); i++ ){
-			result.push_back(path.at(i));
-		}
-
-	result.erase(result.begin());
+	for(unsigned i = 1; i < path.size(); i++ ){
+		result.push_back(path.at(i));
+	}
 
 	return result;
 }
@@ -427,54 +411,41 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 	FloydWarshallShortestPath(graph);
 
 	vector<Vertex<T> *> result;
-	int inicial = graph->findVertexIdx(origin);
 
-	for(T info : deliveries){
-		Vertex<T>* vertex = graph->findVertex(info);
-		vertex->setDist(graph->getW(inicial, graph->findVertexIdx(info)));
-	}
+	int inicial = graph->findVertexIdx(origin);
 
 	MutablePriorityQueue<Vertex<T>> Q;
 	MutablePriorityQueue<Vertex<T>> aux;
 
-	Q.insert(graph->findVertex(origin));
-
 	for(T info : deliveries){
-		Q.insert(graph->findVertex(info));
+		Vertex<T>* vertex = graph->findVertex(info);
+		vertex->setDist(graph->getW(inicial, graph->findVertexIdx(info)));
+		Q.insert(vertex);
 	}
 
 	result.push_back(graph->findVertex(origin));
 
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
+		int vertexIndex = graph->findVertexIdx(*(vertex->getInfo()));
 
 		vector<T> path = graph->getFloydWarshallPath(*(result.back()->getInfo()), *(vertex->getInfo()));
-		for(unsigned i = 0; i < path.size(); i++ ){
+		for(unsigned i = 1; i < path.size(); i++){
 			result.push_back(graph->findVertex(path.at(i)));
 		}
 
-		result.push_back(vertex); // Not sure if it's not already inlcuded in the FWPath
-
-		aux = Q;
-
-		while(!aux.empty()){
-			Vertex<T>* v = aux.extractMin();
-			v->setDist(graph->getW(graph->findVertexIdx(*(vertex->getInfo())), graph->findVertexIdx(*(v->getInfo()))));
+		for(T info : deliveries){
+			vertex->setDist(graph->getW(vertexIndex, graph->findVertexIdx(info)));
 		}
 	}
 	
 	vector<T> path = graph->getFloydWarshallPath(*(result.back()->getInfo()), dest);
-	for(unsigned i = 0; i < path.size(); i++ ){
+	for(unsigned i = 1; i < path.size(); i++ ){
 			result.push_back(graph->findVertex(path.at(i)));
 	}
 
-	result.push_back(graph->findVertex(dest));
-
 	return result;
 }
-
-
-
 
 template <class T>
 vector<Vertex<T> *> twoOptSwap(const vector<Vertex<T> *> &current_path, int i, int k){
@@ -503,6 +474,8 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 	}
 
 	new_path.push_back(path.back());
+
+	path = new_path;
 
 	return weight;
 }

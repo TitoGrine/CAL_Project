@@ -29,8 +29,8 @@ class Graph {
 
 	double rightBound, leftBound, topBound, bottomBound;	
 
-	double ** W = nullptr;   // dist
-	int **P = nullptr;   // path
+	vector<vector<double>>  W;   // dist
+	vector<vector<int>> P;   // path
 
 	priority_queue<Edge<T>> buildHeap();
 
@@ -57,6 +57,8 @@ public:
 
 	// Fp05 - all pairs
 	vector<T> getFloydWarshallPath(const T &origin, const T &dest) const;
+	double edgeWeight(int i, int j);
+	int nextVertex(int i, int j);
 	void resetMatrixW(int n);
 	void resetMatrixP(int n);
 	~Graph();
@@ -86,22 +88,22 @@ vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 
 template <class T>
 double Graph<T>::getW(int i, int j) const{
-	return W[i][j];
+	return W.at(i).at(j);
 }
 
 template <class T>
 void Graph<T>::setW(int i, int j, double value){
-	W[i][j] = value;
+	W.at(i).at(j) = value;
 }
 
 template <class T>
 int Graph<T>::getP(int i, int j) const{
-	return P[i][j];
+	return P.at(i).at(j);
 }
 
 template <class T>
 void Graph<T>::setP(int i, int j, int index){
-	P[i][j] = index;
+	P.at(i).at(j) = index;
 }
 
 /*
@@ -228,6 +230,7 @@ vector<Vertex<T> *> Graph<T>::getPath(const T &origin, const T &dest) const{
 		res.push_back(v);
 	res.push_back(o);
 	reverse(res.begin(), res.end());
+
 	return res;
 }
 
@@ -263,43 +266,43 @@ void Graph<T>::bellmanFordShortestPath(const T &orig) {
 /**************** All Pairs Shortest Path  ***************/
 
 template <class T>
-void Graph<T>::resetMatrixW(int n) {
-	if (this->W != nullptr) {
-		for (int i = 0; i < n; i++)
-			if (this->W[i] != nullptr)
-					delete [] this->W[i];
-		delete [] this->W;
-	}
-	// this->W = new double *[n];
+double Graph<T>::edgeWeight(int i, int j){
+	if(i == j) return 0;
 
-	// for(int i = 0; i < n; i++) 
-	// 	this->W[i] = new double[n];
+	for(Edge<T> edge : *(vertexSet.at(i)->getAdj())){
+		if(edge.dest == vertexSet.at(j))
+			return edge.getWeight();
+	}
+
+	return INF;
+}
+
+template <class T>
+int Graph<T>::nextVertex(int i, int j){
+	for(Edge<T> edge : *(vertexSet.at(i)->getAdj())){
+		if(edge.dest == vertexSet.at(j))
+			return j;
+	}
+
+	return -1;
+}
+
+template <class T>
+void Graph<T>::resetMatrixW(int n) {
+	W = vector<vector<double>> (n, vector<double> (n));
 }
 
 template <class T>
 void Graph<T>::resetMatrixP(int n) {
-	if (this->P != nullptr) {
-		for (int i = 0; i < n; i++)
-			if (this->P[i] != nullptr)
-				delete [] this->P[i];
-		delete [] this->P;
-	}
-
-	// this->P = new int *[n];
-
-	// for(int i = 0; i < n; i++) 
-	// 	this->P[i] = new int[n];
+	P = vector<vector<int>> (n, vector<int> (n));
 }
 
 template <class T>
 Graph<T>::~Graph() {
 	//cout << "begin destroying graph: " << vertexSet.size() << endl;
 
-	resetMatrixW(vertexSet.size());
-	//cout << "destroyed W graph\n";
-
-	resetMatrixP(vertexSet.size());
-	//cout << "destroyed graph\n";
+	W.erase(W.begin(), W.end());
+	P.erase(P.begin(), P.end());
 }
 
 template<class T>
@@ -307,11 +310,22 @@ vector<T> Graph<T>::getFloydWarshallPath(const T &orig, const T &dest) const{
 	vector<T> res;
 	int i = findVertexIdx(orig);
 	int j = findVertexIdx(dest);
-	if (i == -1 || j == -1 || W[i][j] == INF) // missing or disconnected
+	cout << "Initial point: " << i << endl;
+	cout << "Final point: " << j << endl;
+	if (i == -1 || j == -1 || getW(i, j) == INF)  // missing or disconnected
 		return res;
-	for ( ; j != -1; j = P[i][j])
-		res.push_back(vertexSet[j]->info);
-	reverse(res.begin(), res.end());
+	
+	res.push_back(vertexSet[i]->info);
+
+	while(i != j){
+		i = getP(i, j);
+
+		if(i < 0)
+			break;
+		
+		res.push_back(vertexSet[i]->info);
+	}
+
 	return res;
 }
 
