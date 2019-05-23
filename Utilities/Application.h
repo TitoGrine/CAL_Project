@@ -6,6 +6,8 @@
 
 #include "../Graph/Graph.h"
 #include "MapInfo.h"
+#include "Truck.h"
+#include "Delivery.h"
 #include <vector>
 #include <string>
 
@@ -43,7 +45,9 @@ class Application {
 	std::vector<MapInfo> smallShops[_N_SHOPS_TYPE];
 
 
-	std::vector<MapInfo> deliveries;
+	std::vector<Delivery> deliveries;
+
+	std::vector<Truck> trucks;
 
 public:
 	Application();
@@ -66,15 +70,17 @@ public:
 	const std::vector<MapInfo> & getSmallShopsByType(map_info_t shopType) const;
 	MapInfo getRandomShopByType(map_info_t shopType);
 	MapInfo getRandomSmallShopByType(map_info_t shopType);
-	const std::vector < MapInfo> & getDeliveries() const { return this->deliveries; };
+	std::vector < MapInfo> getDeliveriesInfo() const;
+	const std::vector < Delivery> & getDeliveries() const;  
 
 	void addDeposit(const MapInfo &info);
 	bool addShop(const MapInfo &info, map_info_t tagNum);
+	void addTruck(const Truck &truck);
 
 	void addSmallGraph(Graph<MapInfo> * graph);
 	void addMainGraph(Graph<MapInfo> * mainGraph);
 	
-	void addDelivery(const MapInfo &info);
+	void addDelivery(const Delivery &delivery);
 	bool removeDelivery(const MapInfo &info);
 	void clearDelivery() { this->deliveries.clear(); };
 

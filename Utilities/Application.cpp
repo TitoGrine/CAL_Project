@@ -48,6 +48,21 @@ MapInfo Application::getRandomSmallShopByType(map_info_t shopType){
 	return typeShops.at(rand() % typeShops.size());
 }
 
+std::vector < MapInfo> Application::getDeliveriesInfo() const
+{
+	std::vector < MapInfo> result;
+
+	for(Delivery del : this->deliveries) 
+		result.push_back(del.getDest());
+
+	return result;
+}
+
+const std::vector < Delivery> & Application::getDeliveries() const
+{
+	return this->deliveries;
+}
+
 
 bool Application::addInitial(MapInfo initialPoint){
 	if(this->initial != NULL)
@@ -129,11 +144,17 @@ bool Application::addShop(const MapInfo &info, map_info_t shopType)
 	return true;
 }
 
-void Application::addDelivery(const MapInfo &info)
+void Application::addTruck(const Truck &truck)
 {
-	deliveries.push_back(info);
+	this->trucks.push_back(truck);
 }
 
+void Application::addDelivery(const Delivery &delivery)
+{
+	deliveries.push_back(delivery);
+}
+
+/*
 bool Application::removeDelivery(const MapInfo &info)
 {
 	auto it = find(deliveries.begin(), deliveries.end(), info);
@@ -141,7 +162,7 @@ bool Application::removeDelivery(const MapInfo &info)
 		return false;
 	deliveries.erase(it);
 	return true;
-}
+}*/
 
 void Application::clear(){
 	free(this->mainGraph);

@@ -143,4 +143,27 @@ void buildApplication(Application * app, std::string MapName, Graph<MapInfo> * m
 	}
 
 	tagsFile.close();
+
+	//Trucks
+	ifstream trucksFile;
+	trucksFile.open("trucks.txt");
+
+	if(!trucksFile.is_open()){
+		cerr << "Couldn't open trucks file\n";
+		return;
+	}
+
+	unsigned int numTrucks, truckCapacity;
+	getline(trucksFile, line);
+	iss = istringstream(line);
+	iss >> numTrucks;
+
+	for(unsigned int i = 0; i < numTrucks; i++) {
+		getline(trucksFile, line);
+		iss = istringstream(line);
+		iss >> truckCapacity;
+		Truck newTruck(truckCapacity);
+		app->addTruck(newTruck);
+	}
+
 }
