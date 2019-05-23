@@ -223,19 +223,29 @@ void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, cons
 	gv->setVertexColor(final->getID(), "RED");
 	gv->setVertexLabel(final->getID(), "End");
 
-	int edgeID = 0;
-	gv->defineEdgeCurved(false);
+	gv->defineEdgeCurved(true);
+	/*
 	for(auto i = 0; i < graph->getNumVertex(); i++){
 		Vertex<MapInfo> * v = graph->getVertexSet().at(i);
 		if(containsVertex(*points, v)){
 			for(size_t j = 0; j < v->getAdj()->size(); j++)
 				if(containsVertex(*points,  v->getAdj()->at(j).getDest())){
-					if(UNDIRECTED_GRAPH)
-						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::UNDIRECTED);
+					if(UNDIRECTED_GRAPH){
+						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
+						gv->setEdgeLabel(edgeID, to_string(edgeID));
+					}
 					else
 						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
 				}
 		}
+	}
+	*/
+
+	for(unsigned i = 1; i < points->size(); i++){
+		Vertex<MapInfo> * v = points->at(i - 1);
+		Vertex<MapInfo> * u = points->at(i);
+		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
+		gv->setEdgeLabel(i, to_string(i));
 	}
 	
 	gv->rearrange();
