@@ -387,7 +387,7 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
 
-		vector<Vertex<T> *> path = dijkstraShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()));
+		vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()));
 		for(unsigned i = 1; i < path.size(); i++){
 			result.push_back(path.at(i));
 		}
@@ -397,7 +397,7 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 		}
 	}
 
-	vector<Vertex<T> *> path = graph->getPath(*(result.back()->getInfo()), dest);
+	vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), dest);
 	for(unsigned i = 1; i < path.size(); i++ ){
 		result.push_back(path.at(i));
 	}
@@ -467,7 +467,7 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 	vector<Vertex<T> *> intermediate_path;
 	
 	for(unsigned int i = 0; i < path.size() - 1; i++){
-		intermediate_path =  dijkstraShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()));
+		intermediate_path =  aStarShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()));
 		append(new_path, intermediate_path);
 		weight += new_path.back()->getDist();
 		new_path.pop_back();
