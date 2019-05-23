@@ -1,0 +1,11 @@
+USER,ALGORITHM,|V|,|N|,time,UNDIRECTED
+manue,bidijkstra,101,204,3,V
+manue,bidijkstra,101,204,9,V
+manue,bia* euclidian,101,204,3,V
+manue,scc,20063,40742,171,V
+manue,scc,20063,40742,103,V
+manue,scc,20063,40742,150,V
+manue,bia* euclidian,403,840,12,V
+manue,scc,3294,6270,0,V
+manue,scc,3294,6270,0,V
+manue,bidijkstra,35,72,4,V

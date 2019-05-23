@@ -4,6 +4,7 @@
 #include "Graph.h"
 #include "../Utilities/debugGraph.h"
 #include "../Utilities/mingw.thread.h"
+#include "../Utilities/timeLog.h"
 #include <iostream>
 #include <ostream>
 #include <fstream>
@@ -145,12 +146,16 @@ std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirec
 	// ofstream out;
 	// out.open("teste.txt");
 
+	startTime();
+
 	vector<Vertex<T> *> res_normal = dfs(graph, initial);
 
 	// printVertex(res_normal, out);
 
-	if(bidirectional)
+	if(bidirectional){
+		writeTime(SCC, graph, bidirectional);
 		return res_normal;
+	}
 
 	// TODO: mudar para não alterar proprio grafo
 	Graph<T> invertedGraph = graph->invert();
@@ -178,6 +183,8 @@ std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirec
 	// gv->rearrange();
 	// getchar();
 	// gv->closeWindow();
+
+	writeTime(SCC, graph, bidirectional);
 
 	return res;
 }
@@ -275,6 +282,7 @@ std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin
 {
     vector<Vertex<T> *> final_path, path;
 
+	startTime();
 
 	thread t1(dijkstraShortestPath<T>, graph, origin, delivery);
 	
@@ -304,6 +312,9 @@ std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin
 	}
 //	cout << final_path.size() << " <- final_path\n";
 
+
+	writeTime(BIDIJKSTRA, graph, bidirectional);
+
 	return final_path;
 }
 
@@ -311,6 +322,8 @@ template <class T>
 std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
     vector<Vertex<T> *> final_path, path;
+
+	startTime();
 
 	thread t1(aStarShortestPath<T>, graph, origin, delivery);
 	
@@ -338,6 +351,8 @@ std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, c
 		// TODO: verify
 		final_path.insert(final_path.end(), path.rbegin(), path.rend());
 	}
+
+	writeTime(BIASTAR_EUCLIDIAN, graph, bidirectional);
 
 	return final_path;
 }
