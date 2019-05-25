@@ -394,10 +394,11 @@ void Prob1Menu() {
 	std::cout << " CHOOSE AN ALGORITHM:" << endl << endl;
 
 	std::cout << "   1 - Dijkstra Algorithm" << endl;
-	std::cout << "   2 - A* Algorithm" << endl;
+	std::cout << "   2 - A* Algorithm - Euclidian" << endl;
+	std::cout << "   3 - A* Algorithm - Manhattan" << endl;
 	std::cout << "   0 - Go Back" << endl << endl;
 
-	option_number = menuInput(" Option ? ", 0, 2);
+	option_number = menuInput(" Option ? ", 0, 3);
 
 
 	Delivery delivery = mainApp.getDeliveries().at(0);
@@ -408,7 +409,11 @@ void Prob1Menu() {
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
 			break;
 		case 2 :
-			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), BIASTAR_EUCLIDIAN, UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			break;
+		case 3 :
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), BIASTAR_MANHATTAN, UNDIRECTED_GRAPH);
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
 			break;
 		case 0 :
@@ -733,8 +738,9 @@ void MapMenu()
 	std::cout << "   9 - Porto" << endl;
 	std::cout << "   10 - Portugal" << endl;
 	std::cout << "   11 - Viseu" << endl;
+	std::cout << "   12 - Edu" << endl;
 	std::cout << "   0 - Go back" << endl << endl;
-	option_number = menuInput(" Option ? ", 0, 11);
+	option_number = menuInput(" Option ? ", 0, 12);
 	switch (option_number)
 	{
 	case 1:
@@ -780,6 +786,10 @@ void MapMenu()
 	case 11:
 		buildGraph(*graph, "Viseu", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Viseu", graph);		
+		break;
+	case 12:
+		buildGraph(*graph, "Edu", UNDIRECTED_GRAPH);
+		buildApplication(&mainApp, "Edu", graph);	
 		break;
 	case 0:
 		break;
