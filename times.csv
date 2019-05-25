@@ -9,3 +9,17 @@ manue,bia* euclidian,403,840,12,V
 manue,scc,3294,6270,0,V
 manue,scc,3294,6270,0,V
 manue,bidijkstra,35,72,4,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,9,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,2383,5008,0,V
+manue,scc,2383,5008,9,V
+manue,bidijkstra,1209,2680,66,V
+manue,bia* euclidian,1209,2680,81,V
+manue,bia* manhattan,1209,2680,67,V

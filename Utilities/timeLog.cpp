@@ -23,10 +23,14 @@ string algorithmToString(algorithm_t algorithm){
 		return "bidijkstra";
 	case BIASTAR_EUCLIDIAN:
 		return "bia* euclidian";
+	case BIASTAR_MANHATTAN:
+		return "bia* manhattan";
 	case DIJKSTRA:
 		return "dijkstra";
 	case ASTAR_EUCLIDIAN:
 		return "a* euclidian";
+	case ASTAR_MANHATTAN:
+		return "a* manhattan";
 	case SCC:
 		return "scc";
 	case INVERT_GRAPH:

@@ -25,13 +25,13 @@ template <class T>
 std::vector<Vertex<T> *> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
 
 template <class T>
-std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest);
+std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest, algorithm_t aStartType);
 
 template <class T>
 std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
 
 template <class T>
-std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, algorithm_t aStarType, bool bidirectional);
 
 template <class T>
 void FloydWarshallShortestPath(Graph<T> * graph); 
@@ -216,7 +216,7 @@ inline bool dijkstraRelax(Vertex<T> *v, Vertex<T> *w, double weight) {
 }
 
 template <class T>
-inline bool aStarRelax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight) {
+inline bool aStarEuclidianRelax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight) {
 	double heuristicDistance = v->getDist() - v->getEuclideanDist(dest) + weight + w->getEuclideanDist(dest);
 	if (w->getDist() > heuristicDistance) {
 		w->setDist(heuristicDistance);
@@ -228,14 +228,35 @@ inline bool aStarRelax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weigh
 }
 
 template <class T>
-inline bool relax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight, bool isDijkstra) 
-{
-	if(isDijkstra) return dijkstraRelax(v, w, weight);
-	return aStarRelax(v, w, dest, weight);
+inline bool aStarManhattanRelax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight) {
+	double heuristicDistance = v->getDist() - v->getManhattanDist(dest) + weight + w->getEuclideanDist(dest);
+	if (w->getDist() > heuristicDistance) {
+		w->setDist(heuristicDistance);
+		w->setPath(v); 
+		return true;
+	}
+	else
+		return false;
 }
 
 template <class T>
-static std::vector<Vertex<T> *> shortestPath(Graph<T> * graph, const T &origin, const T &dest, bool isDijkstra)
+inline bool relax(Vertex<T> *v, Vertex<T> *w, Vertex<T> *dest, double weight, algorithm_t algorithm) 
+{	
+	switch (algorithm)
+	{
+	case DIJKSTRA: case BIDIJKSTRA:
+		return dijkstraRelax(v, w, weight);
+	case ASTAR_EUCLIDIAN: case BIASTAR_EUCLIDIAN:
+		return aStarEuclidianRelax(v, w, dest, weight);
+	case ASTAR_MANHATTAN: case BIASTAR_MANHATTAN:
+		return aStarManhattanRelax(v, w, dest, weight);
+	default:
+		throw invalid_argument("Algorithm must be either A* or Dijkstra type");
+	}
+}
+
+template <class T>
+static std::vector<Vertex<T> *> shortestPath(Graph<T> * graph, const T &origin, const T &dest, algorithm_t algorithm)
 {
 	std::vector<Vertex<T> *> result;
 	auto s = graph->initSingleSource(origin);
@@ -252,7 +273,7 @@ static std::vector<Vertex<T> *> shortestPath(Graph<T> * graph, const T &origin, 
 		for(unsigned int i = 0; i < v->getAdj()->size(); i++) {
 			auto e = v->getAdj()->at(i);
 			auto oldDist = e.getDest()->getDist();
-			if (relax(v, e.getDest(), d, e.getWeight(), isDijkstra)) {
+			if (relax(v, e.getDest(), d, e.getWeight(), algorithm)) {
 				if (oldDist == INF)
 					q.insert(e.getDest());
 				else
@@ -267,13 +288,13 @@ static std::vector<Vertex<T> *> shortestPath(Graph<T> * graph, const T &origin, 
 template <class T>
 std::vector<Vertex<T> *> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest)
 {
-	return shortestPath(graph, origin, dest, true);
+	return shortestPath(graph, origin, dest, DIJKSTRA);
 }
 
 template <class T>
-std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest)
+std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest, algorithm_t aStartType)
 {
-	return shortestPath(graph, origin, dest, false);
+	return shortestPath(graph, origin, dest, aStartType);
 }
 
 
@@ -319,17 +340,17 @@ std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin
 }
 
 template <class T>
-std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
+std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, algorithm_t aStarType, bool bidirectional)
 {
     vector<Vertex<T> *> final_path, path;
 
 	startTime();
 
-	thread t1(aStarShortestPath<T>, graph, origin, delivery);
+	thread t1(aStarShortestPath<T>, graph, origin, delivery, aStarType);
 	
 	if(bidirectional){
 		Graph<T> newGraph = graph->duplicate();
-		aStarShortestPath<T>(&newGraph, delivery, dest);
+		aStarShortestPath<T>(&newGraph, delivery, dest, aStarType);
 
 		t1.join();
 
@@ -341,7 +362,7 @@ std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, c
 	}
 	else{ 
 		Graph<T> invertedGraph = graph->invert();
-		aStarShortestPath<T>(&invertedGraph, dest, delivery);
+		aStarShortestPath<T>(&invertedGraph, dest, delivery, aStarType);
 
 		t1.join();
 
@@ -352,7 +373,7 @@ std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, c
 		final_path.insert(final_path.end(), path.rbegin(), path.rend());
 	}
 
-	writeTime(BIASTAR_EUCLIDIAN, graph, bidirectional);
+	writeTime(aStarType, graph, bidirectional);
 
 	return final_path;
 }
@@ -402,7 +423,7 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
 
-		vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()));
+		vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()), ASTAR_EUCLIDIAN);
 		for(unsigned i = 1; i < path.size(); i++){
 			result.push_back(path.at(i));
 		}
@@ -412,7 +433,7 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 		}
 	}
 
-	vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), dest);
+	vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), dest, ASTAR_EUCLIDIAN);
 	for(unsigned i = 1; i < path.size(); i++ ){
 		result.push_back(path.at(i));
 	}
@@ -482,7 +503,7 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 	vector<Vertex<T> *> intermediate_path;
 	
 	for(unsigned int i = 0; i < path.size() - 1; i++){
-		intermediate_path =  aStarShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()));
+		intermediate_path =  aStarShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()), ASTAR_EUCLIDIAN);
 		append(new_path, intermediate_path);
 		weight += new_path.back()->getDist();
 		new_path.pop_back();
