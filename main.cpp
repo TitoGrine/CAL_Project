@@ -211,7 +211,7 @@ void paintMapInfoVertexes(GraphViewer * gv, int vertexSize, string vertexColor, 
 	}
 }
 
-void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<Vertex<MapInfo> *> * points){
+void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<Vertex<MapInfo> *> * points, int truck){
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", *points);
 	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
