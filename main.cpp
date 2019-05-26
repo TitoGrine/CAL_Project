@@ -224,34 +224,59 @@ void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, cons
 	gv->setVertexLabel(final->getID(), "End");
 
 	gv->defineEdgeCurved(true);
-	/*
-	for(auto i = 0; i < graph->getNumVertex(); i++){
-		Vertex<MapInfo> * v = graph->getVertexSet().at(i);
-		if(containsVertex(*points, v)){
-			for(size_t j = 0; j < v->getAdj()->size(); j++)
-				if(containsVertex(*points,  v->getAdj()->at(j).getDest())){
-					if(UNDIRECTED_GRAPH){
-						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
-						gv->setEdgeLabel(edgeID, to_string(edgeID));
-					}
-					else
-						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
-				}
-		}
-	}
-	*/
+
+	string truck_tag = to_string(truck) + "-";
 
 	for(unsigned i = 1; i < points->size(); i++){
 		Vertex<MapInfo> * v = points->at(i - 1);
 		Vertex<MapInfo> * u = points->at(i);
 		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
-		gv->setEdgeLabel(i, to_string(i));
+		gv->setEdgeLabel(i, truck_tag + to_string(i));
 	}
 	
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
+}
 
+void addPathGV(GraphViewer * gv, vector<Vertex<MapInfo> *> * points, int truck){
+	paintVertexesGV(gv, 10, "YELLOW", *points);
+
+	string truck_tag = to_string(truck) + "-";
+
+	for(unsigned i = 1; i < points->size(); i++){
+		Vertex<MapInfo> * v = points->at(i - 1);
+		Vertex<MapInfo> * u = points->at(i);
+		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
+		gv->setEdgeLabel(i, truck_tag + to_string(i));
+	}
+	
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+}
+
+void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<vector<Vertex<MapInfo> *>*>* solutions){
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	
+	gv->defineEdgeCurved(true);
+
+	for(unsigned id = 0; id < solutions->size(); id++){
+		addPathGV(gv, solutions->at(id), id);
+	}
+
+	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
+	gv->setVertexSize(initial->getID(), 20);
+	gv->setVertexColor(initial->getID(), "GREEN");
+	gv->setVertexLabel(initial->getID(), "Start");
+
+	gv->setVertexSize(final->getID(), 20);
+	gv->setVertexColor(final->getID(), "RED");
+	gv->setVertexLabel(final->getID(), "End");
+	
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
 }
 
 //=======================================================================================================================//
@@ -406,15 +431,15 @@ void Prob1Menu() {
 	switch (option_number) {
 		case 1 :
 			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 2 :
 			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), BIASTAR_EUCLIDIAN, UNDIRECTED_GRAPH);
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 3 :
 			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), BIASTAR_MANHATTAN, UNDIRECTED_GRAPH);
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 0 :
 		default:
@@ -440,12 +465,12 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 		switch (option_number) {
 		case 1 :
 			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
 			Prob2Menu();
 			break;
 		case 2 :
 			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
+			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
 			Prob2Menu();
 			break;
 		case 0 :
@@ -483,7 +508,7 @@ void Prob2Menu() {
 			break;
 		case 2 :
 			solutionPath = twoOptAlgorithm(mainApp.getSmallGraph(), *mainApp.getInitial(), *mainApp.getLast(), mainApp.getDeliveriesInfo());
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 0 :
 			//std::system("cls");
