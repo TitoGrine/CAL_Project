@@ -405,40 +405,41 @@ void Prob1Menu() {
 		default:
 			break;
 	}
-	mainApp.clearDelivery();
+	mainApp.clearAllDeliveries();
 	ProblemsMenu();
 }
 
 void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* solutionPath){
 	header("ONE TRUCK - MULTIPLE DELIVERIES");
 
-		int option_number;
+	int option_number;
 
-		std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
+	std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
 
-		std::cout << "   1 - Using Euclidean Distance" << endl;
-		std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
-		std::cout << "   0 - Go Back" << endl << endl;
+	std::cout << "   1 - Using Euclidean Distance" << endl;
+	std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
 
-		option_number = menuInput(" Option ? ", 0, 2);
+	option_number = menuInput(" Option ? ", 0, 2);
 
-		switch (option_number) {
-		case 1 :
-			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
-			Prob2Menu();
-			break;
-		case 2 :
-			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
-			Prob2Menu();
-			break;
-		case 0 :
-			//std::system("cls");
-			Prob2Menu();
-			return;
-		default:
-			break;
+	switch (option_number) {
+	case 1 :
+		*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), INF);
+		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
+		Prob2Menu();
+		break;
+	case 2 :
+		FloydWarshallShortestPath(mainApp.getSmallGraph());
+		*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), INF);
+		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
+		Prob2Menu();
+		break;
+	case 0 :
+		//std::system("cls");
+		Prob2Menu();
+		return;
+	default:
+		break;
 	}
 }
 
@@ -476,7 +477,7 @@ void Prob2Menu() {
 		default:
 			break;
 	}
-	mainApp.clearDelivery();
+	mainApp.clearAllDeliveries();
 	ProblemsMenu();
 }
 
@@ -488,12 +489,54 @@ void Prob3Menu() {
 
 	header("MULTIPLE TRUCKS - MULTIPLE DELIVERIES");
 
-	//Distribuir mainApp.deliveries pelos camioes
+	int option_number;
 
-	//Escolher algoritmo a usar
+	std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
 
-	//Aplicar esse algoritmo para a lista de deliveries de cada camiao
+	std::cout << "   1 - Using Euclidean Distance" << endl;
+	std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 2);
+
+	std::priority_queue<Truck> tempTrucks;
+	std::vector<Vertex<MapInfo> *> solutionPath;
+
+	switch (option_number)
+	{
+		case 1:
+			while(!mainApp.getDeliveries().empty()) {
+				Truck truck = 	mainApp.getTrucks().top();
+				truck.setPath(NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truck.getCapacity()));
+				tempTrucks.push(truck);
+				mainApp.getTrucks().pop();
+				mainApp.clearDeliveries();
+			}
+		break;
+		case 2:
+			FloydWarshallShortestPath(mainApp.getSmallGraph());
+			while(!mainApp.getDeliveries().empty()) {
+				Truck truck = mainApp.getTrucks().top();
+				truck.setPath(NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truck.getCapacity()));
+				tempTrucks.push(truck);
+				mainApp.getTrucks().pop();
+				mainApp.clearDeliveries();
+			}
+			break;
+		case 0:
+			ProblemsMenu();
+			break;
+		default:
+			break;
+	}
 	
+	while(!tempTrucks.empty()) {
+		mainApp.addTruck(tempTrucks.top());
+		tempTrucks.pop();
+	}
+	
+	mainApp.clearAllDeliveries();
+	ProblemsMenu();
 }
 
 void ProblemsMenu() {

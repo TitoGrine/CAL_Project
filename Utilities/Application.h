@@ -10,6 +10,7 @@
 #include "Delivery.h"
 #include <vector>
 #include <string>
+#include <queue>
 
 template <class T> class Graph;
 
@@ -47,7 +48,7 @@ class Application {
 
 	std::vector<Delivery> deliveries;
 
-	std::vector<Truck> trucks;
+	std::priority_queue<Truck> trucks;
 
 public:
 	Application();
@@ -71,7 +72,8 @@ public:
 	MapInfo getRandomShopByType(map_info_t shopType);
 	MapInfo getRandomSmallShopByType(map_info_t shopType);
 	std::vector < MapInfo> getDeliveriesInfo() const;
-	const std::vector < Delivery> & getDeliveries() const;  
+	std::vector < Delivery> getDeliveries() const;  
+	std::priority_queue<Truck> getTrucks() const;
 
 	void addDeposit(const MapInfo &info);
 	bool addShop(const MapInfo &info, map_info_t tagNum);
@@ -81,8 +83,8 @@ public:
 	void addMainGraph(Graph<MapInfo> * mainGraph);
 	
 	void addDelivery(const Delivery &delivery);
-	bool removeDelivery(const MapInfo &info);
-	void clearDelivery() { this->deliveries.clear(); };
+	void clearDeliveries();
+	void clearAllDeliveries();
 
 	void clear();
 	void removeSmallGraph();

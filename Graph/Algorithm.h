@@ -4,6 +4,8 @@
 #include "Graph.h"
 #include "../Utilities/debugGraph.h"
 #include "../Utilities/mingw.thread.h"
+#include "../Utilities/Delivery.h"
+#include "../Utilities/MapInfo.h"
 #include <iostream>
 #include <ostream>
 #include <fstream>
@@ -36,10 +38,10 @@ template <class T>
 void FloydWarshallShortestPath(Graph<T> * graph); 
 
 template <class T>
-std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
+std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin,  vector<Delivery> deliveries, const T &dest, double truckCapacity);
 
 template <class T>
-std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
+std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,  vector<Delivery> deliveries, const T &dest, double truckCapacity);
 
 template <class T>
 vector<Vertex<T> *> twoOptSwap(const vector<Vertex<T> *> &current_path, int i, int k);
@@ -370,16 +372,16 @@ void FloydWarshallShortestPath(Graph<T> * graph) {
 }
 
 template <class T>
-std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest){
+std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, vector<Delivery> deliveries, const T &dest, double truckCapacity){
 
 	vector<Vertex<T> *>result;
 	Vertex<T>* start = graph->findVertex(origin);
 
 	MutablePriorityQueue<Vertex<T>> Q;
 	
-	for(T info : deliveries){
-		graph->findVertex(info)->setDist(start->getEuclideanDist(graph->findVertex(info)));
-		Q.insert(graph->findVertex(info));
+	for(Delivery delivery : deliveries){
+		graph->findVertex(delivery.getDest())->setDist(start->getEuclideanDist(graph->findVertex(delivery.getDest())));
+		Q.insert(graph->findVertex(delivery.getDest()));
 	}
 
 	result.push_back(start);
@@ -387,13 +389,22 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 	while(!Q.empty()) {
 		Vertex<T>* vertex = Q.extractMin();
 
+		for(Delivery delivery : deliveries) {
+			if(delivery.getDest() == *vertex->getInfo()) {
+				truckCapacity -= delivery.getVolume();
+				delivery.setDelivered(true);
+				break;
+			}
+		}
+		if(truckCapacity < 0) break;
+
 		vector<Vertex<T> *> path = dijkstraShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()));
 		for(unsigned i = 1; i < path.size(); i++){
 			result.push_back(path.at(i));
 		}
 
-		for(T info : deliveries){
-			graph->findVertex(info)->setDist(vertex->getEuclideanDist(graph->findVertex(info)));
+		for(Delivery delivery : deliveries){
+			graph->findVertex(delivery.getDest())->setDist(vertex->getEuclideanDist(graph->findVertex(delivery.getDest())));
 		}
 	}
 
@@ -406,10 +417,7 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 }
 
 template <class T>
-std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest){
-
-	FloydWarshallShortestPath(graph);
-
+std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, vector<Delivery> deliveries, const T &dest, double truckCapacity){
 	vector<Vertex<T> *> result;
 
 	int inicial = graph->findVertexIdx(origin);
@@ -417,9 +425,9 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 	MutablePriorityQueue<Vertex<T>> Q;
 	MutablePriorityQueue<Vertex<T>> aux;
 
-	for(T info : deliveries){
-		Vertex<T>* vertex = graph->findVertex(info);
-		vertex->setDist(graph->getW(inicial, graph->findVertexIdx(info)));
+	for(Delivery delivery: deliveries){
+		Vertex<T>* vertex = graph->findVertex(delivery.getDest());
+		vertex->setDist(graph->getW(inicial, graph->findVertexIdx(delivery.getDest())));
 		Q.insert(vertex);
 	}
 
@@ -429,13 +437,22 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 		Vertex<T>* vertex = Q.extractMin();
 		int vertexIndex = graph->findVertexIdx(*(vertex->getInfo()));
 
+		for(Delivery delivery : deliveries) {
+			if(delivery.getDest() == *vertex->getInfo()) {
+				truckCapacity -= delivery.getVolume();
+				delivery.setDelivered(true);
+				break;
+			}
+		}
+		if(truckCapacity < 0) break;
+
 		vector<T> path = graph->getFloydWarshallPath(*(result.back()->getInfo()), *(vertex->getInfo()));
 		for(unsigned i = 1; i < path.size(); i++){
 			result.push_back(graph->findVertex(path.at(i)));
 		}
 
-		for(T info : deliveries){
-			vertex->setDist(graph->getW(vertexIndex, graph->findVertexIdx(info)));
+		for(Delivery delivery : deliveries){
+			vertex->setDist(graph->getW(vertexIndex, graph->findVertexIdx(delivery.getDest())));
 		}
 	}
 	

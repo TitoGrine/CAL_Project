@@ -58,9 +58,14 @@ std::vector < MapInfo> Application::getDeliveriesInfo() const
 	return result;
 }
 
-const std::vector < Delivery> & Application::getDeliveries() const
+std::vector < Delivery> Application::getDeliveries() const
 {
 	return this->deliveries;
+}
+
+std::priority_queue<Truck> Application::getTrucks() const
+{
+	return this->trucks;
 }
 
 
@@ -146,7 +151,7 @@ bool Application::addShop(const MapInfo &info, map_info_t shopType)
 
 void Application::addTruck(const Truck &truck)
 {
-	this->trucks.push_back(truck);
+	this->trucks.push(truck);
 }
 
 void Application::addDelivery(const Delivery &delivery)
@@ -154,15 +159,19 @@ void Application::addDelivery(const Delivery &delivery)
 	deliveries.push_back(delivery);
 }
 
-/*
-bool Application::removeDelivery(const MapInfo &info)
+void Application::clearDeliveries()
 {
-	auto it = find(deliveries.begin(), deliveries.end(), info);
-	if(it == deliveries.end())
-		return false;
-	deliveries.erase(it);
-	return true;
-}*/
+	for(auto it = deliveries.begin(); it != deliveries.end();) {
+		if( it->isDelivered())
+			it = deliveries.erase(it);
+		else it++;
+	}
+}
+
+void Application::clearAllDeliveries()
+{
+	this->deliveries.clear();
+}
 
 void Application::clear(){
 	free(this->mainGraph);
