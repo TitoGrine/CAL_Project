@@ -401,7 +401,7 @@ void FloydWarshallShortestPath(Graph<T> * graph) {
 	for(unsigned k = 0; k < n; k++)
 		for(unsigned j = 0; j < n; j++)
 			for(unsigned i = undirected ? j + 1 : 0; i < n; i++) {
-				if(j == k || i == j || graph->getW(i, k) == INF || graph->getW(k, j) == INF)
+				if(j == k || i == k || i == j || graph->getW(i, k) == INF || graph->getW(k, j) == INF)
 					continue; // avoid overflow and unnecessary calculations
 				double val = graph->getW(i, k) + graph->getW(k, j);
 				if (val < graph->getW(i, j)) {
