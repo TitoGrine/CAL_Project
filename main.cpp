@@ -534,9 +534,9 @@ void CalculateTruckPaths(bool euclideanMethod) {
 		double truckCapacity = tempTrucks.top()->getCapacity();
     
 		if(euclideanMethod)
-			solution = NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truckCapacity);
+			solution = NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity);
 		else
-			solution = NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truckCapacity);
+			solution = NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity);
 		
 		tempTrucks.top()->setPath(solution);
 		deliveringTrucks.push_back(tempTrucks.top());
@@ -549,11 +549,7 @@ void CalculateTruckPaths(bool euclideanMethod) {
 		}
 	}
   
-	cout << "BEFORE SHOW GV!!!" << endl;
 	showMultiplePathsGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), deliveriesInfo, deliveringTrucks);
-	mainApp.clearAllDeliveries();
-
-	cout << "AFTER SHOW GV!!!" << endl;
 }
 
 void Prob3Menu() {

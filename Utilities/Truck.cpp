@@ -34,5 +34,5 @@ void Truck::setPath(std::vector<Vertex<MapInfo> *> path)
 
 bool Truck::operator<(const Truck &truck) const
 {
-    return (this->capacity > truck.getCapacity());
+    return (this->capacity < truck.getCapacity());
 }

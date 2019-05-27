@@ -36,7 +36,7 @@ struct CmpTruckPtrs
 {
     bool operator()(const Truck* lhs, const Truck* rhs) const
     {
-        return lhs->getCapacity() > rhs->getCapacity();
+        return *lhs < *rhs;
     }
 };
 

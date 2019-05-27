@@ -419,8 +419,8 @@ void FloydWarshallShortestPath(Graph<T> * graph) {
 }
 
 template <class T>
-std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, vector<Delivery*> deliveries, const T &dest, double truckCapacity){
-
+std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, vector<Delivery*> deliveries, const T &dest, double truckCapacity)
+{
 	vector<Vertex<T> *>result;
 	Vertex<T>* start = graph->findVertex(origin);
 
@@ -439,11 +439,11 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 		for(Delivery* delivery : deliveries) {
 			if(delivery->getDest() == *vertex->getInfo()) {
 				truckCapacity -= delivery->getVolume();
-				delivery->setDelivered(true);
+				if(truckCapacity >= 0) delivery->setDelivered(true);
 				break;
 			}
 		}
-		if(truckCapacity < 0) break;
+		if(truckCapacity <= 0) break;
 
 		vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()), ASTAR_EUCLIDIAN);
 		for(unsigned i = 1; i < path.size(); i++){
