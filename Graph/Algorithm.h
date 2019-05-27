@@ -380,29 +380,40 @@ std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, c
 
 template <class T>
 void FloydWarshallShortestPath(Graph<T> * graph) {
+	bool undirected = true; // In the future replace it by function argument?
+
+	startTime();
+
 	unsigned n = graph->getVertexSet().size();
 
 	graph->resetMatrixW(n);
 	graph->resetMatrixP(n);
 	
 	for (unsigned i = 0; i < n; i++) {
-		for (unsigned j = 0; j < n; j++) {
+		for (unsigned j = i; j < n; j++) {
 			graph->setW(i, j, graph->edgeWeight(i, j));
+			graph->setW(j, i, graph->edgeWeight(j, i));
 			graph->setP(i, j, graph->nextVertex(i, j));
+			graph->setP(j, i, graph->nextVertex(j, i));
 		}
 	}
 
 	for(unsigned k = 0; k < n; k++)
 		for(unsigned j = 0; j < n; j++)
-			for(unsigned i = 0; i < n; i++) {
-				if(graph->getW(i, k) == INF || graph->getW(k, j) == INF)
-					continue; // avoid overflow
+			for(unsigned i = undirected ? j + 1 : 0; i < n; i++) {
+				if(j == k || i == j || graph->getW(i, k) == INF || graph->getW(k, j) == INF)
+					continue; // avoid overflow and unnecessary calculations
 				double val = graph->getW(i, k) + graph->getW(k, j);
 				if (val < graph->getW(i, j)) {
 					graph->setW(i, j, val);
+					if(undirected) graph->setW(j, i, val);
+
 					graph->setP(i, j, graph->getP(i, k));
+					if(undirected) graph->setP(j, i, graph->getP(j, k));
 				}
 			}
+
+	writeTime(FW, graph, true);	
 }
 
 template <class T>
@@ -451,7 +462,6 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 	int inicial = graph->findVertexIdx(origin);
 
 	MutablePriorityQueue<Vertex<T>> Q;
-	MutablePriorityQueue<Vertex<T>> aux;
 
 	for(T info : deliveries){
 		Vertex<T>* vertex = graph->findVertex(info);
