@@ -6,6 +6,12 @@ Truck::Truck(int capacity): capacity(capacity) {
     this->truckID = ID++;
 }
 
+Truck::Truck(const Truck & truck)
+{
+    this->truckID = truck.getID();
+    this->capacity = truck.getCapacity();
+}
+
 int Truck::getID() const 
 { 
     return this->truckID; 
@@ -16,17 +22,7 @@ int Truck::getCapacity() const
     return this->capacity; 
 }
 
-std::string Truck::getPathColor() const 
-{ 
-    return this->pathColor;   
-}
-
-void Truck::setPathColor(std::string pathColor) 
-{ 
-    this->pathColor = pathColor; 
-}
-
-std::vector<Vertex<MapInfo> *> Truck::getPath() const
+const std::vector<Vertex<MapInfo> *> & Truck::getPath() const
 {
     return this->path;
 }

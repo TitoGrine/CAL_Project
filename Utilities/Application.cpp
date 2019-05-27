@@ -52,22 +52,21 @@ std::vector < MapInfo> Application::getDeliveriesInfo() const
 {
 	std::vector < MapInfo> result;
 
-	for(Delivery del : this->deliveries) 
-		result.push_back(del.getDest());
+	for(Delivery* del : this->deliveries) 
+		result.push_back(del->getDest());
 
 	return result;
 }
 
-std::vector < Delivery> Application::getDeliveries() const
+const std::vector < Delivery*> & Application::getDeliveries() const
 {
 	return this->deliveries;
 }
 
-std::priority_queue<Truck> Application::getTrucks() const
+const std::priority_queue<Truck*, std::vector<Truck*>, CmpTruckPtrs> & Application::getTrucks() const
 {
 	return this->trucks;
 }
-
 
 bool Application::addInitial(MapInfo initialPoint){
 	if(this->initial != NULL)
@@ -149,12 +148,13 @@ bool Application::addShop(const MapInfo &info, map_info_t shopType)
 	return true;
 }
 
-void Application::addTruck(const Truck &truck)
+void Application::addTruck(const Truck& truck)
 {
-	this->trucks.push(truck);
+	Truck* newTruck = new Truck(truck);
+	this->trucks.push(newTruck);
 }
 
-void Application::addDelivery(const Delivery &delivery)
+void Application::addDelivery(Delivery* delivery)
 {
 	deliveries.push_back(delivery);
 }
@@ -162,7 +162,7 @@ void Application::addDelivery(const Delivery &delivery)
 void Application::clearDeliveries()
 {
 	for(auto it = deliveries.begin(); it != deliveries.end();) {
-		if( it->isDelivered())
+		if( (*it)->isDelivered())
 			it = deliveries.erase(it);
 		else it++;
 	}
@@ -171,6 +171,11 @@ void Application::clearDeliveries()
 void Application::clearAllDeliveries()
 {
 	this->deliveries.clear();
+}
+
+void Application::popTruck()
+{
+	this->trucks.pop();
 }
 
 void Application::clear(){
@@ -190,4 +195,9 @@ void Application::clear(){
 		shops[i].clear();
 
 	deliveries.clear();
+
+	while(!trucks.empty()) {
+		free(trucks.top());
+		trucks.pop();
+	}
 }

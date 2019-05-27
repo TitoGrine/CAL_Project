@@ -11,23 +11,19 @@ class Truck {
 
     int capacity;
 
-    std::string pathColor;
-
     std::vector<Vertex<MapInfo> *> path;
 
     public:
         Truck();
         Truck(int capacity);
+        Truck(const Truck & truck);
 
         int getID() const;
         int getCapacity() const;
 
-        std::string getPathColor() const;
-        void setPathColor(std::string pathColor);
-
-        std::vector<Vertex<MapInfo> *> getPath() const;
+        const std::vector<Vertex<MapInfo> *> & getPath() const;
         void setPath(std::vector<Vertex<MapInfo> *> path);
 
-        bool operator<(const Truck &truck) const;
+        bool operator<(const Truck & truck) const;
 };
 

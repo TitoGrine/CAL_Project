@@ -1,0 +1,50 @@
+USER,ALGORITHM,|V|,|N|,time,UNDIRECTED
+manue,bidijkstra,101,204,3,V
+manue,bidijkstra,101,204,9,V
+manue,bia* euclidian,101,204,3,V
+manue,scc,20063,40742,171,V
+manue,scc,20063,40742,103,V
+manue,scc,20063,40742,150,V
+manue,bia* euclidian,403,840,12,V
+manue,scc,3294,6270,0,V
+manue,scc,3294,6270,0,V
+manue,bidijkstra,35,72,4,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,9,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,9,24,0,V
+manue,scc,2383,5008,0,V
+manue,scc,2383,5008,9,V
+manue,bidijkstra,1209,2680,66,V
+manue,bia* euclidian,1209,2680,81,V
+manue,bia* manhattan,1209,2680,67,V
+tito9,scc,3294,6270,5,V
+tito9,scc,3294,6270,4,V
+tito9,scc,6193,12350,15,V
+tito9,scc,6193,12350,11,V
+tito9,scc,3294,6270,5,V
+tito9,scc,3294,6270,1,V
+pasga,scc,10176,21530,14,V
+pasga,scc,10176,21530,17,V
+pasga,scc,3294,6270,0,V
+pasga,scc,3294,6270,14,V
+pasga,scc,3294,6270,5,V
+pasga,scc,3294,6270,2,V
+pasga,bidijkstra,115,256,0,V
+pasga,scc,3294,6270,6,V
+pasga,scc,3294,6270,3,V
+pasga,scc,10176,21530,26,V
+pasga,scc,10176,21530,1,V
+pasga,scc,3294,6270,3,V
+pasga,scc,3294,6270,1,V
+pasga,scc,21262,43458,75,V
+pasga,scc,21262,43458,66,V
+pasga,scc,10176,21530,27,V
+pasga,scc,10176,21530,17,V
+pasga,scc,10176,21530,21,V
+pasga,scc,10176,21530,17,V

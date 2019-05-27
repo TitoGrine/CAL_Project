@@ -211,7 +211,7 @@ void paintMapInfoVertexes(GraphViewer * gv, int vertexSize, string vertexColor, 
 	}
 }
 
-void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<Vertex<MapInfo> *> * points){
+void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<Vertex<MapInfo> *> * points, int truck){
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	paintVertexesGV(gv, 10, "YELLOW", *points);
 	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
@@ -223,25 +223,60 @@ void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, cons
 	gv->setVertexColor(final->getID(), "RED");
 	gv->setVertexLabel(final->getID(), "End");
 
-	int edgeID = 0;
-	gv->defineEdgeCurved(false);
-	for(auto i = 0; i < graph->getNumVertex(); i++){
-		Vertex<MapInfo> * v = graph->getVertexSet().at(i);
-		if(containsVertex(*points, v)){
-			for(size_t j = 0; j < v->getAdj()->size(); j++)
-				if(containsVertex(*points,  v->getAdj()->at(j).getDest())){
-					if(UNDIRECTED_GRAPH)
-						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::UNDIRECTED);
-					else
-						gv->addEdge(edgeID++, v->getInfo()->getID(), v->getAdj()->at(j).getDest()->getInfo()->getID(), EdgeType::DIRECTED);
-				}
-		}
+	gv->defineEdgeCurved(true);
+
+	string truck_tag = to_string(truck) + "-";
+
+	for(unsigned i = 1; i < points->size(); i++){
+		Vertex<MapInfo> * v = points->at(i - 1);
+		Vertex<MapInfo> * u = points->at(i);
+		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
+		gv->setEdgeLabel(i, truck_tag + to_string(i));
 	}
 	
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
+}
 
+void addPathGV(GraphViewer * gv, const vector<Vertex<MapInfo> *>  &points, int truck){
+	paintVertexesGV(gv, 10, "YELLOW", points);
+
+	string truck_tag = to_string(truck) + "-";
+
+	for(unsigned i = 1; i < points.size(); i++){
+		Vertex<MapInfo> * v = points.at(i - 1);
+		Vertex<MapInfo> * u = points.at(i);
+		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
+		gv->setEdgeLabel(i, truck_tag + to_string(i));
+	}
+	
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
+}
+
+void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, const vector<Truck*> &deliveringTrucks){
+	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
+	
+	gv->defineEdgeCurved(true);
+
+	for(unsigned id = 0; id < deliveringTrucks.size(); id++){
+		addPathGV(gv, deliveringTrucks.at(id)->getPath(), id);
+	}
+
+	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
+	gv->setVertexSize(initial->getID(), 20);
+	gv->setVertexColor(initial->getID(), "GREEN");
+	gv->setVertexLabel(initial->getID(), "Start");
+
+	gv->setVertexSize(final->getID(), 20);
+	gv->setVertexColor(final->getID(), "RED");
+	gv->setVertexLabel(final->getID(), "End");
+	
+	gv->rearrange();
+	getchar();
+	gv->closeWindow();
 }
 
 //=======================================================================================================================//
@@ -363,10 +398,10 @@ bool DeliveryPlaceMenu(bool getVolume) {
 		}
 	}
 
-	Delivery newDelivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
+	Delivery* newDelivery = new Delivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
 
 	if(getVolume) 
-		newDelivery.setVolume(menuInput(" Delivery Volume: ", 1, 200)); //TODO VER MELHOR MIN E MAX DE VOL
+		newDelivery->setVolume(menuInput(" Delivery Volume: ", 1, 200)); //TODO VER MELHOR MIN E MAX DE VOL
 
 	mainApp.addDelivery(newDelivery);
 	return true;
@@ -384,22 +419,27 @@ void Prob1Menu() {
 	std::cout << " CHOOSE AN ALGORITHM:" << endl << endl;
 
 	std::cout << "   1 - Dijkstra Algorithm" << endl;
-	std::cout << "   2 - A* Algorithm" << endl;
+	std::cout << "   2 - A* Algorithm - Euclidian" << endl;
+	std::cout << "   3 - A* Algorithm - Manhattan" << endl;
 	std::cout << "   0 - Go Back" << endl << endl;
 
-	option_number = menuInput(" Option ? ", 0, 2);
+	option_number = menuInput(" Option ? ", 0, 3);
 
 
-	Delivery delivery = mainApp.getDeliveries().at(0);
+	Delivery* delivery = mainApp.getDeliveries().at(0);
 	vector<Vertex<MapInfo> *>  solutionPath;
 	switch (option_number) {
 		case 1 :
-			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery->getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 2 :
-			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery->getDest(), *(mainApp.getLast()), BIASTAR_EUCLIDIAN, UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
+			break;
+		case 3 :
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery->getDest(), *(mainApp.getLast()), BIASTAR_MANHATTAN, UNDIRECTED_GRAPH);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 0 :
 		default:
@@ -425,13 +465,13 @@ void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* sol
 	switch (option_number) {
 	case 1 :
 		*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), INF);
-		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
+		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
 		Prob2Menu();
 		break;
 	case 2 :
 		FloydWarshallShortestPath(mainApp.getSmallGraph());
 		*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), INF);
-		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath);
+		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
 		Prob2Menu();
 		break;
 	case 0 :
@@ -469,7 +509,7 @@ void Prob2Menu() {
 			break;
 		case 2 :
 			solutionPath = twoOptAlgorithm(mainApp.getSmallGraph(), *mainApp.getInitial(), *mainApp.getLast(), mainApp.getDeliveriesInfo());
-			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath);
+			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 0 :
 			//std::system("cls");
@@ -479,6 +519,41 @@ void Prob2Menu() {
 	}
 	mainApp.clearAllDeliveries();
 	ProblemsMenu();
+}
+
+void CalculateTruckPaths(bool euclideanMethod) {
+
+  std::vector<MapInfo> deliveriesInfo = mainApp.getDeliveriesInfo();
+	std::vector<Delivery*> deliveries = mainApp.getDeliveries();
+  std::priority_queue<Truck*, std::vector<Truck*>, CmpTruckPtrs> tempTrucks = mainApp.getTrucks();
+	std::vector<Vertex<MapInfo> *> solution;
+	std::vector<Truck*> deliveringTrucks;
+
+	while(!deliveries.empty()) 
+	{
+		double truckCapacity = tempTrucks.top()->getCapacity();
+    
+		if(euclideanMethod)
+			solution = NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truckCapacity);
+		else
+			solution = NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truckCapacity);
+		
+		tempTrucks.top()->setPath(solution);
+		deliveringTrucks.push_back(tempTrucks.top());
+		tempTrucks.pop();
+		
+		for(auto it = deliveries.begin(); it != deliveries.end();) {
+			if( (*it)->isDelivered())
+				it = deliveries.erase(it);
+			else it++;
+		}
+	}
+  
+	cout << "BEFORE SHOW GV!!!" << endl;
+	showMultiplePathsGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), deliveriesInfo, deliveringTrucks);
+	mainApp.clearAllDeliveries();
+
+	cout << "AFTER SHOW GV!!!" << endl;
 }
 
 void Prob3Menu() {
@@ -499,40 +574,20 @@ void Prob3Menu() {
 
 	option_number = menuInput(" Option ? ", 0, 2);
 
-	std::priority_queue<Truck> tempTrucks;
-	std::vector<Vertex<MapInfo> *> solutionPath;
-
 	switch (option_number)
 	{
 		case 1:
-			while(!mainApp.getDeliveries().empty()) {
-				Truck truck = 	mainApp.getTrucks().top();
-				truck.setPath(NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truck.getCapacity()));
-				tempTrucks.push(truck);
-				mainApp.getTrucks().pop();
-				mainApp.clearDeliveries();
-			}
-		break;
+			CalculateTruckPaths(true);
+		  break;
 		case 2:
 			FloydWarshallShortestPath(mainApp.getSmallGraph());
-			while(!mainApp.getDeliveries().empty()) {
-				Truck truck = mainApp.getTrucks().top();
-				truck.setPath(NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), truck.getCapacity()));
-				tempTrucks.push(truck);
-				mainApp.getTrucks().pop();
-				mainApp.clearDeliveries();
-			}
+			CalculateTruckPaths(false);
 			break;
 		case 0:
 			ProblemsMenu();
 			break;
 		default:
 			break;
-	}
-	
-	while(!tempTrucks.empty()) {
-		mainApp.addTruck(tempTrucks.top());
-		tempTrucks.pop();
 	}
 	
 	mainApp.clearAllDeliveries();
@@ -766,8 +821,9 @@ void MapMenu()
 	std::cout << "   9 - Porto" << endl;
 	std::cout << "   10 - Portugal" << endl;
 	std::cout << "   11 - Viseu" << endl;
+	std::cout << "   12 - Edu" << endl;
 	std::cout << "   0 - Go back" << endl << endl;
-	option_number = menuInput(" Option ? ", 0, 11);
+	option_number = menuInput(" Option ? ", 0, 12);
 	switch (option_number)
 	{
 	case 1:
@@ -813,6 +869,10 @@ void MapMenu()
 	case 11:
 		buildGraph(*graph, "Viseu", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Viseu", graph);		
+		break;
+	case 12:
+		buildGraph(*graph, "Edu", UNDIRECTED_GRAPH);
+		buildApplication(&mainApp, "Edu", graph);	
 		break;
 	case 0:
 		break;

@@ -46,6 +46,7 @@ public:
 	double getY() const { return this->vertexY; };
 
 	double getEuclideanDist(const Vertex<T> *  vertex2) const;
+	double getManhattanDist(const Vertex<T> * vertex2) const;
 
 	friend class Graph<T>;
 	friend class MutablePriorityQueue<Vertex<T>>;
@@ -87,6 +88,12 @@ template <class T>
 double Vertex<T>::getEuclideanDist(const Vertex<T> *  vertex2) const{
 	return sqrt(pow(vertex2->vertexX - this->vertexY, 2) + pow(vertex2->vertexX - this->vertexY, 2));
 }
+
+template <class T>
+double Vertex<T>::getManhattanDist(const Vertex<T> * vertex2) const{
+	return abs(this->vertexX - vertex2->vertexX) + abs(this->vertexY - vertex2->vertexY);
+}
+
 
 
 #endif
