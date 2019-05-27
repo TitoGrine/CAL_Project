@@ -6,6 +6,7 @@ Delivery::Delivery(const MapInfo &mapInfo): dest(mapInfo)
 {
     this->deliveryID = ID++;
     this->volume = 0;
+    this->delivered = false;
 }
 
 int Delivery::getID() const 
@@ -26,4 +27,14 @@ int Delivery::getVolume() const
 void Delivery::setVolume(const int &volume)
 {
     this->volume = volume;
+}
+
+bool Delivery::isDelivered() const
+{
+    return this->delivered;
+}
+
+void Delivery::setDelivered(bool delivered)
+{
+    this->delivered = delivered;
 }

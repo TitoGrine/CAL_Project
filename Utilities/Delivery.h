@@ -8,6 +8,8 @@ class Delivery {
 
     MapInfo dest;
 
+    bool delivered;
+
     int volume;
 
     public:
@@ -20,4 +22,8 @@ class Delivery {
 
         int getVolume() const;
         void setVolume(const int &volume);
+
+        bool isDelivered() const;
+        void setDelivered(bool delivered);
+
 };

@@ -10,6 +10,7 @@
 #include "Delivery.h"
 #include <vector>
 #include <string>
+#include <queue>
 
 template <class T> class Graph;
 
@@ -31,6 +32,14 @@ enum map_info_t {
 	OTHER	
 };
 
+struct CmpTruckPtrs
+{
+    bool operator()(const Truck* lhs, const Truck* rhs) const
+    {
+        return *lhs < *rhs;
+    }
+};
+
 class Application {
 	Graph<MapInfo> * mainGraph;
 	Graph<MapInfo> * smallGraph;
@@ -44,10 +53,9 @@ class Application {
 
 	std::vector<MapInfo> smallShops[_N_SHOPS_TYPE];
 
+	std::vector<Delivery*> deliveries;
 
-	std::vector<Delivery> deliveries;
-
-	std::vector<Truck> trucks;
+	std::priority_queue<Truck*, std::vector<Truck*>, CmpTruckPtrs> trucks;
 
 public:
 	Application();
@@ -71,7 +79,8 @@ public:
 	MapInfo getRandomShopByType(map_info_t shopType);
 	MapInfo getRandomSmallShopByType(map_info_t shopType);
 	std::vector < MapInfo> getDeliveriesInfo() const;
-	const std::vector < Delivery> & getDeliveries() const;  
+	const std::vector < Delivery*> & getDeliveries() const;  
+	const std::priority_queue<Truck*, std::vector<Truck*>, CmpTruckPtrs> & getTrucks() const;
 
 	void addDeposit(const MapInfo &info);
 	bool addShop(const MapInfo &info, map_info_t tagNum);
@@ -80,9 +89,11 @@ public:
 	void addSmallGraph(Graph<MapInfo> * graph);
 	void addMainGraph(Graph<MapInfo> * mainGraph);
 	
-	void addDelivery(const Delivery &delivery);
-	bool removeDelivery(const MapInfo &info);
-	void clearDelivery() { this->deliveries.clear(); };
+	void addDelivery(Delivery* delivery);
+	void clearDeliveries();
+	void clearAllDeliveries();
+
+	void popTruck();
 
 	void clear();
 	void removeSmallGraph();

@@ -239,14 +239,14 @@ void showPathGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, cons
 	gv->closeWindow();
 }
 
-void addPathGV(GraphViewer * gv, vector<Vertex<MapInfo> *> * points, int truck){
-	paintVertexesGV(gv, 10, "YELLOW", *points);
+void addPathGV(GraphViewer * gv, const vector<Vertex<MapInfo> *>  &points, int truck){
+	paintVertexesGV(gv, 10, "YELLOW", points);
 
 	string truck_tag = to_string(truck) + "-";
 
-	for(unsigned i = 1; i < points->size(); i++){
-		Vertex<MapInfo> * v = points->at(i - 1);
-		Vertex<MapInfo> * u = points->at(i);
+	for(unsigned i = 1; i < points.size(); i++){
+		Vertex<MapInfo> * v = points.at(i - 1);
+		Vertex<MapInfo> * u = points.at(i);
 		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
 		gv->setEdgeLabel(i, truck_tag + to_string(i));
 	}
@@ -256,13 +256,13 @@ void addPathGV(GraphViewer * gv, vector<Vertex<MapInfo> *> * points, int truck){
 	gv->closeWindow();
 }
 
-void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, vector<vector<Vertex<MapInfo> *>*>* solutions){
+void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, const vector<Truck*> &deliveringTrucks){
 	GraphViewer * gv = createVertexGraphViewer(graph, 4, "GRAY");
 	
 	gv->defineEdgeCurved(true);
 
-	for(unsigned id = 0; id < solutions->size(); id++){
-		addPathGV(gv, solutions->at(id), id);
+	for(unsigned id = 0; id < deliveringTrucks.size(); id++){
+		addPathGV(gv, deliveringTrucks.at(id)->getPath(), id);
 	}
 
 	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
@@ -398,10 +398,10 @@ bool DeliveryPlaceMenu(bool getVolume) {
 		}
 	}
 
-	Delivery newDelivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
+	Delivery* newDelivery = new Delivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
 
 	if(getVolume) 
-		newDelivery.setVolume(menuInput(" Delivery Volume: ", 1, 200)); //TODO VER MELHOR MIN E MAX DE VOL
+		newDelivery->setVolume(menuInput(" Delivery Volume: ", 1, 200)); //TODO VER MELHOR MIN E MAX DE VOL
 
 	mainApp.addDelivery(newDelivery);
 	return true;
@@ -426,59 +426,60 @@ void Prob1Menu() {
 	option_number = menuInput(" Option ? ", 0, 3);
 
 
-	Delivery delivery = mainApp.getDeliveries().at(0);
+	Delivery* delivery = mainApp.getDeliveries().at(0);
 	vector<Vertex<MapInfo> *>  solutionPath;
 	switch (option_number) {
 		case 1 :
-			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
+			solutionPath = bidirectionalDijkstra(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery->getDest(), *(mainApp.getLast()), UNDIRECTED_GRAPH);
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 2 :
-			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), BIASTAR_EUCLIDIAN, UNDIRECTED_GRAPH);
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery->getDest(), *(mainApp.getLast()), BIASTAR_EUCLIDIAN, UNDIRECTED_GRAPH);
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 3 :
-			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery.getDest(), *(mainApp.getLast()), BIASTAR_MANHATTAN, UNDIRECTED_GRAPH);
+			solutionPath = bidirectionalAStar(mainApp.getSmallGraph(), *(mainApp.getInitial()), delivery->getDest(), *(mainApp.getLast()), BIASTAR_MANHATTAN, UNDIRECTED_GRAPH);
 			showPathGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), &solutionPath, 1);
 			break;
 		case 0 :
 		default:
 			break;
 	}
-	mainApp.clearDelivery();
+	mainApp.clearAllDeliveries();
 	ProblemsMenu();
 }
 
 void NearestNeighbourMenu(Graph<MapInfo> * graph, vector<Vertex<MapInfo> *>* solutionPath){
 	header("ONE TRUCK - MULTIPLE DELIVERIES");
 
-		int option_number;
+	int option_number;
 
-		std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
+	std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
 
-		std::cout << "   1 - Using Euclidean Distance" << endl;
-		std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
-		std::cout << "   0 - Go Back" << endl << endl;
+	std::cout << "   1 - Using Euclidean Distance" << endl;
+	std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
 
-		option_number = menuInput(" Option ? ", 0, 2);
+	option_number = menuInput(" Option ? ", 0, 2);
 
-		switch (option_number) {
-		case 1 :
-			*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
-			Prob2Menu();
-			break;
-		case 2 :
-			*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveriesInfo(), *mainApp.getLast());
-			showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
-			Prob2Menu();
-			break;
-		case 0 :
-			//std::system("cls");
-			Prob2Menu();
-			return;
-		default:
-			break;
+	switch (option_number) {
+	case 1 :
+		*solutionPath = NearestNeighborEuclidean(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), INF);
+		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
+		Prob2Menu();
+		break;
+	case 2 :
+		FloydWarshallShortestPath(mainApp.getSmallGraph());
+		*solutionPath = NearestNeighborFloyd(graph, *mainApp.getInitial(), mainApp.getDeliveries(), *mainApp.getLast(), INF);
+		showPathGV(graph, mainApp.getInitial(), mainApp.getLast(), mainApp.getDeliveriesInfo(), solutionPath, 1);
+		Prob2Menu();
+		break;
+	case 0 :
+		//std::system("cls");
+		Prob2Menu();
+		return;
+	default:
+		break;
 	}
 }
 
@@ -516,8 +517,39 @@ void Prob2Menu() {
 		default:
 			break;
 	}
-	mainApp.clearDelivery();
+	mainApp.clearAllDeliveries();
 	ProblemsMenu();
+}
+
+void CalculateTruckPaths(bool euclideanMethod) {
+
+  std::vector<MapInfo> deliveriesInfo = mainApp.getDeliveriesInfo();
+	std::vector<Delivery*> deliveries = mainApp.getDeliveries();
+  std::priority_queue<Truck*, std::vector<Truck*>, CmpTruckPtrs> tempTrucks = mainApp.getTrucks();
+	std::vector<Vertex<MapInfo> *> solution;
+	std::vector<Truck*> deliveringTrucks;
+
+	while(!deliveries.empty()) 
+	{
+		double truckCapacity = tempTrucks.top()->getCapacity();
+    
+		if(euclideanMethod)
+			solution = NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity);
+		else
+			solution = NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity);
+		
+		tempTrucks.top()->setPath(solution);
+		deliveringTrucks.push_back(tempTrucks.top());
+		tempTrucks.pop();
+		
+		for(auto it = deliveries.begin(); it != deliveries.end();) {
+			if( (*it)->isDelivered())
+				it = deliveries.erase(it);
+			else it++;
+		}
+	}
+  
+	showMultiplePathsGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), deliveriesInfo, deliveringTrucks);
 }
 
 void Prob3Menu() {
@@ -528,12 +560,34 @@ void Prob3Menu() {
 
 	header("MULTIPLE TRUCKS - MULTIPLE DELIVERIES");
 
-	//Distribuir mainApp.deliveries pelos camioes
+	int option_number;
 
-	//Escolher algoritmo a usar
+	std::cout << " CHOOSE A DISTANCE CALCULATING ALGORITHM:" << endl << endl;
 
-	//Aplicar esse algoritmo para a lista de deliveries de cada camiao
+	std::cout << "   1 - Using Euclidean Distance" << endl;
+	std::cout << "   2 - Using Floyd-Warshall's Algorithm" << endl;
+	std::cout << "   0 - Go Back" << endl << endl;
+
+	option_number = menuInput(" Option ? ", 0, 2);
+
+	switch (option_number)
+	{
+		case 1:
+			CalculateTruckPaths(true);
+		  break;
+		case 2:
+			FloydWarshallShortestPath(mainApp.getSmallGraph());
+			CalculateTruckPaths(false);
+			break;
+		case 0:
+			ProblemsMenu();
+			break;
+		default:
+			break;
+	}
 	
+	mainApp.clearAllDeliveries();
+	ProblemsMenu();
 }
 
 void ProblemsMenu() {
