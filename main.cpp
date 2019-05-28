@@ -832,7 +832,7 @@ void MapMenu()
 	std::cout << "   11 - Viseu" << endl;
 	std::cout << "   12 - Edu" << endl;
 	std::cout << "   0 - Go back" << endl << endl;
-	option_number = menuInput(" Option ? ", 0, 12);
+	option_number = menuInput(" Option ? ", 0, 11);
 	switch (option_number)
 	{
 	case 1:
@@ -878,10 +878,6 @@ void MapMenu()
 	case 11:
 		buildGraph(*graph, "Viseu", UNDIRECTED_GRAPH);
 		buildApplication(&mainApp, "Viseu", graph);		
-		break;
-	case 12:
-		buildGraph(*graph, "Edu", UNDIRECTED_GRAPH);
-		buildApplication(&mainApp, "Edu", graph);	
 		break;
 	case 0:
 		break;
