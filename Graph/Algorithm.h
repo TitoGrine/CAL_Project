@@ -99,11 +99,16 @@ bool dfsVisit(Vertex<T> *v, Vertex<T> *end) {
 
 template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
+	startTime();
+
 	std::vector<Vertex<T> *> res;
 	for(auto vertex: graph->getVertexSet())
 		vertex->setVisited(false);
 	
 	dfsVisit(initial, res);
+
+	writeTime(DFS, graph, false);	
+
 	return res;
 }
 
@@ -303,9 +308,9 @@ std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, co
 template <class T>
 std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional)
 {
-    vector<Vertex<T> *> final_path, path;
-
 	startTime();
+
+    vector<Vertex<T> *> final_path, path;
 
 	thread t1(dijkstraShortestPath<T>, graph, origin, delivery);
 	
@@ -344,9 +349,9 @@ std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin
 template <class T>
 std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, algorithm_t aStarType, bool bidirectional)
 {
-    vector<Vertex<T> *> final_path, path;
-
 	startTime();
+
+    vector<Vertex<T> *> final_path, path;
 
 	thread t1(aStarShortestPath<T>, graph, origin, delivery, aStarType);
 	
@@ -384,7 +389,7 @@ template <class T>
 void FloydWarshallShortestPath(Graph<T> * graph) {
 	bool undirected = true; // In the future replace it by function argument?
 
-	startTime();
+	//startTime();
 
 	unsigned n = graph->getVertexSet().size();
 
@@ -415,12 +420,14 @@ void FloydWarshallShortestPath(Graph<T> * graph) {
 				}
 			}
 
-	writeTime(FW, graph, true);	
+	//writeTime(FW, graph, true);	
 }
 
 template <class T>
 std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin, vector<Delivery*> deliveries, const T &dest, double truckCapacity)
 {
+	startTime();
+
 	vector<Vertex<T> *>result;
 	Vertex<T>* start = graph->findVertex(origin);
 
@@ -460,11 +467,15 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 		result.push_back(path.at(i));
 	}
 
+	writeTime(NNEUCLIDIAN, graph, true);	
+
 	return result;
 }
 
 template <class T>
 std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin, vector<Delivery*> deliveries, const T &dest, double truckCapacity){
+	startTime();
+
 	vector<Vertex<T> *> result;
 
 	int inicial = graph->findVertexIdx(origin);
@@ -506,6 +517,8 @@ std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,
 	for(unsigned i = 1; i < path.size(); i++ ){
 			result.push_back(graph->findVertex(path.at(i)));
 	}
+
+	writeTime(NNFW, graph, true);	
 
 	return result;
 }
@@ -559,7 +572,6 @@ std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path)
 	
 	vector<Vertex<T> *> bestPath = path;
 
-
 	while(currentBestWeight != lastBestWeight){
 		lastBestWeight = currentBestWeight;
 
@@ -579,11 +591,15 @@ std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path)
 
 	}
 
+	writeTime(OPT2, graph, true);	
+
 	return bestPath;
 }
 
 template <class T>
 std::vector<Vertex<T> *> twoOptAlgorithm(Graph<T> * graph, const T &origin, const T &dest, const vector<T> deliveries){
+	startTime();
+
 	vector<Vertex<T> *> possible_solution;
 
 	possible_solution.push_back(graph->findVertex(origin));

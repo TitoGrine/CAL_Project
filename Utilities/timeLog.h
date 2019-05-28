@@ -4,6 +4,7 @@
 #include "MapInfo.h"
 
 enum algorithm_t{
+	DFS,
 	BIDIJKSTRA,
 	BIASTAR_EUCLIDIAN,
 	BIASTAR_MANHATTAN,

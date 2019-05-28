@@ -19,6 +19,8 @@ const static string timesFileName = "times.csv";
 string algorithmToString(algorithm_t algorithm){
 	switch (algorithm)
 	{
+	case DFS:
+		return "Depth First Search";
 	case BIDIJKSTRA:
 		return "bidijkstra";
 	case BIASTAR_EUCLIDIAN:
