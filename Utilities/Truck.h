@@ -11,6 +11,8 @@ class Truck {
 
     int capacity;
 
+    std::vector<Delivery*> deliveries;
+
     std::vector<Vertex<MapInfo> *> path;
 
     public:
@@ -20,6 +22,9 @@ class Truck {
 
         int getID() const;
         int getCapacity() const;
+
+        const std::vector<Delivery*> & getDeliveries() const;
+        void addDelivery(Delivery* delivery);
 
         const std::vector<Vertex<MapInfo> *> & getPath() const;
         void setPath(std::vector<Vertex<MapInfo> *> path);

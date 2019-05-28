@@ -6,6 +6,9 @@
 #include "../Utilities/MapInfo.h"
 #include "../Graph/Graph.h"
 
+map_info_t stringToMapInfoType(string shopTypeString);
+
+std::string mapInfoTypeToString(map_info_t shop_type);
 
 void buildGraph(Graph<MapInfo> & graph, std::string MapName, bool bidirectional);
 

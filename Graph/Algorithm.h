@@ -422,7 +422,6 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 				break;
 			}
 		}
-		if(truckCapacity <= 0) break;
 
 		vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), *(vertex->getInfo()), ASTAR_EUCLIDIAN);
 		for(unsigned i = 1; i < path.size(); i++){
@@ -432,6 +431,8 @@ std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &ori
 		for(Delivery* delivery : deliveries){
 			graph->findVertex(delivery->getDest())->setDist(vertex->getEuclideanDist(graph->findVertex(delivery->getDest())));
 		}
+
+		if(truckCapacity <= 0) break;
 	}
 
 	vector<Vertex<T> *> path = aStarShortestPath(graph, *(result.back()->getInfo()), dest, ASTAR_EUCLIDIAN);

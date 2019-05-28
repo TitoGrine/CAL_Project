@@ -14,24 +14,6 @@
 
 template <class T> class Graph;
 
-enum map_info_t {
-	DEPARTMENT_STORE,
-	VARIETY_STORE,
-	SUPERMARKET,
-	DIY,
-	CONVENIENCE,
-	CLOTHES,
-	HARDWARE,
-	FURNITURE,
-	ELECTRONICS,
-	MOBILE_PHONE,
-	SHOES,
-	ALCOHOL,
-	_N_SHOPS_TYPE,
-	DEPOSIT,
-	OTHER	
-};
-
 struct CmpTruckPtrs
 {
     bool operator()(const Truck* lhs, const Truck* rhs) const
