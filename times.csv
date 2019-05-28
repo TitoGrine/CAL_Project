@@ -9776,3 +9776,17 @@ pasga,NN euclidian,7687,17164,10,V
 pasga,NN euclidian,7687,17164,17,V
 pasga,NN euclidian,7687,17164,12,V
 pasga,NN euclidian,7687,17164,13,V
+pasga,Depth First Search,10176,21530,20,F
+pasga,scc,10176,21530,42,V
+pasga,Depth First Search,10176,21530,20,F
+pasga,scc,10176,21530,43,V
+pasga,NN euclidian,7687,17164,20,V
+pasga,NN euclidian,7687,17164,17,V
+pasga,Depth First Search,10176,21530,20,F
+pasga,scc,10176,21530,45,V
+pasga,Depth First Search,10176,21530,20,F
+pasga,scc,10176,21530,46,V
+pasga,NN euclidian,7687,17164,13,V
+pasga,NN euclidian,7687,17164,15,V
+pasga,NN euclidian,7687,17164,12,V
+pasga,NN euclidian,7687,17164,15,V

@@ -258,8 +258,8 @@ void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * fi
 	
 	gv->defineEdgeCurved(true);
 
-	for(unsigned id = 0; id < deliveringTrucks.size(); id++){
-		addPathGV(gv, deliveringTrucks.at(id)->getPath(), id);
+	for (Truck* truck : deliveringTrucks) {
+		addPathGV(gv, truck->getPath(), truck->getID());
 	}
 
 	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
