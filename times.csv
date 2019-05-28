@@ -327,3 +327,254 @@ tito9,Depth First Search,10176,21530,22,F
 tito9,scc,10176,21530,39,V
 tito9,Depth First Search,6193,12350,11,F
 tito9,scc,6193,12350,22,V
+tito9,Depth First Search,2383,5008,18,F
+tito9,scc,2383,5008,164,V
+tito9,Depth First Search,2383,5008,2,F
+tito9,scc,2383,5008,10,V
+tito9,NN euclidian,1209,2680,7,V
+tito9,NN FW,1209,2680,5,V
+tito9,Depth First Search,7340,15008,13,F
+tito9,scc,7340,15008,24,V
+tito9,Depth First Search,7340,15008,7,F
+tito9,scc,7340,15008,17,V
+tito9,NN euclidian,38,74,0,V
+tito9,NN FW,38,74,4,V
+tito9,Depth First Search,8505,17384,22,F
+tito9,scc,8505,17384,37,V
+tito9,Depth First Search,8505,17384,11,F
+tito9,scc,8505,17384,24,V
+tito9,NN euclidian,3148,6738,11,V
+tito9,Depth First Search,21262,43458,58,F
+tito9,scc,21262,43458,111,V
+tito9,Depth First Search,21262,43458,63,F
+tito9,scc,21262,43458,118,V
+tito9,NN euclidian,7709,16814,47,V
+tito9,Depth First Search,74622,183174,835,F
+tito9,scc,74622,183174,1748,V
+tito9,Depth First Search,74622,183174,830,F
+tito9,scc,74622,183174,1734,V
+tito9,NN euclidian,25658,61094,208,V
+tito9,Depth First Search,2949,6268,6,F
+tito9,scc,2949,6268,14,V
+tito9,Depth First Search,2949,6268,3,F
+tito9,scc,2949,6268,10,V
+tito9,NN euclidian,2294,5072,18,V
+tito9,NN euclidian,2294,5072,18,V
+tito9,NN euclidian,2294,5072,10,V
+tito9,OPT-2,2294,5072,1285,V
+tito9,NN FW,2294,5072,11,V
+tito9,Depth First Search,6193,12350,13,F
+tito9,scc,6193,12350,25,V
+tito9,Depth First Search,6193,12350,4,F
+tito9,scc,6193,12350,13,V
+tito9,NN euclidian,788,1602,1,V
+tito9,NN FW,788,1602,7,V
+tito9,scc,3294,6270,9,V
+tito9,scc,20063,40742,60,V
+tito9,scc,21262,43458,76,V
+tito9,scc,2949,6268,5,V
+tito9,scc,2383,5008,4,V
+tito9,scc,7340,15008,17,V
+tito9,scc,8505,17384,16,V
+tito9,scc,10176,21530,32,V
+tito9,scc,6193,12350,11,V
+tito9,scc,74622,183174,687,V
+tito9,scc,74622,183174,881,V
+tito9,scc,74622,183174,902,V
+tito9,scc,74622,183174,697,V
+tito9,scc,74622,183174,891,V
+tito9,scc,74622,183174,885,V
+tito9,scc,74622,183174,886,V
+tito9,scc,74622,183174,884,V
+tito9,scc,74622,183174,888,V
+tito9,scc,74622,183174,904,V
+tito9,scc,74622,183174,961,V
+tito9,scc,74622,183174,874,V
+tito9,scc,74622,183174,687,V
+tito9,scc,74622,183174,888,V
+tito9,scc,74622,183174,716,V
+tito9,scc,20063,40742,61,V
+tito9,scc,20063,40742,67,V
+tito9,scc,20063,40742,60,V
+tito9,scc,20063,40742,64,V
+tito9,scc,20063,40742,53,V
+tito9,scc,20063,40742,54,V
+tito9,scc,20063,40742,69,V
+tito9,scc,3294,3135,202,F
+tito9,scc,3294,3135,243,F
+tito9,scc,3294,3135,202,F
+tito9,scc,3294,3135,200,F
+tito9,scc,3294,3135,228,F
+tito9,scc,3294,3135,229,F
+tito9,scc,3294,3135,236,F
+tito9,scc,3294,3135,214,F
+tito9,scc,3294,3135,192,F
+tito9,scc,3294,3135,199,F
+tito9,scc,3294,3135,194,F
+tito9,scc,3294,3135,222,F
+tito9,scc,3294,3135,219,F
+tito9,scc,20063,20371,8046,F
+tito9,scc,20063,20371,9996,F
+tito9,scc,20063,20371,8130,F
+tito9,scc,20063,20371,8014,F
+tito9,scc,21262,21729,8992,F
+tito9,scc,21262,21729,9151,F
+tito9,scc,21262,21729,9261,F
+tito9,scc,21262,21729,9548,F
+tito9,scc,2949,3134,166,F
+tito9,scc,2949,3134,170,F
+tito9,scc,2949,3134,219,F
+tito9,scc,2949,3134,245,F
+tito9,scc,2949,3134,330,F
+tito9,scc,2949,3134,195,F
+tito9,scc,2949,3134,215,F
+tito9,scc,2949,3134,311,F
+tito9,scc,2949,3134,195,F
+tito9,scc,2949,3134,187,F
+tito9,scc,2949,3134,184,F
+tito9,scc,2383,2504,122,F
+tito9,scc,2383,2504,119,F
+tito9,scc,2383,2504,118,F
+tito9,scc,2383,2504,207,F
+tito9,scc,2383,2504,129,F
+tito9,scc,2383,2504,178,F
+tito9,scc,2383,2504,116,F
+tito9,scc,2383,2504,146,F
+tito9,scc,2383,2504,302,F
+tito9,scc,2383,2504,150,F
+tito9,scc,7340,7504,1090,F
+tito9,scc,7340,7504,1075,F
+tito9,scc,7340,7504,1230,F
+tito9,scc,7340,7504,1149,F
+tito9,scc,7340,7504,1145,F
+tito9,scc,8505,8692,1413,F
+tito9,scc,8505,8692,1391,F
+tito9,scc,8505,8692,1427,F
+tito9,scc,8505,8692,1532,F
+tito9,scc,8505,8692,1427,F
+tito9,scc,8505,8692,1446,F
+tito9,scc,8505,8692,1480,F
+tito9,scc,10176,10765,2126,F
+tito9,scc,10176,10765,2097,F
+tito9,scc,10176,10765,2105,F
+tito9,scc,10176,10765,2127,F
+tito9,scc,10176,10765,2170,F
+tito9,scc,10176,10765,2138,F
+tito9,scc,10176,10765,2149,F
+tito9,scc,6193,6175,697,F
+tito9,scc,6193,6175,749,F
+tito9,scc,6193,6175,737,F
+tito9,scc,6193,6175,748,F
+tito9,scc,6193,6175,737,F
+tito9,scc,6193,6175,748,F
+tito9,scc,74622,91587,129260,F
+tito9,scc,74622,91587,132486,F
+tito9,scc,74622,91587,136288,F
+tito9,scc,21262,21729,17396,F
+tito9,scc,21262,21729,8418,F
+tito9,OPT-2,530,568,4307,V
+tito9,scc,20063,20371,7855,F
+tito9,scc,20063,20371,7805,F
+tito9,OPT-2,526,573,6791,V
+tito9,scc,20063,20371,8260,F
+tito9,scc,20063,20371,8092,F
+tito9,OPT-2,526,573,2,V
+tito9,NN euclidian,526,573,3,V
+tito9,scc,20063,20371,8718,F
+tito9,scc,20063,20371,8683,F
+tito9,OPT-2,526,573,3,V
+tito9,scc,20063,20371,9638,F
+tito9,scc,20063,20371,8215,F
+tito9,OPT-2,526,573,7302,V
+tito9,OPT-2,526,573,1262,V
+tito9,OPT-2,526,573,1277,V
+tito9,OPT-2,526,573,3711,V
+tito9,OPT-2,526,573,10212,V
+tito9,OPT-2,526,573,15697,V
+tito9,OPT-2,526,573,21876,V
+tito9,OPT-2,526,573,14046,V
+tito9,OPT-2,526,573,22058,V
+tito9,NN euclidian,526,573,3,V
+tito9,OPT-2,526,573,31709,V
+tito9,scc,2949,3134,181,F
+tito9,scc,2949,3134,195,F
+tito9,scc,2949,3134,183,F
+tito9,scc,2383,2504,131,F
+tito9,scc,2383,2504,127,F
+tito9,scc,2383,2504,126,F
+tito9,scc,10176,10765,2108,F
+tito9,scc,10176,10765,2139,F
+tito9,scc,10176,10765,2165,F
+tito9,scc,10176,10765,2075,F
+tito9,scc,2383,2504,129,F
+tito9,scc,2383,5008,3,V
+tito9,scc,2383,5008,2,V
+tito9,OPT-2,1209,2680,29,V
+tito9,scc,10176,21530,33,V
+tito9,scc,10176,21530,32,V
+tito9,OPT-2,7687,17164,92,V
+tito9,scc,10176,21530,27,V
+tito9,scc,10176,21530,31,V
+tito9,scc,21262,43458,85,V
+tito9,scc,21262,43458,83,V
+tito9,OPT-2,7709,16814,41,V
+tito9,scc,8505,17384,23,V
+tito9,scc,8505,17384,22,V
+tito9,OPT-2,3148,6738,99,V
+tito9,scc,8505,17384,22,V
+tito9,scc,8505,17384,23,V
+tito9,scc,8505,17384,17,V
+tito9,scc,8505,17384,23,V
+tito9,OPT-2,3148,6738,172,V
+tito9,scc,8505,17384,24,V
+tito9,scc,8505,17384,23,V
+
+-- Testes 2OPT --
+tito9,OPT-2,3148,6738,15,V
+tito9,OPT-2,3148,6738,38,V
+tito9,OPT-2,3148,6738,98,V
+tito9,OPT-2,3148,6738,151,V
+tito9,OPT-2,3148,6738,327,V
+tito9,OPT-2,3148,6738,431,V
+tito9,OPT-2,3148,6738,623,V
+tito9,OPT-2,3148,6738,972,V
+tito9,OPT-2,3148,6738,1186,V
+
+-- Testes 2OPT--
+tito9,OPT-2,87,198,4,V
+
+tito9,scc,2949,6268,4,V
+tito9,scc,2949,6268,3,V
+tito9,OPT-2,2294,5072,102,V
+tito9,scc,7340,15008,17,V
+tito9,scc,7340,15008,17,V
+tito9,scc,7340,15008,12,V
+tito9,OPT-2,3282,7082,59,V
+tito9,OPT-2,3282,7082,105,V
+tito9,scc,2383,5008,2,V
+tito9,scc,2383,5008,2,V
+tito9,OPT-2,1209,2680,61,V
+tito9,scc,10176,21530,23,V
+tito9,scc,10176,21530,31,V
+tito9,OPT-2,7687,17164,218,V
+tito9,scc,3294,6270,3,V
+tito9,scc,3294,6270,3,V
+tito9,scc,3294,6270,4,V
+tito9,scc,21262,43458,75,V
+tito9,scc,21262,43458,64,V
+tito9,scc,21262,43458,61,V
+tito9,OPT-2,754,1594,19,V
+tito9,scc,21262,43458,69,V
+tito9,scc,74622,183174,978,V
+tito9,scc,74622,183174,874,V
+tito9,OPT-2,25658,61094,521,V
+tito9,scc,74622,183174,893,V
+tito9,scc,74622,183174,837,V
+tito9,scc,74622,183174,859,V
+tito9,scc,74622,183174,674,V
+tito9,scc,74622,183174,677,V
+tito9,scc,74622,183174,865,V
+tito9,scc,74622,183174,758,V
+tito9,scc,74622,183174,701,V
+tito9,scc,6193,12350,11,V
+tito9,OPT-2,386,796,19,V

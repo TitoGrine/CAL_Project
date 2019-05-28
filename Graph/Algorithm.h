@@ -84,42 +84,14 @@ void dfsVisit(Vertex<T> *v, std::vector<Vertex<T> *> & res) {
 }
 
 template <class T>
-bool dfsVisit(Vertex<T> *v, Vertex<T> *end) {
-	v->setVisited(true);
-	for(unsigned int i = 0; i < v->getAdj()->size(); i++){
-		if(v->getAdj()->at(i).getDest() == end)
-			return true;
-
-		if(!v->getAdj()->at(i).getDest()->getVisited())
-			return dfsVisit(v->getAdj()->at(i).getDest(), end);
-	}
-
-	return false;
-}
-
-template <class T>
 std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial) {
-	startTime();
-
 	std::vector<Vertex<T> *> res;
 	for(auto vertex: graph->getVertexSet())
 		vertex->setVisited(false);
 	
 	dfsVisit(initial, res);
 
-	writeTime(DFS, graph, false);	
-
 	return res;
-}
-
-template <class T>
-bool checkConnection(Graph<T> * graph, Vertex<T> *start, Vertex<T> *end){
-	for(auto vertex: graph->getVertexSet())
-		vertex->setVisited(false);
-	
-	start->setVisited(true);
-
-	return dfsVisit(start, end);
 }
 
 template <class T>
@@ -544,8 +516,8 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 	
 	for(unsigned int i = 0; i < path.size() - 1; i++){
 		intermediate_path =  aStarShortestPath(graph, *(path.at(i)->getInfo()), *(path.at(i + 1)->getInfo()), ASTAR_EUCLIDIAN);
+		weight += intermediate_path.back()->getDist();
 		append(new_path, intermediate_path);
-		weight += new_path.back()->getDist();
 		new_path.pop_back();
 	}
 
@@ -559,13 +531,16 @@ double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path){
 template <class T>
 bool validPath(Graph<T> * graph, const vector<Vertex<T> *> &path){
 	for(unsigned int i = 0; i < path.size() - 1; i++)
-		if(!checkConnection(graph, path.at(i), path.at(i + 1))) return false;
+		if(!containsVertex(dfs(graph, path.at(i)), path.at(i + 1))) 
+			return false;
 
 	return true;
 }
 
 template <class T>
 std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path){
+	vector<Vertex<T> *> deliveryOrder = path;
+	vector<Vertex<T> *> new_deliveryOrder;
 	double currentBestWeight = calculatePathWeight(graph, path);
 	double lastBestWeight = -1;
 	double pathWeight = -1;
@@ -575,15 +550,18 @@ std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path)
 	while(currentBestWeight != lastBestWeight){
 		lastBestWeight = currentBestWeight;
 
-		for(unsigned int i = 1; i < path.size() - 3; i++)
-			for(unsigned int k = i + 1; k < path.size() - 2; k++){
-				path = twoOptSwap(bestPath, i, k);
+		for(unsigned int i = 1; i < deliveryOrder.size() - 3; i++)
+			for(unsigned int k = i + 1; k < deliveryOrder.size() - 2; k++){
+				path = twoOptSwap(deliveryOrder, i, k);
+
+				new_deliveryOrder = path;
 
 				if(validPath(graph, path)){
 					pathWeight = calculatePathWeight(graph, path);
 
 					if(pathWeight < currentBestWeight){
 						bestPath = path;
+						deliveryOrder = new_deliveryOrder;
 						currentBestWeight = pathWeight;
 					}
 				}
