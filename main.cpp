@@ -266,6 +266,7 @@ void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * fi
 	}
 
 	paintMapInfoVertexes(gv, 15, "BLUE", deliveries);
+	
 	gv->setVertexSize(initial->getID(), 20);
 	gv->setVertexColor(initial->getID(), "GREEN");
 	gv->setVertexLabel(initial->getID(), "Start");
@@ -273,7 +274,7 @@ void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * fi
 	gv->setVertexSize(final->getID(), 20);
 	gv->setVertexColor(final->getID(), "RED");
 	gv->setVertexLabel(final->getID(), "End");
-	
+
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
@@ -526,7 +527,6 @@ void CalculateTruckPaths(bool euclideanMethod) {
   std::vector<MapInfo> deliveriesInfo = mainApp.getDeliveriesInfo();
 	std::vector<Delivery*> deliveries = mainApp.getDeliveries();
   std::priority_queue<Truck*, std::vector<Truck*>, CmpTruckPtrs> tempTrucks = mainApp.getTrucks();
-	std::vector<Vertex<MapInfo> *> solution;
 	std::vector<Truck*> deliveringTrucks;
 
 	while(!deliveries.empty()) 
@@ -534,11 +534,10 @@ void CalculateTruckPaths(bool euclideanMethod) {
 		double truckCapacity = tempTrucks.top()->getCapacity();
     
 		if(euclideanMethod)
-			solution = NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity);
+			tempTrucks.top()->setPath(NearestNeighborEuclidean(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity));
 		else
-			solution = NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity);
+			tempTrucks.top()->setPath(NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity));
 		
-		tempTrucks.top()->setPath(solution);
 		deliveringTrucks.push_back(tempTrucks.top());
 		tempTrucks.pop();
 		
