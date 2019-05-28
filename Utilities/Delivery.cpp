@@ -2,7 +2,7 @@
 
 int Delivery::ID = 0;
 
-Delivery::Delivery(const MapInfo &mapInfo): dest(mapInfo)
+Delivery::Delivery(const MapInfo &mapInfo, map_info_t shop_type): dest(mapInfo), shop_type(shop_type)
 {
     this->deliveryID = ID++;
     this->volume = 0;
@@ -17,6 +17,11 @@ int Delivery::getID() const
 MapInfo Delivery::getDest() const 
 {
     return this->dest;
+}
+
+map_info_t Delivery::getShopType() const
+{
+    return this->shop_type;
 }
 
 int Delivery::getVolume() const 

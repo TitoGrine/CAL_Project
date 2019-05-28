@@ -1,5 +1,5 @@
 #include <iostream>
-#include <thread>
+#include <iomanip>
 
 #include "Graph/Algorithm.h"
 
@@ -245,15 +245,12 @@ void addPathGV(GraphViewer * gv, const vector<Vertex<MapInfo> *>  &points, int t
 	string truck_tag = to_string(truck) + "-";
 
 	for(unsigned i = 1; i < points.size(); i++){
+		int edgeID = i*100 + truck; 
 		Vertex<MapInfo> * v = points.at(i - 1);
 		Vertex<MapInfo> * u = points.at(i);
-		gv->addEdge(i, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
-		gv->setEdgeLabel(i, truck_tag + to_string(i));
+		gv->addEdge(edgeID, v->getInfo()->getID(), u->getInfo()->getID(), EdgeType::DIRECTED);
+		gv->setEdgeLabel(edgeID, truck_tag + to_string(i));
 	}
-	
-	gv->rearrange();
-	getchar();
-	gv->closeWindow();
 }
 
 void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * final, const vector<MapInfo> & deliveries, const vector<Truck*> &deliveringTrucks){
@@ -278,6 +275,17 @@ void showMultiplePathsGV(Graph<MapInfo> * graph, MapInfo * initial, MapInfo * fi
 	gv->rearrange();
 	getchar();
 	gv->closeWindow();
+}
+
+void showDeliveringTrucksTerminal(const vector<Truck*> &deliveringTrucks)
+{
+	cout << "TRUCK ID ----- DELIVERY ID ----- SHOP TYPE" << endl;
+
+	for(Truck* truck : deliveringTrucks) {
+		for(Delivery* delivery : truck->getDeliveries()) {
+			cout << truck->getID() << " ----- " << delivery->getID() << " ----- " << mapInfoTypeToString(delivery->getShopType()) << endl;
+		}
+	}
 }
 
 //=======================================================================================================================//
@@ -386,11 +394,14 @@ bool DeliveryPlaceMenu(bool getVolume) {
 
 	std::cout << "   0 - Go Back" << endl << endl;
 
+	map_info_t shop_type;
+
 	option_number = menuInput(" Option ? ", 0, 12);
 	bool valid = false;
 	while(!valid){
 		if(option_number == 0) return false;
-		if(mainApp.getSmallShopsByType(static_cast<map_info_t>(option_number - 1)).empty()){
+		shop_type = static_cast<map_info_t>(option_number - 1);
+		if(mainApp.getSmallShopsByType(shop_type).empty()){
 			cout << " There is no delivery place of that type in this SCC\n";
 			option_number = menuInput(" Option ? ", 0, 12);
 		}
@@ -399,7 +410,7 @@ bool DeliveryPlaceMenu(bool getVolume) {
 		}
 	}
 
-	Delivery* newDelivery = new Delivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)));
+	Delivery* newDelivery = new Delivery(mainApp.getRandomSmallShopByType(static_cast<map_info_t>(option_number - 1)), shop_type);
 
 	if(getVolume) 
 		newDelivery->setVolume(menuInput(" Delivery Volume: ", 1, 200)); //TODO VER MELHOR MIN E MAX DE VOL
@@ -538,16 +549,19 @@ void CalculateTruckPaths(bool euclideanMethod) {
 		else
 			tempTrucks.top()->setPath(NearestNeighborFloyd(mainApp.getSmallGraph(), *mainApp.getInitial(), deliveries, *mainApp.getLast(), truckCapacity));
 		
-		deliveringTrucks.push_back(tempTrucks.top());
-		tempTrucks.pop();
-		
 		for(auto it = deliveries.begin(); it != deliveries.end();) {
-			if( (*it)->isDelivered())
-				it = deliveries.erase(it);
+			if( (*it)->isDelivered()) {
+					tempTrucks.top()->addDelivery(*it);
+					it = deliveries.erase(it);
+			}
 			else it++;
 		}
+
+		deliveringTrucks.push_back(tempTrucks.top());
+		tempTrucks.pop();
 	}
   
+	showDeliveringTrucksTerminal(deliveringTrucks);
 	showMultiplePathsGV(mainApp.getSmallGraph(), mainApp.getInitial(), mainApp.getLast(), deliveriesInfo, deliveringTrucks);
 }
 

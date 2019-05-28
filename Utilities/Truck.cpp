@@ -22,6 +22,16 @@ int Truck::getCapacity() const
     return this->capacity; 
 }
 
+void Truck::addDelivery(Delivery* delivery)
+{
+    this->deliveries.push_back(delivery);
+}
+
+const std::vector<Delivery*> & Truck::getDeliveries() const
+{
+    return this->deliveries;
+}
+
 const std::vector<Vertex<MapInfo> *> & Truck::getPath() const
 {
     return this->path;

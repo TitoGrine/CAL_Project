@@ -22,6 +22,25 @@ map_info_t stringToMapInfoType(string shopTypeString){
 	else return OTHER;	
 }
 
+string mapInfoTypeToString(map_info_t shop_type) {
+
+	switch (shop_type) {
+		case DEPARTMENT_STORE: return "Department Store";
+		case VARIETY_STORE: return "Variery Store";
+		case SUPERMARKET: return "SuperMarket";
+		case DIY: return "DoItYourself";
+		case CONVENIENCE: return "Convenience";
+		case CLOTHES: return "Clothes";
+		case HARDWARE: return "Hardware";
+		case FURNITURE: return "Furniture";
+		case ELECTRONICS: return "Electronics";
+		case MOBILE_PHONE: return "Mobile Phone";
+		case SHOES: return "Shoes";
+		case ALCOHOL: return "Alcohol";
+		default: return "";
+	}
+}
+
 void buildGraph(Graph<MapInfo> & graph, std::string MapName, bool bidirectional){
 	ifstream nodesFile;
 	nodesFile.open("./Maps/" + MapName + "/T04_nodes_X_Y_" + MapName + ".txt");
