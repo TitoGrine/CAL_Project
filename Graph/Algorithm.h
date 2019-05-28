@@ -14,63 +14,214 @@
 
 // #include "../GraphViewer/graphviewer.h"
 
-template <class T>
-std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
-
-template <class T>
-std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirectional);
-
-template <class T>
-Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, Vertex<T> * last, bool bidirectional);
-
-template <class T>
-std::vector<Vertex<T> *> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
-
-template <class T>
-std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest, algorithm_t aStartType);
-
-template <class T>
-std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
-
-template <class T>
-std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, algorithm_t aStarType, bool bidirectional);
-
-template <class T>
-void FloydWarshallShortestPath(Graph<T> * graph); 
-
-template <class T>
-std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin,  vector<Delivery*> deliveries, const T &dest, double truckCapacity);
-
-template <class T>
-std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,  vector<Delivery*> deliveries, const T &dest, double truckCapacity);
-
-template <class T>
-vector<Vertex<T> *> twoOptSwap(const vector<Vertex<T> *> &current_path, int i, int k);
-
-template <class T>
-double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path);  
-
-template <class T>
-bool validPath(Graph<T> * graph, const vector<Vertex<T> *> &path);
-
-template <class T>
-std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path);
-
-template <class T>
-std::vector<Vertex<T> *> twoOptAlgorithm(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
-
-/* ------------------------------------------------------------------------------------------------ */
+/**
+ * @brief Auxilary function of Depth First Search algorithm. Called recursively, 
+ * checking if the connected vertexes of vertex v have been visited. If so, calls 
+ * it self again using the adjacent vertex, if not continues.
+ * 
+ * @param v 		Vertex to be searched
+ * @param res 		Vector holding the visited vertexes so far by the DFS
+ */
 template <class T>
 void dfsVisit(Vertex<T> *v, std::vector<Vertex<T> *> & res);
 
+/**
+ * @brief Calculates the Depth First Search of the vertex inicial in the Graph graph.
+ * Uses the auxilary funtion dfsVisit().
+ * 
+ * @param graph 	Graph containig at least the initial vertex
+ * @param initial 	Starting vertex of DFS
+ * @return std::vector<Vertex<T> *> Returns the corresponding DFS in order
+ */
 template <class T>
-bool dfsVisit(Vertex<T> *v, Vertex<T> *end);
+std::vector<Vertex<T> *> dfs(Graph<T> * graph, Vertex<T> * initial);
 
+/**
+ * @brief Calculates the Strong Connected Component of graph that includes the vertex 
+ * initial. Works for both directed and undirected graphs.
+ * 
+ * @param graph 			Graph containig at least the initial vertex
+ * @param initial 			Starting vertex contained in the SCC	
+ * @param bidirectional 	Signals if the graph is directed (false) or not (true)
+ * @return std::vector<Vertex<T> *>	Returns the corresponding SCC containing initial 
+ */
 template <class T>
-bool containsVertex(std::vector<Vertex<T> *> vectorVert, Vertex<T> * vert);
+std::vector<Vertex<T> *> scc(Graph<T> * graph, Vertex<T> * initial, bool bidirectional);
 
+/**
+ * @brief Calculates the Strong Connected Component of the mainGraph that includes both
+ * the initial and last vertex. Returns a new Graph without the vertexes and edges that
+ * do not belong in the SCC.
+ * 
+ * @param mainGraph 		Graph containig at least the initial and last vertex
+ * @param initial 			Vertex that must be contained in the SCC
+ * @param last 				Vertex that must be contained in the SCC
+ * @param bidirectional 	Tells if the graph is directed (false) or not (true)
+ * @return Graph<T> 		New graph containing only vertexes and edges that belong in the SCC
+ */
 template <class T>
-bool checkConnection(Graph<T> * graph, Vertex<T> *start, Vertex<T> *end);
+Graph<T> shrinkGraph(Graph<T> * mainGraph, Vertex<T> * initial, Vertex<T> * last, bool bidirectional);
+
+/**
+ * @brief Calculates the shortest path between origin and dest using Dijkstra's Algorithm.
+ * 
+ * @param graph 			Graph containig at least the initial and last vertex
+ * @param origin 			Starting vertex of the desired path
+ * @param dest 				Last vertex of the desired path
+ * @return std::vector<Vertex<T> *> 	Vector containing the vertexes in the shortest Path in visiting order
+ */
+template <class T>
+std::vector<Vertex<T> *> dijkstraShortestPath(Graph<T> * graph, const T &origin, const T &dest);
+
+/**
+ * @brief Calculates the shortest path between origin and dest using A*'s Algorithm.
+ * 
+ * @param graph 			Graph containig at least the initial and last vertex
+ * @param origin 			Starting vertex of the desired path
+ * @param dest 				Last vertex of the desired path
+ * @param aStarType			Indicates whether it should use Euclidian or Manhattan distance as heuristics
+ * @return std::vector<Vertex<T> *> 	Vector containing the vertexes in the shortest Path in visiting order
+ */
+template <class T>
+std::vector<Vertex<T> *> aStarShortestPath(Graph<T> * graph, const T &origin, const T &dest, algorithm_t aStartType);
+
+/**
+ * @brief Calculates the shortest path between origin and dest, that
+ * includes the delivery point of interest, using Dijkstra's Algorithm.
+ * Uses threads in order to accelerate the calculation processing, having one calculate
+ * the path between the origin and the delivery vertex, and the other between the delivery
+ * and the dest vertex.
+ * 
+ * @param graph 			Graph containig at least the initial, delivery and last vertex
+ * @param origin 			Starting vertex of the desired path
+ * @param delivery 			Point of interest that must be included in the path
+ * @param dest 				Last vertex of the desired path
+ * @param bidirectional 	Indicates whether the graph is directed (false) or not (true)
+ * @return std::vector<Vertex<T> *> 	Vector containing the vertexes in the shortest Path in visiting order
+ */
+template <class T>
+std::vector<Vertex<T> *> bidirectionalDijkstra(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, bool bidirectional);
+
+/**
+ * @brief Calculates the shortest path between origin and dest, that
+ * includes the delivery point of interest, using A*'s Algorithm.
+ * Uses threads in order to accelerate the calculation processing, having one calculate
+ * the path between the origin and the delivery vertex, and the other between the delivery
+ * and the dest vertex.
+ * 
+ * @param graph 			Graph containig at least the initial, delivery and last vertex
+ * @param origin 			Starting vertex of the desired path
+ * @param delivery 			Point of interest that must be included in the path
+ * @param dest 				Last vertex of the desired path
+ * @param aStarType			Indicates whether it should use Euclidean or Manhattan distance as heuristics 
+ * @param bidirectional 	Indicates whether the graph is directed (false) or not (true)
+ * @return std::vector<Vertex<T> *> 	Vector containing the vertexes in the shortest Path in visiting order
+ */
+template <class T>
+std::vector<Vertex<T> *> bidirectionalAStar(Graph<T> * graph, const T &origin, const T &delivery, const T &dest, algorithm_t aStarType, bool bidirectional);
+
+/**
+ * @brief Calculates the shortest distance and path between all pairs of point belonging
+ * to the graph. Stores the results in two matrixes contained in the Graph class.
+ * 
+ * @param graph 		Graph to be analysed
+ */
+template <class T>
+void FloydWarshallShortestPath(Graph<T> * graph); 
+
+/**
+ * @brief Calculates the shortest path between origin and dest that contains all the vertexes
+ * included in the vector  deliveries, that can be transported by the truck with the given capacity, 
+ * using the Nearest Neighbor Algorithm. It uses Euclidean distance as the criteria for the 
+ * Priority Queue, and A*'s algorithm to get intermidiate paths.
+ * 
+ * @param graph 			Graph containig at least the initial, deliveries and last vertexes
+ * @param origin 			Starting vertex of the desired path
+ * @param deliveries 		Points of interest that must be included in the path until maximum capacity is reached
+ * @param dest 				Last vertex of the desired path
+ * @param truckCapacity 	Maximum capacity that the truck used can hold (INF = unlimited)
+ * @return std::vector<Vertex<T> *> 	Resulting path for the given truck
+ */
+template <class T>
+std::vector<Vertex<T> *> NearestNeighborEuclidean(Graph<T> * graph, const T &origin,  vector<Delivery*> deliveries, const T &dest, double truckCapacity);
+
+/**
+ * @brief Calculates the shortest path between origin and dest that contains all the vertexes
+ * included in the vector  deliveries, that can be transported by the truck with the given capacity, 
+ * using the Nearest Neighbor Algorithm. It uses both the distance and path matrixes calculated by
+ * the Floyd-Warshall's algorithms. Requires the mentioned algorithm to be executed prior.
+ * 
+ * @param graph 			Graph containig at least the initial, deliveries and last vertexes
+ * @param origin 			Starting vertex of the desired path
+ * @param deliveries 		Points of interest that must be included in the path until maximum capacity is reached
+ * @param dest 				Last vertex of the desired path
+ * @param truckCapacity 	Maximum capacity that the truck used can hold (INF = unlimited)
+ * @return std::vector<Vertex<T> *> 	Resulting path for the given truck
+ * */
+template <class T>
+std::vector<Vertex<T> *> NearestNeighborFloyd(Graph<T> * graph, const T &origin,  vector<Delivery*> deliveries, const T &dest, double truckCapacity);
+
+/**
+ * @brief Swaps vertexes in the current path with indexes between i and k.
+ * 
+ * @param current_path 		Path to be swapped
+ * @param i 				Lowest index to swap
+ * @param k 				Highest index to swap
+ * @return vector<Vertex<T> *> 	Corresponding path with swapped vertexes
+ */
+template <class T>
+vector<Vertex<T> *> twoOptSwap(const vector<Vertex<T> *> &current_path, int i, int k);
+
+/**
+ * @brief Calculates the path weight that goes through all the vertexes in the given path
+ * vector, and changes it to the shortest path. Uses A*'s algorithms to contruct the path.
+ * 
+ * @param graph 			Graph that includes all vertexes in path
+ * @param path 				Vertexes that must be visited in the calculated path
+ * @return double 			Calculated path weight
+ */
+template <class T>
+double calculatePathWeight(Graph<T> * graph, vector<Vertex<T> *> &path);  
+
+/**
+ * @brief Checks whether there can exist a path including all vertexes in path
+ * in the given graph. Uses various DFS in order to calculate the result.
+ * 
+ * @param graph 			Graph that includes all vertexes in path
+ * @param path 				Vertexes to be checked for a valid path
+ * @return true 			There is a path connecting all vertexes
+ * @return false 			There isn't a path connecting all vertexes
+ */
+template <class T>
+bool validPath(Graph<T> * graph, const vector<Vertex<T> *> &path);
+
+/**
+ * @brief Given the vertexes which must be included in the path, attempts to calculate
+ * the shortest path connecting all between the first and last vertex, by swapping
+ * the order of the points of interest looking for an improvement. Returns the calculated
+ * path when a set of iterations has been done with no improvement.
+ * 
+* @param graph 			Graph that includes all vertexes in path
+ * @param path 			Vertexes that must be included in the improved path
+ * @return std::vector<Vertex<T> *> 	Improved path
+ */
+template <class T>
+std::vector<Vertex<T> *> improvePath(Graph<T> * graph, vector<Vertex<T> *> path);
+
+/**
+ * @brief Attemps to calculate the shortest path between origin and dest, passing through all
+ * vertexes contained in the vector deliveries. It uses the auxilary function improvePath in
+ * order to achieve the result
+ * 
+ * @param graph 			Graph containig at least the initial, deliveries and last vertexes
+ * @param origin 			Starting vertex of the desired path
+ * @param deliveries 		Points of interest that must be included in the path until maximum capacity is reached
+ * @param dest 				Last vertex of the desired path
+ * @return std::vector<Vertex<T> *>  Improved path with the vertexes by order in which they should be visited
+ */
+template <class T>
+std::vector<Vertex<T> *> twoOptAlgorithm(Graph<T> * graph, const T &origin, const vector<T> deliveries, const T &dest);
+
 
 /* ------------------------------------------------------------------------------------------------ */
 
