@@ -23,56 +23,216 @@ template <class T> class Graph;
 
 /*************************** Graph  **************************/
 
+/**
+ * @brief Class graph used to store vertexex and edges, and aplly methods to the stored values.
+ * Adapted from the class given to us.
+ * 
+ */
 template <class T>
 class Graph {
-	vector<Vertex<T> *> vertexSet;    // vertex set
+	// Set of the vertexed that compose this graph
+	vector<Vertex<T> *> vertexSet;    
 
+	//Bounds of the graph
 	double rightBound, leftBound, topBound, bottomBound;	
 
-	vector<vector<double>>  W;   // dist
-	vector<vector<int>> P;   // path
+	// Matrix of distances between vertex, used in Floyd-Warshall Algorithm
+	vector<vector<double>>  W;   
 
+	// Matrix of paths between vertex, used in Floyd-Warshall Algorithm
+	vector<vector<int>> P;   
+
+	// Used in some methods
 	priority_queue<Edge<T>> buildHeap();
 
 public:
+	/**
+	 * @brief Finds the index in the vertex set of the vertex with the info received in the parameter
+	 * @param in Info of the vertex 
+	 * @return Index in the verex set of the vertex
+	 * 
+	 */
 	int findVertexIdx(const T &in) const;
+	
+	/**
+	 * @brief Finds the vertex in the vertex with the info received in the parameter
+	 * @param in Info of the vertex
+	 * @return Pointer to the vertes
+	 * 
+	 */
 	Vertex<T> *findVertex(const T &in) const;
+
+	/**
+	 * @brief Adds a new Vertex to the vertex set
+	 * @param in Info of the vertex
+	 * @param x X Coord of the vertex
+	 * @param y Y Coord of the vertex
+	 * @return True if the addition was successful, 
+	 * False otherwise
+	 * 
+	 */
 	bool addVertex(const T &in, double x, double y);
+	
+	/**
+	 * @brief Adds a new Edge to the graph
+	 * @param sourc Info of the source vertex of the edge
+	 * @param dest Info of the destination vertex of the edge
+	 * @param w Weight of the edge
+	 * @return True if the addition was successful, 
+	 * False otherwise
+	 * 
+	 */
 	bool addEdge(const T &sourc, const T &dest, double w);
+
+	/**
+	 * @brief Return the current size of the vertex set
+	 * @return Size of the vertex set
+	 * 
+	 */
 	int getNumVertex() const;
+	
+	/**
+	 * @brief Return the current vertex set
+	 * @return The vertex set
+	 * 
+	 */
 	vector<Vertex<T> *> getVertexSet() const;
 
+	/**
+	 * @brief Returns the distance in the vertex matrix between vertex width indexes i and j
+	 * @param i Index in the vertex matrix of the source vertex
+	 * @param j Index in the vertex matrix of the destination vertex
+	 * @return Distance between the vertexes
+	 * 
+	 */
 	double getW(int i, int j) const;
+
+	/**
+	 * @brief Sets the distance in the vertex matrix between the vertex with indexes i and j
+	 * @param i Index in the vertex matrix of the source vertex
+	 * @param j Index in the vertex matrix of the destination vertex
+	 * @param value Distance between the two vertexes
+	 * 
+	 */
 	void setW(int i, int j, double value);
+	
+	/**
+	 * @brief Returns the index of the following vertex in the shortest path between i and j	 
+	 * @param i Index in the path matrix of the source vertex
+	 * @param j Index in the path matrix of the destination vertex 
+	 * @return Index of the following vertex in the shortest path between in and j
+	 * 
+	 */
 	int getP(int i, int j) const;
+
+	/**
+	 * @brief Sets the index of the following vertex in the shortest path between i and j	 
+	 * @param i Index in the path matrix of the source vertex
+	 * @param j Index in the path matrix of the destination vertex 
+	 * @param index of the following vertex in the shortest path between in and j
+	 * 
+	 */
 	void setP(int i, int j, int index);
 
-	// Fp05
+	/**
+	 * @brief Initializes single source shortest path data (path, dist).
+ 	 * Receives the content of the source vertex and returns a pointer to the source vertex.
+ 	 * Used by all single-source shortest path algorithms.
+	 * @param orig Origin vertex info
+	 * @return Pointer to the origin vertex in the vertex set
+	 * 
+	 */
 	Vertex<T> * initSingleSource(const T &orig);
 
-	// Fp05 - single source
-	void unweightedShortestPath(const T &s);
-	void bellmanFordShortestPath(const T &s);
+	/**
+	 * @brief Return the previously calculated path between two vertexes
+	 * @param origin Info of the origin vertex
+	 * @param dest Info of the destination vertex
+	 * @return Path between the two vertexes
+	 * 
+	 */
 	vector<Vertex<T> *> getPath(const T &origin, const T &dest) const;
 
-	// Fp05 - all pairs
+	/**
+	 * @brief Return the previously Floyd-Warshall calculated path between two vertexes
+	 * @param origin Info of the origin vertex
+	 * @param dest Info of the destination vertex
+	 * @return Path between the two vertexes
+	 * 
+	 */
 	vector<T> getFloydWarshallPath(const T &origin, const T &dest) const;
+
+	/**
+	 * @brief Returns the weight of the edge that connecets the two vertexes with indexes i and j in the vertex set
+	 * @param i Index of the source vertex in the vertex set
+	 * @param j Index of the source vertex in the vertex set
+	 * @return Wight of the edge
+	 * 
+	 */
 	double edgeWeight(int i, int j);
+	
+	/**
+	 *
+	 * 
+	 */
 	int nextVertex(int i, int j);
+
+	/**
+	 * @brief Resets the matrix of distances
+	 * @param n Size of the matrix
+	 * 
+	 */
 	void resetMatrixW(int n);
+	
+	/**
+	 * @brief Resets the matrix of paths
+	 * @param n Size of the matrix
+	 * 
+	 */
 	void resetMatrixP(int n);
+
+	/**
+	 * @brief Deletes this graph, freeing all previously allocated memory
+	 * 
+	 */
 	~Graph();
-
-	// Fp07 - minimum spanning tree
-	vector<Vertex<T>*> calculatePrim();
-	vector<Vertex<T>*> calculateKruskal();
-
+	
+	/**
+	 * @brief Return the Right bound of this graph
+	 * @return Right bound
+	 */
 	double getRightBound() const { return this->rightBound; };
+
+	/**
+	 * @brief Return the left bound of this graph
+	 * @return left bound
+	 */
 	double getLeftBound() const { return this->leftBound; };
+
+	/**
+	 * @brief Return the top bound of this graph
+	 * @return top bound
+	 */
 	double getTopBound() const { return this->topBound; };
+
+	/**
+	 * @brief Return the bottom bound of this graph
+	 * @return bottom bound
+	 */
 	double getBottomBound() const { return this->bottomBound; };
 
+	/**
+	 * @brief Inverts this graph
+	 * @return Inverted graph
+	 * 
+	 */
 	Graph<T> invert();
+	
+	/**
+	 * @brief Creates a copy of this graph
+	 * @return Copy of this graph
+	 * 
+	 */
 	Graph<T> duplicate();
 };
 
@@ -106,9 +266,6 @@ void Graph<T>::setP(int i, int j, int index){
 	P.at(i).at(j) = index;
 }
 
-/*
- * Auxiliary function to find a vertex with a given content.
- */
 template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
 	for (auto v : vertexSet)
@@ -117,9 +274,6 @@ Vertex<T> * Graph<T>::findVertex(const T &in) const {
 	return nullptr;
 }
 
-/*
- * Finds the index of the vertex with a given content.
- */
 template <class T>
 int Graph<T>::findVertexIdx(const T &in) const {
 	for (unsigned i = 0; i < vertexSet.size(); i++)
@@ -127,13 +281,9 @@ int Graph<T>::findVertexIdx(const T &in) const {
 			return i;
 	return -1;
 }
-/*
- *  Adds a vertex with a given content or info (in) to a graph (this).
- *  Returns true if successful, and false if a vertex with that content already exists.
- */
+
 template <class T>
 bool Graph<T>::addVertex(const T &in, double x, double y) {
-	// TODO: confiar que ele n tem indices repetidos??
 	if (findVertex(in) != nullptr)
 		return false;
 
@@ -158,7 +308,6 @@ bool Graph<T>::addVertex(const T &in, double x, double y) {
 	return true;
 }
 
-// TODO: meter isto direito
 template <class T>
 Graph<T> Graph<T>::invert(){
 	Graph<T> newGraph = Graph();
@@ -184,11 +333,6 @@ Graph<T> Graph<T>::duplicate(){
 	return newGraph;
 }
 
-/*
- * Adds an edge to a graph (this), given the contents of the source and
- * destination vertices and the edge weight (w).
- * Returns true if successful, and false if the source or destination vertex does not exist.
- */
 template <class T>
 bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 	auto v1 = findVertex(sourc);
@@ -201,12 +345,6 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 
 
 /**************** Single Source Shortest Path algorithms ************/
-
-/**
- * Initializes single source shortest path data (path, dist).
- * Receives the content of the source vertex and returns a pointer to the source vertex.
- * Used by all single-source shortest path algorithms.
- */
 template<class T>
 Vertex<T> * Graph<T>::initSingleSource(const T &origin) {
 	for(auto v : vertexSet) {
@@ -233,35 +371,6 @@ vector<Vertex<T> *> Graph<T>::getPath(const T &origin, const T &dest) const{
 
 	return res;
 }
-
-/*
-template<class T>
-void Graph<T>::unweightedShortestPath(const T &orig) {
-	auto s = initSingleSource(orig);
-	queue< Vertex<T>* > q;
-	q.push(s);
-	while( ! q.empty() ) {
-		auto v = q.front();
-		q.pop();
-		for(auto e: v->adj)
-			if (relax(v, e.dest, 1))
-				q.push(e.dest);
-	}
-}
-
-template<class T>
-void Graph<T>::bellmanFordShortestPath(const T &orig) {
-	initSingleSource(orig);
-	for (unsigned i = 1; i < vertexSet.size(); i++)
-		for (auto v: vertexSet)
-			for (auto e: v->adj)
-				relax(v, e.dest, e.weight);
-	for (auto v: vertexSet)
-		for (auto e: v->adj)
-			if (relax(v, e.dest, e.weight))
-				cout << "Negative cycle!" << endl;
-}
-*/
 
 /**************** All Pairs Shortest Path  ***************/
 
@@ -299,8 +408,6 @@ void Graph<T>::resetMatrixP(int n) {
 
 template <class T>
 Graph<T>::~Graph() {
-	//cout << "begin destroying graph: " << vertexSet.size() << endl;
-
 	W.erase(W.begin(), W.end());
 	P.erase(P.begin(), P.end());
 }
@@ -327,103 +434,6 @@ vector<T> Graph<T>::getFloydWarshallPath(const T &orig, const T &dest) const{
 	}
 
 	return res;
-}
-
-/**************** Minimum Spanning Tree  ***************/
-
-template <class T>
-vector<Vertex<T>* > Graph<T>::calculatePrim() {
-	for(auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-		v->visited = false;
-	}
-	auto s = vertexSet.at(0);
-	s->dist = 0;
-	MutablePriorityQueue<Vertex<T>> q;
-	q.insert(s);
-	while( ! q.empty() ) {
-		auto v = q.extractMin();
-		v->visited = true;
-		for(auto e : v->adj) {
-			if(!e.dest->visited){
-				auto oldDist = e.dest->dist;
-				if (e.dest->dist > e.weight){
-					e.dest->dist = e.weight;
-					e.dest->path = v;
-					if (oldDist == INF)
-						q.insert(e.dest);
-					else
-						q.decreaseKey(e.dest);
-				}
-			}
-		}
-	}
-	return vertexSet;
-}
-
-template <class T>
-priority_queue<Edge<T>> Graph<T>::buildHeap(){
-	priority_queue<Edge<T>> heap;
-	for(auto v : vertexSet){
-		for(auto edge : v->adj)
-			heap.push(edge);
-	}
-	return heap;
-}
-
-template <class T>
-int findDisjSet(vector<vector<Vertex<T> *>> & vectorDisjSet, Vertex<T> * ver){
-	for(size_t i = 0; i < vectorDisjSet.size(); i++)
-		if(find(vectorDisjSet.at(i).begin(), vectorDisjSet.at(i).end(), ver) != vectorDisjSet.at(i).end())
-			return i;
-	return -1;
-}
-
-template <class T>
-void uniteDisjSet(vector<vector<Vertex<T> *>> & vectorDisjSet, int disj1, int disj2){
-	vectorDisjSet.at(disj1).insert(vectorDisjSet.at(disj1).end(), vectorDisjSet.at(disj2).begin(), vectorDisjSet.at(disj2).end());
-	vectorDisjSet.erase(vectorDisjSet.begin() + disj2);
-}
-
-template <class T>
-vector<Vertex<T>*> Graph<T>::calculateKruskal() {
-	int edgesAccepted = 0;
-
-	priority_queue<Edge<T>> h = buildHeap();
-	
-	vector<vector<Vertex<T> *>> vectorDisjSet;
-	int i = 0;
-	for(auto v: vertexSet){
-		vector<Vertex<T> * > DisjSet = {v};
-		vectorDisjSet.push_back(DisjSet);
-	}
-
-	while(edgesAccepted < getNumVertex()-1) {
-		Edge<T> e = h.top();
-		h.pop();
-		int oriDisjSet = findDisjSet(vectorDisjSet, e.orig);
-		int destDisjSet = findDisjSet(vectorDisjSet, e.dest);
-
-		if(oriDisjSet != destDisjSet && e.dest->path == NULL) {
-			// cout << e.getWeight() <<  " (" << e.orig->info << "->" << e.dest->info << ") ";
-			e.dest->path = e.orig;
-			edgesAccepted++;
-			uniteDisjSet(vectorDisjSet, oriDisjSet, destDisjSet);
-		}		
-	}
-	cout << endl;
-	cout << vectorDisjSet.size() << endl;
-	/*
-	for(auto v: vectorDisjSet.at(0)){
-		cout << v->info << "<-";
-		if(v->path != NULL)
-			cout << v->path->info;
-		cout << "|";		
-	}
-	cout << endl;
-	*/
-	return vertexSet;
 }
 
 
