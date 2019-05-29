@@ -165,15 +165,17 @@ public:
 	/**
 	 * @brief Returns the weight of the edge that connecets the two vertexes with indexes i and j in the vertex set
 	 * @param i Index of the source vertex in the vertex set
-	 * @param j Index of the source vertex in the vertex set
+	 * @param j Index of the destination vertex in the vertex set
 	 * @return Wight of the edge
 	 * 
 	 */
 	double edgeWeight(int i, int j);
 	
 	/**
-	 *
-	 * 
+	 * @brief Return the next vertex on the shortest path between i and j
+	 * @param i Index of the source vertex in the path matrix
+	 * @param j Index of the detination vertex in the path matrix
+	 * @return Return j if it is adjacent to i, otherwise returns -1
 	 */
 	int nextVertex(int i, int j);
 
